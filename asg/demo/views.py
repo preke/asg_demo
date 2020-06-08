@@ -54,11 +54,15 @@ def get_survey_text(refs):
     Return with a dict as below default value:
     '''
     default_survey = {
-        'Title': "test",
-        'Abstract': "test",
-        'Introduction': "test",
-        'Methodology': "test",
-        'Conclusion': "test"
+        'Title': "This is the survey title",
+        'Abstract': "test "*150,
+        'Introduction': "test "*500,
+        'Methodology': [
+            {"subtitle": "This is the first subtitle", "content": "test "*500},
+            {"subtitle": "This is the second subtitle", "content": "test "*500},
+            {"subtitle": "This is the third subtitle", "content": "test "*500}
+        ],
+        'Conclusion': "test "*150
     }
     survey = {}
     try:

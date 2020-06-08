@@ -16,7 +16,7 @@ THEME INFO
 <!-- ===========================
 SITE TITLE
 =========================== -->
-<title>Zhiyuan Wen</title>
+<title>Automatic Survey Paper Generation</title>
 
 <!-- ===========================
 FAVICONS
@@ -198,7 +198,7 @@ FONTS & ICONS
 			url: "/get_topic",
 			data: $('#topic_form').serialize(),
 			success: function(result) {
-				alert(result);
+				// alert(result);
 				global_refs = result;
 				for (const v of result['references']) {
 					document.getElementById("ref_list").innerHTML+= "<a href=\"#\" class=\"list-group-item\">" + v + "</a>";
@@ -223,13 +223,19 @@ FONTS & ICONS
 			data: global_refs,
 			success: function(result) {
 				// alert("Success!");
-				alert(result);
+				// alert(result);
 				for(var p in result) {
 					if (p == "Title") {
 						document.getElementById("survey_content").innerHTML+= "<h1>" + result[p] + "</h1>";
-					} else {
+					} else if ((p == "Introduction") || (p == "Conclusion") || (p == "Abstract")) {
 						document.getElementById("survey_content").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
 						document.getElementById("survey_content").innerHTML+= "<p>" + result[p] + "</p>";
+					} else {
+						document.getElementById("survey_content").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
+						for(var inner_json in result[p]) {
+							document.getElementById("survey_content").innerHTML+= "<h3>" + result[p][inner_json]["subtitle"] + "</h3>";
+							document.getElementById("survey_content").innerHTML+= "<p>" + result[p][inner_json]["content"] + "</p>";
+						}
 					}
 				}
 				$("#survey").attr("style","display:inline;");
@@ -258,4 +264,7 @@ FONTS & ICONS
 <script src="{% static 'scripts/evenfly.js' %}"></script>
 {% endblock %}
 </body>
+<footer>
+	<h5 align="center" > IMCL NLP Group</h5>
+</footer>
 </html>
