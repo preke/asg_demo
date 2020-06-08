@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="">
+
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ===========================
+THEME INFO
+=========================== -->
+<meta name="description" content="">
+<meta name="keywords" content="">
+<meta name="author" content="">
+
+<!-- ===========================
+SITE TITLE
+=========================== -->
+<title>Zhiyuan Wen</title>
+
+<!-- ===========================
+FAVICONS
+=========================== -->
+<!--<link rel="icon" href="img/favicon.png">-->
+{% load static %}
+<link rel="apple-touch-icon" sizes="144x144" href="{% static 'img/apple-touch-icon-ipad-retina.png' %}" />
+<link rel="apple-touch-icon" sizes="114x114" href="{% static 'img/apple-touch-icon-iphone-retina.png' %}" />
+<link rel="apple-touch-icon" sizes="72x72" href="{% static 'img/apple-touch-icon-ipad.png' %}" />
+<link rel="apple-touch-icon" sizes="57x57" href="{% static 'img/apple-touch-icon-iphone.png' %}" />
+
+<!-- ===========================
+STYLESHEETS
+=========================== -->
+<script src="https://kit.fontawesome.com/a3d039cc94.js" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="{% static 'css/fontawesome-free-5.13.0-web/css/fontawesome.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/fontawesome-free-5.13.0-web/css/brands.css' %}">
+<link rel="stylesheet" href="{% static 'css/fontawesome-free-5.13.0-web/css/solid.css' %}">
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+
+<!-- ===========================
+FONTS & ICONS
+=========================== -->
+<!--<link href='http://fonts.googleapis.com/css?family=Kristi|Alegreya+Sans:300' rel='stylesheet' type='text/css'>-->
+<!--<link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">-->
+
+
+
+<!--[if IE]>
+	<script src="https://cdn.jsdelivr.net/html5shiv/3.7.2/html5shiv.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
+</head>
+
+<body>
+{% block body %}
+<div class="container">
+	<!-- ===========================
+	HEADER
+	============================ -->
+	<div class="jumbotron">
+		<h1 align="center"> Let Machine Write Surveys</h1>
+		<h2 align="right"> --- Automatic Survey Paper Generation</h2>
+		<br>
+		<br>
+	</div>
+	<hr class="firsthr">
+
+	<!-- ===========================
+	CHOOSE TOPICS
+	============================ -->
+	<div class="col-md-12">
+			<h2 align="left"> <span class="fas fa-tags"></span>  Choose a Topic From: </h2>
+			<div class="row">
+				<div class="col-md-1"></div>
+				<div class="col-md-10">
+					<form action="" method="post", id="topic_form">
+						{% csrf_token %}
+						<div class="btn-group btn-group-justified" role="group" aria-label="...">
+							<label class="btn btn-default">
+								<input type="radio" name="topics" id="option1" value="Topic 1"> Topic 1
+							</label>
+							<label class="btn btn-default">
+								<input type="radio" name="topics" id="option2" value="Topic 2"> Topic 2
+							</label>
+							<label class="btn btn-default">
+								<input type="radio" name="topics" id="option3" value="Topic 3"> Topic 3
+							</label>
+						</div>
+						<br>
+						<div class="btn-group btn-group-justified" role="group" aria-label="...">
+							<label class="btn btn-default">
+								<input type="radio" name="topics" id="option4" value="Topic 4"> Topic 4
+							</label>
+							<label class="btn btn-default">
+								<input type="radio" name="topics" id="option5" value="Topic 5"> Topic 5
+							</label>
+							<label class="btn btn-default">
+								<input type="radio" name="topics" id="option6" value="Topic 6"> Topic 6
+							</label>
+						</div>
+						<br>
+
+						<div style="text-align: center">
+							<input class="btn btn-info" onclick="sub_topic()" value="submit">
+						</div>
+						<!--ajax:    https://blog.csdn.net/u013398398/article/details/52136837-->
+					</form>
+				</div>
+				<div class="col-md-1"></div>
+			</div>
+	</div>
+
+	<!-- ===========================
+     References
+    ============================ -->
+	<div class="col-md-12" style="display: none" id="refs">
+		<h2 align="left"> <span class="fas fa-copy"></span> Here are the most related references from our dataset: </h2>
+
+		<div class="list-group pre-scrollable" id="ref_list">
+			<!--<a href="#" class="list-group-item">Reference 1</a>-->
+			<!--<a href="#" class="list-group-item">Reference 2</a>-->
+			<!--<a href="#" class="list-group-item">Reference 3</a>-->
+			<!--<a href="#" class="list-group-item">Reference 4</a>-->
+			<!--<a href="#" class="list-group-item">Reference 5</a>-->
+			<!--<a href="#" class="list-group-item">Reference 6</a>-->
+			<!--<a href="#" class="list-group-item">Reference 7</a>-->
+			<!--<a href="#" class="list-group-item">Morbi leo risus</a>-->
+			<!--<a href="#" class="list-group-item">Porta ac consectetur ac</a>-->
+			<!--<a href="#" class="list-group-item">Vestibulum at eros</a>-->
+			<!--<a href="#" class="list-group-item">Cras justo odio</a>-->
+			<!--<a href="#" class="list-group-item">Dapibus ac facilisis in</a>-->
+			<!--<a href="#" class="list-group-item">Morbi leo risus</a>-->
+			<!--<a href="#" class="list-group-item">Porta ac consectetur ac</a>-->
+			<!--<a href="#" class="list-group-item">Vestibulum at eros</a>-->
+		</div>
+		<div style="text-align: center">
+			<input class="btn btn-info" onclick="display_survey()" value="Start Generation">
+		</div>
+	</div>
+	<hr class="firsthr">
+	<!-- ===========================
+     Generated survey
+    ============================ -->
+	<div class="col-md-12" style="display: none" id="survey">
+		<h2 align="left"> <span class="fas fa-scroll"></span> Here is the generated survey: </h2>
+		<div class="container pre-scrollable col-md-12" style="max-height: 700px" id="survey_content">
+			<!--<h1>This is the survey Title</h1>-->
+			<!--<br>-->
+			<!--<br>-->
+			<!--<h2 style="padding: 0px; color: black">Abstract</h2>-->
+			<!--<p>Test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test </p>-->
+			<!--<br>-->
+			<!--<h2 style="padding: 0px; color: black">Introduction</h2>-->
+			<!--<p>Test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test </p>-->
+			<!--<p>Test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test </p>-->
+			<!--<p>Test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test </p>-->
+			<!--<p>Test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test </p>-->
+			<!--<br>-->
+			<!--<h2 style="padding: 0px; color: black">Related Works</h2>-->
+			<!--<p>Test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test </p>-->
+			<!--<p>Test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test </p>-->
+			<!--<p>Test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test </p>-->
+			<!--<p>Test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test </p>-->
+			<!--<br>-->
+			<!--<h2 style="padding: 0px; color: black">Methodology</h2>-->
+			<!--<p>Test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test </p>-->
+			<!--<p>Test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test </p>-->
+			<!--<h3>3.1 Sub-section 1</h3>-->
+			<!--<p>Test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test </p>-->
+			<!--<p>Test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test </p>-->
+			<!--<h3>3.1 Sub-section 2</h3>-->
+			<!--<p>Test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test </p>-->
+			<!--<p>Test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test </p>-->
+			<!--<br>-->
+			<!--<h2 style="padding: 0px; color: black">Conclusion</h2>-->
+			<!--<p>Test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test </p>-->
+			<!--<p>Test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test </p>-->
+			<!--<p>Test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test </p>-->
+			<!--<p>Test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test </p>-->
+		<!---->
+		</div>
+	</div>
+
+
+</div><!--container end-->
+
+<!-- =========================== Script ============================ -->
+{% block script %}
+<script>
+	var global_refs = {};
+    function sub_topic(){
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: "/get_topic",
+			data: $('#topic_form').serialize(),
+			success: function(result) {
+				alert(result);
+				global_refs = result;
+				for (const v of result['references']) {
+					document.getElementById("ref_list").innerHTML+= "<a href=\"#\" class=\"list-group-item\">" + v + "</a>";
+				}
+				$("#refs").attr("style","display:inline;");
+			},
+			error: function(jqXHR, textStatus, errorThrown){
+				alert(jqXHR.responseText);
+				alert(jqXHR.status);
+				alert(jqXHR.readyState);
+				alert(jqXHR.statusText);
+				alert(textStatus);
+				alert(errorThrown);
+			}
+		});
+	}
+	function display_survey(){
+		$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: "/get_survey",
+			data: global_refs,
+			success: function(result) {
+				// alert("Success!");
+				alert(result);
+				for(var p in result) {
+					if (p == "Title") {
+						document.getElementById("survey_content").innerHTML+= "<h1>" + result[p] + "</h1>";
+					} else {
+						document.getElementById("survey_content").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
+						document.getElementById("survey_content").innerHTML+= "<p>" + result[p] + "</p>";
+					}
+				}
+				$("#survey").attr("style","display:inline;");
+			},
+			error: function(jqXHR, textStatus, errorThrown){
+				alert(jqXHR.responseText);
+				alert(jqXHR.status);
+				alert(jqXHR.readyState);
+				alert(jqXHR.statusText);
+				alert(textStatus);
+				alert(errorThrown);
+			}
+		});
+	}
+
+</script>
+{% endblock%}
+
+
+<!--necessary scripts and plugins-->
+{% load static %}
+<!--<script src="{% static 'scripts/jquery-1.8.3.min.js' %}"></script>-->
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="{% static 'scripts/bootstrap.min.js' %}"></script>
+<script src="{% static 'scripts/jquery.nicescroll.min.js' %}"></script>
+<script src="{% static 'scripts/evenfly.js' %}"></script>
+{% endblock %}
+</body>
+</html>
