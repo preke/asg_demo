@@ -1,0 +1,100 @@
+Deep Learning Based Recommender System A Survey New Perspectives 	4
+Sustainable Offloading Mobile Cloud Computing Algorithmic Design Implementation 	1
+An Exhaustive Survey Security Concerns Solutions Different Components Virtualization 	1
+Urban Computing Leveraging Location Based Social Network Data A Survey 	3
+Trust Evaluation Cross Cloud Federation Survey Requirement Analysis 	3
+Identifying Top k Nodes Social Networks A Survey 	3
+A Comprehensive Survey Parallelization Elasticity Stream Processing 	1
+Indoor Localization Improved Spatial Context A Survey 	0
+Analysis Classification Shape Changing Interfaces Design Application based Research 	1
+Survey Access Control Community Centered Collaborative Systems 	1
+Analysis Online Social Network Connections Identification Influential Users Survey Open Research Issues 	3
+Automatic Software Repair A Bibliography 	1
+Objectives State Art Location Based Social Network Recommender Systems 	3
+Recent Advancements Event Processing 	1
+Edge Oriented Computing Paradigms A Survey Architecture Design System Management 	4
+GeoStreams A Survey 	1
+A Survey Routing Anonymous Communication Protocols 	1
+A Survey End System Optimizations High Speed Networks 	3
+Toolflows Mapping Convolutional Neural Networks FPGAs A Survey Future Directions 	3
+Scalable Graph Processing Frameworks A Taxonomy Open Challenges 	1
+Graph Summarization Methods Applications A Survey 	3
+Sequence Aware Recommender Systems 	3
+FPGA Dynamic Partial Reconfiguration A Survey Architectures Methods Applications 	3
+Evaluation Contextual Information Retrieval Foundations Recent Advances Challenges Context Dynamicity Data Privacy 	0
+Is Multimedia Multisensorial A Review Mulsemedia Systems 	1
+A Survey Compiler Autotuning Machine Learning 	1
+A Survey On Chip Optical Interconnects 	1
+A Perspective Analysis Handwritten Signature Technology 	1
+A Survey Agent based Simulation Using Hardware Accelerators 	1
+Hypervideos Interactive Multimedia Presentations 	1
+Smart Computing Sensing Technologies Animal Welfare A Systematic Review 	1
+A Survey Comparative Study Hard Soft Real Time Dynamic Resource Allocation Strategies Multi Many Core Systems 	4
+A Survey Techniques Cache Partitioning Multicore Processors 	4
+GPU Virtualization Scheduling Methods A Comprehensive Survey 	1
+Optimization Complex Dataflows User Defined Functions 	1
+A Survey Malware Detection Using Data Mining Techniques 	4
+Nudges Privacy Security Understanding Assisting Users Choices Online 	3
+Bridging Chasm A Survey Software Engineering Practice Scientific Programming 	4
+Interoperability Portability Approaches Inter Connected Clouds A Review 	1
+Analysis JavaScript Programs Challenges Research Trends 	1
+Systems Applications Social Networks 	2
+Structural XML Query Processing 	1
+Graph Processing GPUs A Survey 	1
+A Survey Optical Network Chip Architectures 	1
+An Offensive Defensive Exposition Wearable Computing 	1
+The Experience Sampling Method Mobile Devices 	1
+Geomagnetism Smartphone Based Indoor Localization Challenges Advances Comparisons 	0
+A Survey Socially Aware Peer Peer Systems 	2
+Understanding Graph Based Trust Evaluation Online Social Networks Methodologies Challenges 	2
+Ensuring Security Privacy Preservation Cloud Data Services 	1
+Socializing Semantic Gap A Comparative Survey Image Tag Assignment Refinement Retrieval 	1
+Handling Boot Storms Virtualized Data Centers A Survey 	1
+Consistency Non Transactional Distributed Storage Systems 	1
+Distributed Intelligent MEMS A Survey Real Time Programming Framework 	4
+A Survey Thread Level Speculation Techniques 	1
+A Survey Wireless Indoor Localization Device Perspective 	0
+Heap Abstractions Static Analysis 	1
+A Survey Predictive Modeling Imbalanced Domains 	1
+Performance Security Improvements Tor A Survey 	1
+The Six Pillars Building Big Data Analytics Ecosystems 	1
+A Survey Recent Prefetching Techniques Processor Caches 	1
+User Intent Multimedia Search A Survey State Art Future Challenges 	0
+Toward Engineering Secure Android Ecosystem A Survey Existing Techniques 	1
+Scalability Issues Online Social Networks 	3
+A Survey Signed Network Mining Social Media 	3
+A Study Security Isolation Techniques 	1
+droid Assessment Evaluation Android Application Analysis Tools 	3
+Processor Design Soft Errors Challenges State Art 	0
+Visual Menu Techniques 	1
+Affinity Based Thread Data Mapping Shared Memory Systems 	4
+Scientific Workflows Moving Across Paradigms 	4
+From Security Assurance Cloud A Survey 	1
+Mobile Crowd Sensing Computing The Review Emerging Human Powered Sensing Paradigm 	0
+A Survey Hypervisor Based Monitoring Approaches Applications Evolutions 	3
+Video Interaction Tools A Survey Recent Work 	1
+The Multiple Facets Software Diversity Recent Developments Year 2000 Beyond 	1
+The Feet Human Computer Interaction A Survey Foot Based Interaction 	0
+Energy Efficiency Techniques Cloud Computing A Survey Taxonomy 	2
+In Network Trajectory Privacy Preservation 	1
+Thinking Like Vertex A Survey Vertex Centric Frameworks Large Scale Distributed Graph Processing 	1
+How Close We Realizing Pragmatic VANET Solution A Meta Survey 	1
+A Survey Cache Management Mechanisms Real Time Embedded Systems 	4
+A Survey Assessment Ranking Methodologies User Generated Content Web 	3
+A Survey Techniques Architecting Managing Asymmetric Multicore Processors 	4
+Evolution Attacks Threat Models Solutions Virtualized Systems 	1
+Workload Characterization A Survey Revisited 	1
+A Survey Role Mining 	1
+A Survey Architectural Techniques Managing Process Variation 	4
+Type Inference Executables 	1
+Security Privacy Protection Visual Sensor Networks A Survey 	3
+Collaborative Filtering User Item Matrix A Survey State Art Future Challenges 	0
+A Survey Methods Analyzing Improving GPU Energy Efficiency 	1
+Distributed data management MapReduce 	1
+Light horizontal interactive surfaces Input space tabletop computing 	1
+Multimedia search reranking A literature survey 	1
+Aggregated search A new information retrieval paradigm 	1
+Shortest path queries static networks 	1
+A catalog stream processing optimizations 	1
+A survey techniques improving energy efficiency large scale distributed systems 	1
+A survey server approaches securing web applications 	1
