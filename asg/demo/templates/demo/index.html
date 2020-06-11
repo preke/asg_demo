@@ -74,32 +74,33 @@ FONTS & ICONS
 	<div class="col-md-12">
 			<h2 align="left"> <span class="fas fa-tags"></span>  Choose a topic from: </h2>
 			<div class="row">
-				<div class="col-md-1"></div>
-				<div class="col-md-10">
+				<!--<div class="col-md-1"></div>-->
+				<div class="col-md-12">
 					<form action="" method="post", id="topic_form">
 						{% csrf_token %}
 						<div class="btn-group btn-group-justified" role="group" aria-label="...">
 							<label class="btn btn-default" style="height:80px">
-								<input type="radio" name="topics" id="option1" value="Smart Sensing"> Smart Sensing
+								<input type="radio" name="topics" id="option1" value="2742488"> Energy Efficiency in Cloud Computing
 							</label>
 							<label class="btn btn-default" style="height:80px">
-								<input type="radio" name="topics" id="option2" value="Indoor Localization"> Indoor Localization
+								<input type="radio" name="topics" id="option2" value="2830555"> Cache Management for Real-Time Systems
 							</label>
 							<label class="btn btn-default" style="height:80px">
-								<input type="radio" name="topics" id="option3" value="Cloud Computing"> Cloud Computing
+								<input type="radio" name="topics" id="option3" value="2907070"> Predictive Modeling on Imbalanced Data
 							</label>
 						</div>
 						<br>
 						<div class="btn-group btn-group-justified" role="group" aria-label="...">
 							<label class="btn btn-default" style="height:80px">
-								<input type="radio" name="topics" id="option4" value="Social Network"> Social Network
+								<input type="radio" name="topics" id="option4" value="3073559"> Malware Detection with Data Mining
 							</label>
 							<label class="btn btn-default" style="height:80px">
-								<input type="radio" name="topics" id="option5" value="Recommender Systems"> Recommender Systems
+								<!--<input name="topics" id="option6" value="" disabled>-->
 							</label>
 							<label class="btn btn-default" style="height:80px">
-								<input type="radio" name="topics" id="option6" value="Real Time System"> Real Time System
+								<input type="radio" name="topics" id="option5" value="3274658"> Analysis of Handwritten Signature
 							</label>
+
 						</div>
 						<br>
 
@@ -109,7 +110,7 @@ FONTS & ICONS
 						<!--ajax:    https://blog.csdn.net/u013398398/article/details/52136837-->
 					</form>
 				</div>
-				<div class="col-md-1"></div>
+				<!--<div class="col-md-1"></div>-->
 			</div>
 	</div>
 
@@ -185,6 +186,15 @@ FONTS & ICONS
 					} else if ((p == "Introduction") || (p == "Conclusion") || (p == "Abstract")) {
 						document.getElementById("survey_content").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
 						document.getElementById("survey_content").innerHTML+= "<p>" + result[p] + "</p>";
+					} else if (p == "References" ) {
+						document.getElementById("survey_content").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
+						var cnt = 1;
+						for (var entry in result[p]) {
+							document.getElementById("survey_content").innerHTML+= "<p style=\"color:black;\">[" + cnt + "]" + "   " + result[p][entry] + "</p>";
+							cnt = cnt + 1;
+						}
+
+
 					} else {
 						document.getElementById("survey_content").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
 						for(var inner_json in result[p]) {
