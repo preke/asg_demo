@@ -8,18 +8,118 @@ Created on Thu Jun 11 15:28:09 2020
 from nltk.tokenize import sent_tokenize
 from nltk.tokenize import word_tokenize
 from summa.summarizer import summarize
+import pandas as pd
+import numpy as np
+
+# line 66, 88 change the title for the category descroption
+no2word = {2: "two", 3: "three", 4: "four", 5: "five", 6: "six"}
+Survey_dict = {
+    '2742488': 'Energy Efficiency in Cloud Computing',
+    '2830555': 'Cache Management for Real-Time Systems',
+    '2907070': 'Predictive Modeling on Imbalanced Data',
+    '3073559': 'Malware Detection with Data Mining',
+    '3274658': 'Analysis of Handwritten Signature'
+}
+
+Survey_Topic_dict = {
+    '2742488': ['energy'],
+    '2830555': ['cache'],
+    '2907070': ['imbalanced'],
+    '3073559': ['malware', 'detection'],
+    '3274658': ['handwritten', 'signature']
+}
 
 
-def readReferenceTsv(fileName):
+def readReference(df):
     refs = []
-    with open(fileName, "r") as f:
-        lines = f.readlines()
-        for line in lines[1:]:
-            line = line.strip().split("\t")
-            if len(line) == 6:
-                refs.append([line[4], line[5]])
+    train_tsv = df
 
+    abstract = train_tsv["abstract"]
+    intro = train_tsv["intro"]
+    refs = [(a, i) for a, i in zip(abstract, intro)]
+    refs = [refs[i] for i in range(len(refs))]
+    # print(len(refs))
     return refs
+
+
+def getReferenceCategories(fileID, mask):
+    cate_topics = []
+    train_tsv = pd.read_csv(fileID + ".tsv", sep='\t', header=0, index_col=0)
+    ls = train_tsv["label"]
+    ds = train_tsv["topic_word"]
+    cate_topics = [(d, l) for d, l in zip(ds, ls)]
+    cate_topics = [cate_topics[i] for i in range(len(cate_topics)) if mask[i] == 1]
+    topics = []
+    labels = {}
+    for topic, label in cate_topics:
+        topic = eval(topic)
+        if label not in labels:
+            labels[label] = " ".join(topic)
+    topics = sorted([(key, labels[key]) for key in labels])
+    topics = [topic[1] for topic in topics]
+    return topics
+
+
+# pay attention to the index of category description
+def getReferenceTypes(fileID, mask):
+    cate_topics = []
+    train_tsv = pd.read_csv(fileID + ".tsv", sep='\t', header=0, index_col=0)
+    ls = train_tsv["label"]
+    ds = train_tsv["topic_word"]
+    cs = train_tsv["cate_desc"]
+    cate_topics = [(d, c, l) for d, c, l in zip(ds, cs, ls)]
+    # replace the category description index with 1 in train_tsv.iloc[i][10]
+    cate_topics = [cate_topics[i] for i in range(len(cate_topics)) if mask[i] == 1]
+    topics = []
+    labels = {}
+    for topic, des, label in cate_topics:
+        topic = eval(topic)
+        if label not in labels:
+            labels[label] = [" ".join(topic), des]
+    topics = sorted([(key, labels[key]) for key in labels])
+    tops = [topic[1][0] for topic in topics]
+    descriptions = [topic[1][1] for topic in topics]
+    return tops, descriptions
+
+
+# pay attention to the index of category description
+def getReferenceDes(df):
+    cate_topics = []
+    train_tsv = df
+    # replace the category description index with the forth element of 1 in train_tsv.iloc[i][10]
+    ls = train_tsv["label"]
+    ds = train_tsv["topic_word"]
+
+    # cs = train_tsv["cate_desc"]
+    cs = train_tsv["label"] ## convert
+
+    rs = train_tsv["ref_entry"]
+    rds = train_tsv["description"]
+    cate_topics = [(r, d, rd, c, l) for r, d, rd, c, l in zip(rs, ds, rds, cs, ls)]
+    cate_topics = [cate_topics[i] for i in range(len(cate_topics))]
+    topics = []
+    labels = {}
+    for ref, topic, ref_des, des, label in cate_topics:
+        # topic = eval(topic)
+        if label not in labels:
+            labels[label] = [" ".join(topic), des, [(ref, ref_des)]]
+        else:
+            labels[label][2].append((ref, ref_des))
+    topics = sorted([(key, labels[key]) for key in labels])
+    tops = [topic[1][0] for topic in topics]
+    descriptions = [topic[1][1] for topic in topics]
+    refs = []
+    idx = 1
+    ref_deses = []
+    for topic in topics:
+        each_topic = []
+        for i, t in enumerate(topic[1][2]):
+            ref, ref_des = t
+            refs.append("[" + str(idx) + "]. " + ref)
+            each_topic.append(topic[1][2][i][1].replace("[NO]", "[" + str(idx) + "]"))
+            idx += 1
+        ref_deses.append(each_topic)
+    return refs, ref_deses
 
 
 def cleanText(text):
@@ -49,7 +149,7 @@ def sentText(refs):
 def testTopicSentence(topic, sent):
     flag = 0
     for word in topic:
-        if word in topic:
+        if word in sent:
             flag += 1
     if flag == len(topic):
         return True
@@ -81,7 +181,7 @@ def extractTopicSent(abslist, introlist):
     for al, il in zip(abslist, introlist):
         newal = []
         for a in al:
-            if "we" not in a and "paper" not in a:
+            if "we" not in a and "paper" not in a and "We" not in a:
                 newal.append(a)
             else:
                 if len(newal) > 0:
@@ -145,13 +245,14 @@ def cleanSummary(summ):
     return text
 
 
-'''--------------------------------------summary--------------------------------------------'''
+'''--------------------------------------abstract generation--------------------------------------------'''
 
 
-def sumAllSent(topic, fileName):
+def absGen(fileID, df_selected, category_label):  # Abstract Section generation
+    topic = Survey_Topic_dict[fileID]
     summ = None
     # refs = readReference()
-    refs = readReferenceTsv(fileName)
+    refs = readReference(df_selected)
     newRefs, aiRefs, abslist, introlist = sentText(refs)
     # print(len(abslist))
     newabs, newintro = extractTopicRef(topic, abslist, introlist)
@@ -167,13 +268,242 @@ def sumAllSent(topic, fileName):
     summ = summarize(text, words=100)
     # print(summ)
     clean_sum = cleanSummary(summ)
-    # print("\n")
-    # print(clean_sum)
-    return clean_sum
+    # categories = getReferenceCategories(fileID)  # return the categories of exisitng works
+    categories = category_label
+    template = "In this survey, we conduct a comprehensive overview of " + Survey_dict[
+        fileID].lower() + "." + " We classify existing methods into " + no2word[
+                   len(categories)] + " categories: "
+    cate_des = ""
+    for i in range(len(categories)):
+        if i != len(categories) - 1:
+            cate_des += categories[i]
+            cate_des +=', '
+        else:
+            cate_des += ' and '
+            cate_des += categories[i]
+
+
+    template += cate_des + "."
+    abstract = clean_sum + " " + template
+    return abstract
+
+
+'''------------------------------------introduction generation---------------------------------------------'''
+
+
+def cleanIntroText(text):
+    texts = text.strip().split("\n")
+    sents = []
+    for t in texts:
+        sents.append(sent_tokenize(t))
+    return sents
+
+
+def sentIntroText(refs):
+    newRefs = []
+    aiRefs = []
+    abslist = []
+    introlist = []
+    for ref in refs:
+        newAbs = [word_tokenize(sent) for sent in cleanText(ref[0])]
+        newIntro = []
+        for para in cleanIntroText(ref[1]):
+            cur_para = [word_tokenize(sent) for sent in para]
+            newIntro.append(cur_para)
+        newRefs.append([newAbs, newIntro])
+        aiRefs.append(newAbs + newIntro)
+        abslist.append(newAbs)
+        introlist.append(newIntro)
+
+    return newRefs, aiRefs, abslist, introlist
+
+
+def extractTopicIntro(introlist):
+    newintro = []
+    for il in introlist:  # il refer to each introduction
+        newil = []
+        for i in il:  # i refer to each paragraph
+            newit = []
+            for sent in i:  # sent refer to each sentence
+                if "we" not in sent and "We" not in sent and "this" not in sent and "This" not in sent and "paper" not in sent and "papers" not in sent:  # and "paper" not in sent
+                    newit.append(sent)
+                else:
+                    if len(newit) > 0:
+                        newil.append(newit)
+                        newit = []
+                    break
+        if len(newil) > 0:
+            newintro.append(newil)
+    return newintro
+
+
+def getIntroPara(newintro, NO):
+    intros = []
+    for intro in newintro:
+        if len(intro) < 2 or len(intro) <= NO:
+            continue
+            # intros.append(extractTopicIntro(intro))
+        else:
+            intros.append(intro[NO])
+
+    return intros
+
+
+def combinePara(intros):
+    texts = []
+    for intro in intros:
+        text = combineSentence(intro)
+        texts.append(text)
+    introparas = " ".join(texts)
+    return introparas
+
+
+def extractSimilarity(similarity, sent_len):
+
+    weight = [0.] * sent_len
+    for i, j, s in similarity:
+        weight[i] += s
+        weight[j] += s
+
+    idx = sent_len - np.argsort(np.array(weight))
+    sent_id = [i for i in range(len(idx)) if idx[i] < 20]
+    return sent_id
+
+
+def selectIntroSentences(intros):
+    sentences = []
+    for intro in intros:
+        sentences += intro
+    similarity = testSim(sentences)
+    similarity = sorted(similarity, key=lambda x: x[2], reverse=True)
+    sent_id = extractSimilarity(similarity, len(sentences))
+    sentences = [sentences[i] for i in sent_id]
+    return sentences
+
+
+def introGen(fileID, df_selected, category_label, category_description):  # Introduction Section generation
+    topic = Survey_Topic_dict[fileID]
+    One = False
+    introNO = 0
+    refs = readReference(df_selected)
+    newRefs, aiRefs, abslist, introlist = sentIntroText(refs)
+    newabs, newintro = extractTopicRef(topic, abslist, introlist)
+    newintro = extractTopicIntro(newintro)
+    if One:
+        intros = getIntroPara(newintro, introNO)
+    else:
+        intros = []
+        for intro in newintro:
+            its = []
+            for i in intro:
+                its += i
+            intros.append(its)
+    sentences = selectIntroSentences(intros)
+    introPara = combineSentence(sentences)
+
+    if One:
+        summ = summarize(introPara, words=50)
+    else:
+        summ = summarize(introPara, words=400)
+    sent = sent_tokenize(summ)
+    summ = " ".join([s.strip() for s in sent])
+    summ = summ.replace("\n", "")
+
+    categories = category_label
+    des = category_description
+    # types, des = getReferenceTypes(fileID, mask)
+
+    template = "In this paper, we reviewed existing works and classify them into " + no2word[
+        len(categories)] + " types namely: "
+
+    keywords_des = ""
+    for i in range(len(categories)):
+        if i != len(categories) - 1:
+            keywords_des += categories[i]
+            keywords_des += ', '
+        else:
+            keywords_des += ' and '
+            keywords_des += categories[i]
+
+    keywords_des += "."
+    template += keywords_des
+    types_des = " ".join(des)
+    template += " " + types_des
+    introduction = summ + "\n" + template
+    conjunction = " In the next section, we will introduce existing works in each types with details."
+    introduction += conjunction
+    introduction = introduction.replace("< NO >", "")
+    return introduction
+
+
+def conclusionGen(fileID, category_label):  # Conclusion section generation
+    categories = category_label  # return the categories of exisitng works
+    template = "In this survey, we conduct a comprehensive overview of " + Survey_dict[
+        fileID].lower() + "." + " We provide a taxonomy which groups the researchs of " + Survey_dict[
+                   fileID].lower() + " into " + no2word[len(categories)] + " categories: "
+    keywords_des = ""
+    for i in range(len(categories)):
+        if i != len(categories) - 1:
+            keywords_des += categories[i]
+            keywords_des += ', '
+        else:
+            keywords_des += ' and '
+            keywords_des += categories[i]
+
+    keywords_des += "."
+    template += keywords_des
+    return template
+
+
+def methodologyGen(fileID, df_selected, category_label, category_description):
+    types, des = category_label, category_description
+    refs, ref_des = getReferenceDes(df_selected)
+
+    template = "We reviewed existing works and classify them into " + no2word[
+        len(types)] + " types namely: "
+
+
+    keywords_des = ""
+    for i in range(len(types)):
+        if i != len(types) - 1:
+            keywords_des += types[i]
+            keywords_des += ', '
+        else:
+            keywords_des += ' and '
+            keywords_des += types[i]
+
+    keywords_des += "."
+
+
+    template += keywords_des
+    types_des = " ".join(des)
+    template += " " + types_des + "\n"
+
+    proceeding = template
+    detailed_des = []
+    for i, ref_d in enumerate(ref_des):
+        tmp_dict = {}
+        content = "For " + types[i] + ", there are several existing works. "
+        content += " ".join(ref_d) + "\n"
+
+        tmp_dict['subtitle'] = types[i].title()
+        tmp_dict['content'] = content
+        detailed_des.append(tmp_dict)
+
+    # refs = "\n".join(refs)
+    return proceeding, detailed_des
+
+
+def generateSurvey(fileID, mask):
+    abstract = absGen(fileID, mask)
+    introduction = introGen(fileID, mask)
+    methodology, reference = methodologyGen(fileID, mask)
+    conclusion = conclusionGen(fileID, mask)
+    survey = abstract + "\n\n" + introduction + "\n\n" + methodology + "\n\n" + conclusion + "\n\n" + reference
+    return abstract, introduction, methodology, conclusion, reference, survey
 
 
 if __name__ == "__main__":
-    # sumAllSent(["energy"],"tsvs/2742488.tsv")
-    sumAllSent(["cache"], "tsvs/2830555.tsv")
-    # sumAllSent(["imbalanced"],"tsvs/2907070.tsv")
-    # introGen(["energy"],"tsvs/2742488.tsv")
+    mask = [1] * 500
+    abstract, introduction, methodology, conclusion, reference, survey = generateSurvey("2742488", mask)
+    print(survey)

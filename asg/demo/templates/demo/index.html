@@ -68,6 +68,20 @@ FONTS & ICONS
 	</div>
 	<hr class="firsthr">
 
+
+	<!-- ===========================
+	HEADER
+	============================ -->
+	<div class="col-md-12">
+		<h2 align="left"> <span class="fas fa-sitemap"></span>  Workflow of the Demo: </h2>
+			<div align="center">
+				<img src="{% static 'img/workflow.png' %}" style="width:800px;height:350px;", id="workflow_img" >
+			</div>
+		<br>
+		<br>
+	</div>
+	<hr class="firsthr">
+
 	<!-- ===========================
 	CHOOSE TOPICS
 	============================ -->
@@ -105,7 +119,7 @@ FONTS & ICONS
 						<br>
 
 						<div style="text-align: center">
-							<input class="btn btn-info" onclick="sub_topic()" value="submit">
+							<input class="btn btn-info" onclick="sub_topic()" value="Submit">
 						</div>
 						<!--ajax:    https://blog.csdn.net/u013398398/article/details/52136837-->
 					</form>
@@ -124,11 +138,35 @@ FONTS & ICONS
 			<div class="list-group pre-scrollable" id="ref_list">
 			</div>
 		</form>
+		<p align="right"> *(Select the references for instant survey generation)</p>
 		<div style="text-align: center">
-			<input class="btn btn-info" onclick="display_survey()" value="Start Generation">
+			<input class="btn btn-info" onclick="display_taxonomy()" value="Automatic Taxonomy">
 		</div>
 	</div>
 	<hr class="firsthr">
+	<!-- ===========================
+     Taxonomy Result
+    ============================ -->
+	<div class="col-md-12" style="display: none" id="taxonomy">
+		<h2 align="left"> <span class="fas fa-chart-pie"></span> The Clustering Result of Selected References is (re-ordered): </h2>
+		<div class="row">
+			<div class="col-md-7" style="height:500px;">
+				<img src="{% static 'img/tsne_result.png' %}" style="width:500px;height:500px;", id="tsne_img">
+			</div>
+			<div class="col-md-5" style="height:500px;">
+					<ul id="legend" style="position: relative;top: 100%;transform: translateY(-100%);">
+					</ul>
+			</div>
+		</div>
+		<br>
+		<br>
+		<hr class="firsthr">
+		<div style="text-align: center">
+			<input class="btn btn-info" onclick="display_survey()" value="Generate Survey Content" style="width: 200px">
+		</div>
+	</div>
+
+
 	<!-- ===========================
      Generated survey
     ============================ -->
@@ -171,12 +209,36 @@ FONTS & ICONS
 			}
 		});
 	}
-	function display_survey(){
+
+
+	function display_taxonomy(){
 		$.ajax({
 			type: "POST",
 			dataType: "json",
-			url: "/get_survey",
+			url: "/automatic_taxonomy",
 			data: $('#ref_form').serialize(),
+			success: function(result) {
+				// alert("Success!");
+				for (let i = 0, len = result['colors'].length; i < len; i++) {
+					document.getElementById("legend").innerHTML += "<li class=\"list-group-item\"; style=\"color: "+ result['colors'][i]+" \">" + result['category_label'][i]+" </li>"
+				}
+				$("#tsne_img").attr("src","{% static 'img/tsne_result.png' %}");
+				$("#taxonomy").attr("style","display:inline;");
+				// alert(result);
+			},
+			error: function(jqXHR, textStatus, errorThrown){
+				alert(jqXHR.responseText);
+			}
+		});
+	}
+
+
+
+	function display_survey(){
+		$.ajax({
+			type: "GET",
+			dataType: "json",
+			url: "/get_survey",
 			success: function(result) {
 				// alert("Success!");
 				// alert(result);
@@ -197,9 +259,10 @@ FONTS & ICONS
 
 					} else {
 						document.getElementById("survey_content").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
-						for(var inner_json in result[p]) {
-							document.getElementById("survey_content").innerHTML+= "<h3>" + result[p][inner_json]["subtitle"] + "</h3>";
-							document.getElementById("survey_content").innerHTML+= "<p>" + result[p][inner_json]["content"] + "</p>";
+						document.getElementById("survey_content").innerHTML+= "<p>" + result[p][0] + "</p>";
+						for(var inner_json in result[p][1]) {
+							document.getElementById("survey_content").innerHTML+= "<h3>" + result[p][1][inner_json]["subtitle"] + "</h3>";
+							document.getElementById("survey_content").innerHTML+= "<p>" + result[p][1][inner_json]["content"] + "</p>";
 						}
 					}
 				}

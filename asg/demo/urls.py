@@ -6,4 +6,5 @@ urlpatterns = [
     path('', views.index, name='index'),
     url(r'^get_topic$', views.get_topic, name='get_topic'),
     url(r'^get_survey$', views.get_survey, name='get_survey'),
+    url(r'^automatic_taxonomy$', views.automatic_taxonomy, name='automatic_taxonomy'),
 ]

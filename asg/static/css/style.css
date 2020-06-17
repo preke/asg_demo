@@ -13,6 +13,16 @@ body {
     border: 1px solid #a5d4fc;
 }
 
+.bottom-vertical{
+
+    position: relative;
+
+    top: 100%;
+
+    transform: translateY(-100%);
+
+}
+
 img {
     max-width: 100%
 }
@@ -41,7 +51,7 @@ h2 {
 }
 
 h3 {
-    font-size: 1.2em;
+    font-size: 1.0em;
     /*text-transform: uppercase;*/
     color: #000;
     margin-top: 0;
