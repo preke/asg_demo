@@ -12,6 +12,7 @@ TaggededDocument = gensim.models.doc2vec.TaggedDocument
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.cluster import SpectralClustering
 from operator import itemgetter
+import traceback
 
 
 import numpy as np
@@ -72,7 +73,7 @@ class ref_category_desp(object):
                 if ((single_sentence.startswith('keywords'))== False):
                     sentences = sentences + single_sentence
 
-                    #print(single_sentence)
+                    # print(single_sentence)
         sentences = sentences.replace('.', '. ')
         sentences = sentences.replace('.  ', '. ')
         sentences = sentences.replace('\n', ' ')
@@ -81,16 +82,20 @@ class ref_category_desp(object):
 
     # use textrank to get the category description
     def textrank_summary(self, sentences, summary_len):
-
+        category_summary = ''
         summary = summarize(sentences, words=summary_len)
-
+        if (summary):
+            category_summary = summary
         return summary
 
     # 找出category description句对应的句子
     # 其实是为了找到category description对应的topic word (经过concat已无法通过序号找到)
     def summary_sentence_match(self, summary_sentence, abs_list):
         max_ratio = 0
-        matched_sentence_list = []
+        matched_sentence_list = ['', '']
+        if summary_sentence =='':
+            return matched_sentence_list
+
         for sentences_list in abs_list:
             for sentence in sentences_list:
                 single_sentence = str(sentence[0])
@@ -98,14 +103,19 @@ class ref_category_desp(object):
                 if (ratio >= max_ratio):
                     max_ratio = ratio
                     matched_sentence_list = sentence
-        summary_sent_info = matched_sentence_list
-        return summary_sent_info
+
+        return matched_sentence_list
 
     # 按固定格式写 category_desp
     def rewrite_category_desp(self, num, category_summary, topic_word):
-        num_list = ['first','sencond','third','fourth','fifth','sixth','seventh','eighth','ninth']
+        num_list = ['first','sencond','third','fourth','fifth','sixth','seventh','eighth','ninth','tenth']
         topic_word = topic_word.replace('-',' ')
-        text = "The "+num_list[num] +" category is about the "+topic_word+'. '
+        try:
+            text = "The "+num_list[num] +" category is about the "+topic_word+'. '
+        except Exception:
+            #Error in the function rewrite_category_desp: more than ten categories
+            print(traceback.print_exc())
+
         category_desp = text + category_summary
         category_desp = category_desp.replace('  ',' ')
         category_desp = category_desp.replace('.', '. ')
@@ -114,63 +124,96 @@ class ref_category_desp(object):
 
         return category_desp
 
-    def desp_generator(self, match_ratio = 70, summary_len = 30, topic_selection = 'topic_bigram'):
+    def category_summary(self,train_data, match_ratio = 70, summary_len = 30, topic_selection = 'topic_bigram'):
 
-        train_tsv=self.input_DF
+        topic_word_list = train_data['topic_word'].reset_index(drop=True)
+        topic_word_list = topic_word_list[0]
+        topic_bigram_list = train_data['topic_bigram'].reset_index(drop=True)[0]
+        topic_trigram_list = train_data['topic_trigram'].reset_index(drop=True)[0]
+        abstract_list = train_data['intro'].reset_index(drop=True)
+
+        # select the sentences matched with the topic_words/topic_bigrams/topic_trigrams
+        # from the abstracts in ref papers by the function sentence_selection
+        if topic_selection == 'topic_word_list':
+            topic_str = topic_word_list
+        elif topic_selection == 'topic_trigram_list':
+            topic_str = topic_trigram_list
+        else:
+            topic_str = topic_bigram_list
+        '''
+        topic_str = topic_str.replace('[', '')
+        topic_str = topic_str.replace(']', '')
+        topic_str = topic_str.replace('\\', '')
+        topic_str = topic_str.replace('\'', '')
+        topic_str = topic_str.replace('_', '-')
+        topic_list = topic_str.split(',')
+        '''
+        # topic_str = eval(topic_str)
+        topic_str = [i.replace('[', '') for i in topic_str]
+        topic_str = [i.replace(']', '') for i in topic_str]
+        topic_str = [i.replace('\\', '') for i in topic_str]
+        topic_str = [i.replace('\'', '') for i in topic_str]
+        topic_str = [i.replace('_', '-') for i in topic_str]
+        topic_list = topic_str
+
+        matched_sent_list = []
+        for abs in abstract_list:
+            matched_sentences = self.sentence_selection(abs, topic_list, match_ratio)
+            matched_sent_list.append(matched_sentences)
+
+
+
+        # concat the sentences in matched_sent_list and replace some symbols
+        concat_sents = self.sentence_concat(matched_sent_list)
+
+        # use textrank to summarize the selected sentences
+        category_summary = self.textrank_summary(concat_sents, summary_len)
+
+        return category_summary,matched_sent_list
+
+    def desp_generator(self, match_ratio = 70, summary_len = 30, topic_selection = 'topic_bigram'):
+        train_tsv = self.input_DF
         data_without_NaN = train_tsv.dropna(axis=0)
+
         type_info = data_without_NaN['label'].value_counts()
         type_list = list(data_without_NaN['label'].unique())
         desp_list = []
 
         for type_item in type_list:
-            desp_dict = {}
-            train_data = data_without_NaN[data_without_NaN['label'] == type_item]
-
-            topic_word_list = train_data['topic_word'].reset_index(drop=True)
-            topic_word_list =topic_word_list[0]
-            topic_bigram_list = train_data['topic_bigram'].reset_index(drop=True)[0]
-            topic_trigram_list = train_data['topic_trigram'].reset_index(drop=True)[0]
-            abstract_list = train_data['intro'].reset_index(drop=True)
-
-            # select the sentences matched with the topic_words/topic_bigrams/topic_trigrams
-            # from the abstracts in ref papers by the function sentence_selection
-            if topic_selection == 'topic_word_list':
-                topic_str = topic_word_list
-            elif topic_selection == 'topic_trigram_list':
-                topic_str = topic_trigram_list
-            else:
-                topic_str = topic_bigram_list
-
-            topic_str = [i.replace('[', '') for i in topic_str]
-            topic_str = [i.replace(']', '') for i in topic_str]
-            topic_str = [i.replace('\\', '') for i in topic_str]
-            topic_str = [i.replace('\'', '') for i in topic_str]
-            topic_str = [i.replace('_', '-') for i in topic_str]
-            topic_list = topic_str
-
-            matched_sent_list = []
-            for abs in abstract_list:
-                matched_sentences = self.sentence_selection(abs, topic_list, match_ratio)
-                matched_sent_list.append(matched_sentences)
 
             #print('___________________________')
             #print('type_item: ' + str(type_item) + '  fuzzy matched sentences: ')
 
-            # concat the sentences in matched_sent_list and replace some symbols
-            concat_sents = self.sentence_concat(matched_sent_list)
+            desp_dict = {}
+            train_data = data_without_NaN[data_without_NaN['label'] == type_item]
 
+            category_summary,matched_sent_list = self.category_summary(train_data, match_ratio, summary_len, topic_selection)
 
-            # use textrank to summarize the selected sentences
-            category_summary = self.textrank_summary(concat_sents, summary_len)
+            # adjust the match_ratio dynamically to get a category_summary sentence
+            while (category_summary == ''):
+                match_ratio = match_ratio - 10
+                category_summary,matched_sent_list = self.category_summary(train_data, match_ratio, summary_len, topic_selection)
+                if match_ratio <= 0:
+                    break
 
-            summary_sent_info = self.summary_sentence_match(category_summary,matched_sent_list)
+            topic_word = ''
+            category_desp = ''
+
+            if category_summary != '':
+                summary_sent_info = self.summary_sentence_match(category_summary, matched_sent_list)
+
+                if summary_sent_info[1]!='':
+                    topic_word = summary_sent_info[1]
+                    category_desp = self.rewrite_category_desp(type_item, category_summary, topic_word)
+                else:
+                    print("failed to find the topic word in the category_summary")
+
 
             desp_dict['category'] = type_item
-            desp_dict['category_desp'] = self.rewrite_category_desp(type_item,category_summary,summary_sent_info[1])
-            desp_dict['topic_word'] = summary_sent_info[1]
+            desp_dict['category_desp'] = category_desp
+            desp_dict['topic_word'] = topic_word
 
             desp_list.append(desp_dict)
-
         return desp_list
 
 
