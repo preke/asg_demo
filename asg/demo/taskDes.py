@@ -244,6 +244,34 @@ def cleanSummary(summ):
         text = " ".join(sent)
     return text
 
+def cleanComma(text):
+    word = word_tokenize(text)
+    comma = [",", ".", ")"]
+    new_text = []
+    for i in range(len(word) - 1):
+        if word[i] in comma and word[i + 1] in comma:
+            continue
+        elif word[i] in comma and word[i + 1] not in comma:
+            new_text.append(word[i])
+        else:
+            new_text.append(word[i])
+    new_text.append(word[i])
+    clean_text = ""
+    for word in new_text:
+        if len(clean_text) == 0:
+            clean_text += word
+        else:
+            if word[0].isalpha() or word[0].isdigit():
+                clean_text += " " + word
+            else:
+                if word == ")" or word == "(":
+                    clean_text += " " + word
+                else:
+                    clean_text += word
+
+    if clean_text[-1] != ".":
+        clean_text += "."
+    return clean_text
 
 '''--------------------------------------abstract generation--------------------------------------------'''
 
@@ -268,6 +296,7 @@ def absGen(fileID, df_selected, category_label):  # Abstract Section generation
     summ = summarize(text, words=100)
     # print(summ)
     clean_sum = cleanSummary(summ)
+    clean_sum = cleanComma(clean_sum)
     # categories = getReferenceCategories(fileID)  # return the categories of exisitng works
     categories = category_label
     template = "In this survey, we conduct a comprehensive overview of " + Survey_dict[
@@ -408,7 +437,10 @@ def introGen(fileID, df_selected, category_label, category_description):  # Intr
     sent = sent_tokenize(summ)
     summ = " ".join([s.strip() for s in sent])
     summ = summ.replace("\n", "")
-
+    summ = summ.replace("< NO >", "")
+    summ = summ.replace("< NO>", "")
+    summ = summ.replace("<NO >", "")
+    summ = cleanComma(summ)
     categories = category_label
     des = category_description
     # types, des = getReferenceTypes(fileID, mask)
