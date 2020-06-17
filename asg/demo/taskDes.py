@@ -464,7 +464,7 @@ def introGen(fileID, df_selected, category_label, category_description):  # Intr
     introduction = summ + "\n" + template
     conjunction = " In the next section, we will introduce existing works in each types with details."
     introduction += conjunction
-    introduction = introduction.replace("< NO >", "")
+    # introduction = introduction.replace("< NO >", "")
     return introduction
 
 
