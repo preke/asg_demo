@@ -150,11 +150,11 @@ FONTS & ICONS
 	<div class="col-md-12" style="display: none" id="taxonomy">
 		<h2 align="left"> <span class="fas fa-chart-pie"></span> The Clustering Result of Selected References is (re-ordered): </h2>
 		<div class="row">
-			<div class="col-md-7" style="height:500px;">
-				<img src="{% static 'img/tsne_result.png' %}" style="width:500px;height:500px;", id="tsne_img">
+			<div class="col-md-7" style="height:400px;">
+				<img src="#" style="width:400px;height:400px;", id="tsne_img">
 			</div>
-			<div class="col-md-5" style="height:500px;">
-					<ul id="legend" style="position: relative;top: 100%;transform: translateY(-100%);">
+			<div class="col-md-5" style="height:400px;">
+					<ul id="legend" style="position: relative;top: 30%;transform: translateY(-30%);">
 					</ul>
 			</div>
 		</div>
@@ -222,7 +222,10 @@ FONTS & ICONS
 				for (let i = 0, len = result['colors'].length; i < len; i++) {
 					document.getElementById("legend").innerHTML += "<li class=\"list-group-item\"; style=\"color: "+ result['colors'][i]+" \">" + result['category_label'][i]+" </li>"
 				}
-				$("#tsne_img").attr("src","{% static 'img/tsne_result.png' %}");
+				var addr = "static/img/tsne_";
+				addr += result['survey_id'];
+				addr += ".png";
+				$("#tsne_img").attr("src", addr);
 				$("#taxonomy").attr("style","display:inline;");
 				// alert(result);
 			},

@@ -81,7 +81,8 @@ def automatic_taxonomy(request):
 
     cate_list = {
         'colors': colors,
-        'category_label': category_label
+        'category_label': category_label,
+        'survey_id': Global_survey_id
     }
     cate_list = json.dumps(cate_list)
     return HttpResponse(cate_list)
@@ -181,7 +182,7 @@ def Clustering_refs(n_clusters):
     df_selected = df.iloc[Global_ref_list]
 
     ## update cluster labels and keywords
-    df_selected, colors = clustering(df_selected, n_clusters)
+    df_selected, colors = clustering(df_selected, n_clusters, Global_survey_id)
     # print(colors)
 
     ## get description and topic word for each cluster

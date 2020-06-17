@@ -174,7 +174,7 @@ class ref_category_desp(object):
         return desp_list
 
 
-def clustering(df, n_cluster=3):
+def clustering(df, n_cluster, survey_id):
     text = df['abstract']
     wordstest_model = text
     test_model = [
@@ -373,7 +373,7 @@ def clustering(df, n_cluster=3):
     X_tsne = tsne.fit_transform(np.array(infered_vectors_list))
     colors = scatter(X_tsne, df['label'])
 
-    plt.savefig(IMG_PATH + 'tsne_result' + '.png', dpi=800)
+    plt.savefig(IMG_PATH + 'tsne_' + survey_id + '.png', dpi=800)
     plt.close()
     return df, colors
 
