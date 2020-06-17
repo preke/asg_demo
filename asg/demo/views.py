@@ -40,7 +40,7 @@ Survey_n_clusters = {
     '2830555' : 3,
     '2907070' : 3,
     '3073559' : 3,
-    '3274658' : 4
+    '3274658' : 2
 }
 
 Global_survey_id = ""
@@ -181,12 +181,13 @@ def Clustering_refs(n_clusters):
     df = pd.read_csv(DATA_PATH + Global_survey_id + '.tsv', sep='\t', index_col=0)
     df_selected = df.iloc[Global_ref_list]
 
+    print(df_selected.shape)
     ## update cluster labels and keywords
     df_selected, colors = clustering(df_selected, n_clusters, Global_survey_id)
     # print(colors)
-
+    print(df_selected.shape)
     ## get description and topic word for each cluster
-    description_list = get_cluster_description(df_selected)
+    description_list = get_cluster_description(df_selected, Global_survey_id)
     # print(description_list)
 
     global Global_df_selected

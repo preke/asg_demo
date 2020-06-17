@@ -40,10 +40,11 @@ class ref_category_desp(object):
 
     def __init__(
             self,
-            input_DF
+            input_DF,
+            survey_id
     ):
         self.input_DF = input_DF
-
+        self.survey_id = survey_id
     # select the sentences that can match with the topic words
     def sentence_selection(self, abs, topic_list,match_ratio=30):
 
@@ -130,7 +131,13 @@ class ref_category_desp(object):
         topic_word_list = topic_word_list[0]
         topic_bigram_list = train_data['topic_bigram'].reset_index(drop=True)[0]
         topic_trigram_list = train_data['topic_trigram'].reset_index(drop=True)[0]
-        abstract_list = train_data['intro'].reset_index(drop=True)
+
+        # train_data['abs_intro'] = train_data['abstract']+train_data['intro']
+        if self.survey_id == '3073559' or self.survey_id == '2907070':
+            abstract_list = train_data['abstract'].reset_index(drop=True)
+            train_data.to_csv('test.tsv', sep='\t')
+        else:
+            abstract_list = train_data['intro'].reset_index(drop=True)
 
         # select the sentences matched with the topic_words/topic_bigrams/topic_trigrams
         # from the abstracts in ref papers by the function sentence_selection
@@ -173,7 +180,9 @@ class ref_category_desp(object):
 
     def desp_generator(self, match_ratio = 70, summary_len = 30, topic_selection = 'topic_bigram'):
         train_tsv = self.input_DF
+
         data_without_NaN = train_tsv.dropna(axis=0)
+
 
         type_info = data_without_NaN['label'].value_counts()
         type_list = list(data_without_NaN['label'].unique())
@@ -202,12 +211,39 @@ class ref_category_desp(object):
             if category_summary != '':
                 summary_sent_info = self.summary_sentence_match(category_summary, matched_sent_list)
 
-                if summary_sent_info[1]!='':
+                # if summary_sent_info[1]!='':
+                try:
                     topic_word = summary_sent_info[1]
-                    category_desp = self.rewrite_category_desp(type_item, category_summary, topic_word)
+                except Exception:
+                    # failed to find the topic word in the category_summary
+                    print(traceback.print_exc())
                 else:
-                    print("failed to find the topic word in the category_summary")
+                    category_desp = self.rewrite_category_desp(type_item, category_summary, topic_word)
 
+            else:
+                topic_selection = 'topic_word_list'  # 如果bigram匹配不到，再用word匹配一轮
+                category_summary, matched_sent_list = self.category_summary(train_data, match_ratio, summary_len,
+                                                                            topic_selection)
+
+                # adjust the match_ratio dynamically to get a category_summary sentence
+                while (category_summary == ''):
+                    match_ratio = match_ratio - 10
+                    category_summary, matched_sent_list = self.category_summary(train_data, match_ratio, summary_len,
+                                                                                topic_selection)
+                    if match_ratio <= 0:
+                        break
+
+                if category_summary != '':
+                    summary_sent_info = self.summary_sentence_match(category_summary, matched_sent_list)
+
+                    # if summary_sent_info[1]!='':
+                    try:
+                        topic_word = summary_sent_info[1]
+                    except Exception:
+                        # failed to find the topic word in the category_summary
+                        print(traceback.print_exc())
+                    else:
+                        category_desp = self.rewrite_category_desp(type_item, category_summary, topic_word)
 
             desp_dict['category'] = type_item
             desp_dict['category_desp'] = category_desp
@@ -258,7 +294,7 @@ def clustering(df, n_cluster, survey_id):
         i += 1
 
     sim_matrix = cosine_similarity(infered_vectors_list)
-    labels = SpectralClustering(n_clusters=n_cluster).fit_predict(sim_matrix)
+    labels = SpectralClustering(n_clusters=n_cluster, gamma=0.1).fit_predict(sim_matrix)
     df['label'] = labels
 
     tfidf_top_words = []
@@ -412,11 +448,13 @@ def clustering(df, n_cluster, survey_id):
 
 
     ## get tsne fig
-    tsne = TSNE(n_components=2, init='pca', perplexity=12)
+
+    tsne = TSNE(n_components=2, init='pca', perplexity=15)
     X_tsne = tsne.fit_transform(np.array(infered_vectors_list))
     colors = scatter(X_tsne, df['label'])
-
+    ''' fix first
     plt.savefig(IMG_PATH + 'tsne_' + survey_id + '.png', dpi=800)
+    '''
     plt.close()
     return df, colors
 
@@ -444,11 +482,11 @@ def scatter(x, colors):
     return color_hex[:colors.nunique()]
 
 
-def get_cluster_description(df):
+def get_cluster_description(df, survey_id):
     match_ratio = 70  # threshold for fuzzy matching
     summary_len = 30  # length of generated summary
     topic_selection = 'topic_bigram_list'  # topic_bigram_list #topic_word_list #topic_trigram_list
     input_DF = df
-    category_desp = ref_category_desp(input_DF)
+    category_desp = ref_category_desp(input_DF, survey_id)
     description_list = category_desp.desp_generator(match_ratio=match_ratio, summary_len=summary_len, topic_selection='topic_bigram_list')
     return description_list
