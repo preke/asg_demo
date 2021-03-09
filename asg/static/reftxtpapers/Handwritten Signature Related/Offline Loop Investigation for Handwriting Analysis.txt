@@ -1,0 +1,457 @@
+Offline Loop Investigation for Handwriting Analysis
+Tal Steinherz,David Doermann,Ehud Rivlin,Nathan Intrator
+
+
+Resolution of different types of loops in handwritten script presents a difficult task and is an important step in many classic word recognition systems, writer modeling, and signature verification. When processing a handwritten script, a great deal of ambiguity occurs when strokes overlap, merge, or intersect. This paper presents a novel loop modeling and contour-based handwriting analysis that improves loop investigation. We show excellent results on various loop resolution scenarios, including axial loop understanding and collapsed loop recovery. We demonstrate our approach for loop investigation on several realistic data sets of static binary images and compare with the ground truth of the genuine online signal.
+
+1 INTRODUCTION
+SHARING many of the trajectory singularities, loops appearas one of the most dominant features available in cursive handwriting processing [1], [2], [3], [4], [5]. In particular, loops are the key to successful offline-to-online-based word recognition systems, i.e., those mapping a static (bitmap) image to an ordered list of pixel locations along a time axis [6], [7], [8], [9], [10]. It is useful to investigate how improved loop detection and recognition can facilitate not only character recognition but also writer modeling for identification and examination [11], [12], [13] and script or style identification [14], [15], [16]. Similarly, many other applications in forensic science, such as signature verification, could benefit from loop analysis [17], [18], [19], [20], [21].
+The dominance of loops in these tasks reflects in part on their frequent presence in handwritten cursive words and their parameterizable descriptive nature. J.C. Simon first elucidated the elementary nature of loops and provided an intuitive definition of the types of loops [22]: “Displacing a pen from left to right in an oscillating movement, with loops, descendants (legs), and ascendants (poles).” Moreover, in the common case of pure cursive handwriting, its continuous nature constrains many ascending and descending strokes in a loop form. Therefore, we consider an extended definition of loops to contain all kinds of uninterrupted enclosures [23], including those with invisible “holes.” Thus, loops can be found in the usual letters like a, d, e, g, o, p, q, and in letters like b, f , h, j, k, l, s, t, y, and z. In most cases, any stroke intersection, excluding delayed strokes, relates to some kind of a loop.
+The significance of loops increases because of their parameterizable nature, which enables the transformation of a static loop image into a quantified feature vector. Thus, the loop provides information in a format usable in machine learning algorithms. Given the ground truth for genuine loops provided by the online signal, loop investigation essentially tries to understand the isomorphism between the offline image and the online signal. Unfortunately, such a transformation is not straightforward [2].
+Loop investigation has been considered in the context of enhancing offline handwritten word representation and the reconstruction of the genuine ordered list of strokes. It has been done mostly by using temporal (dynamic) information recovery techniques such as contour analysis [24], [25], gray-scale examination [26], [27], and path minimization [28], [29], [30]. Other methods include thinning/skeletonization [31], [32], [33], [34], [35], [36], [37], [38], [39] and morphological loop investigation [40], [41], [42]. This paper improves aspects of former solutions; we detect and resolve the structure of most loops. Our method uses a sophisticated contour analysis we call The Multipartite Matching Approach. Our algorithm is beneficial in cases, where a complete offline to online transformation is desired.
+This paper has four main sections: Section 2 introduces the theory of loops; in Sections 3 and 4, The Multipartite Matching Approach and its implementation are demonstrated; Section 5 provides experimental results. The concluding section provides a final discussion.
+
+2 LOOP THEORY
+2.1 Definition
+A loop is a handwritten pattern, made of several strokes formed when the writing instrument returns to a previous location while touching the pad continuously, giving a
+. T. Steinherz and N. Intrator are with the Department of Computer Science, Tel-Aviv University, Ramat Aviv 69978, Israel. E-mail: irital10@yahoo.com, nin@tau.ac.il. . D. Doermann is with the Institute for Advanced Computer Studies, 3451 AV Williams Building, University of Maryland, College Park, MD 20742. E-mail: doermann@umiacs.umd.edu. . E. Rivlin is with the Department of Computer Science, Technion, Haifa 32000, Israel. E-mail: ehudr@cs.technion.ac.il.
+Manuscript received 28 Dec. 2007; accepted 12 Feb. 2008; published online 12 Mar. 2008. Recommended for acceptance by D. Lopresti. For information on obtaining reprints of this article, please send e-mail to: tpami@computer.org, and reference IEEECS Log Number TPAMI-2007-12-0849. Digital Object Identifier no. 10.1109/TPAMI.2008.68.
+0162-8828/09/$25.00 2009 IEEE Published by the IEEE Computer Society
+closed outline with a “hole” in the center. In this case, a stroke is a writing locus between every two consecutive local extremity points of the vertical dimension (y-axis).
+In practice, especially in low-resolution images, we require additional information to distinguish a real authentic loop from a pair of two close, connected, and partially overlapping strokes. For this purpose, we define an authentic loop to be either real or large, where we have the following:
+. in a real loop, like the one presented in Fig. 1a, the area is not empty, . in a large loop, like the one shown in Fig. 1b, the area is empty, but the perimeter exceeds a predetermined threshold,
+where the area is the group of all background pixels inside the “hole” and the perimeter is the collection of foreground pixels surrounding it.
+However, Fig. 1c shows a shape that satisfies the definition of a loop but is rejected because it is too small. Patterns like the one illustrated in Fig. 1d are considered loops only when sufficiently large because they are rarely actual loops.
+
+2.2 Classification
+Let the axis be the main shortest path from the left side of the word to its right side, and let the tarsi be the remaining parts— ascenders and descenders. Then, based on J.C. Simon’s definition of a loop, we propose classification into two kinds:
+1. Natural loops, like the ones presented in Fig. 2, appear on tarsi and hence have a single anchor point where they hang on the axis. 2. Artificial loops, like the ones shown in Fig. 3, partition the axis by presenting two interface points in diverse locations. The first interface point, on the left side, is the entrance, while the second one is the exit, hence it appears on the right side.
+
+2.3 Modeling
+We have developed two distinctive models that describe the two loop classes.
+A natural loop (Fig. 2) consists of a continuous pair of consecutive strokes that surround an imaginary natural “hole.” All pairs of successive pixels by the temporal order are also 8-neighbors in the image domain. A bottom-up topdown pair of adjacent strokes sketches an ascending loop in a counterclockwise manner. A descending loop is drawn the other way around.
+An artificial loop (Fig. 3) occurs when two sets of consecutive strokes introduce another contact point separate from their concatenation interface, sandwiching a blocked artificial “hole” between them. Either enclosing sets of consecutive strokes could be a natural subloop itself. The other alternatives are short poles or simple lines. The contact point could appear at the top or bottom for upper or lower artificial loops, respectively.
+An artificial loop is categorized according to its natural subloop (“hole”) configuration: neither side, only on the left side, only on the right side, both on the left and right sides.
+
+2.4 Offline versus Online
+In static (binary) images, the temporal information is implicit and often ambiguous. When offline processing occurs, visible “holes” appear as the only evidence that support allegedly genuine loop identification. Nevertheless, the abovementioned designation clearly displays that both types of loops present “holes,” so no isomorphism occurs
+between the collection of “holes” and one of the classes. The
+designation of axial and on-tarsus loops helps moderately
+but would not provide an indicative response for situations
+where multiambiguous “holes” are encapsulated within a
+single “frame” of an artificial (axial) loop. This happens
+when a natural subloop formulates one of the “walls” that
+encloses the complete loop’s artificial “hole.” Furthermore,
+superfluous “holes” exist, like those in Figs. 4a and 4b,
+resulting from noisy pixels or remainders of traced-over
+natural subloops. Therefore, general information on “hole”
+inclusion or absence does not satisfactorily complete the
+categorization task, so the architecture of the presumed
+loop must be figured for each “hole” individually. In addition to uncertainties in the association of some
+observable “holes,” many others, both natural and artificial,
+collapse and become hidden in the transition to a static
+(binary) image format [40], [41], [42]. In this case, a blob remains in the original position of the genuine “hole.” This phenomenon results from blotting or blurring affects common to mechanical writing tools. Figs. 4c and 4d provides two examples of collapsed “holes,” a natural hidden loop and a natural hidden subloop on the left and right, respectively. Fig. 3a shows a collapsed artificial “hole.”
+Handwritten blobs also can be found in intersections of strokes, junctions, and zones where consecutive strokes touch or partially override each other. In fact, previous studies showed that blob width could not distinguish the derivatives of genuine loops from the other byproducts [25], [41], [42], [43]. This task requires advanced shape analysis.
+In the context of loops, then, one must be able to identify and classify all authentic “holes” to bridge the gap between offline and online and recover the topological structure of a loop. Complete identification requires recovery of collapsed “holes.” Successful classification means distinguishing between natural, artificial, and superfluous “holes” a posteriori.
+
+3 THE MULTIPARTITE MATCHING APPROACH
+3.1 Overview
+Originally, a single stroke in real time produces two contours on opposite sides, where a contour part is an ordered list of the minimum on-the-edge adjacent pixels. Usually, a contour piece would be located approximately half a stroke-width away from the exact position of the pen tip. Naturally, some valuable information is lost in the transition to a static image representation. In this case, some contour pieces that cross have disappeared, others become difficult to sort because spatial connectivity is not isomorphic to the genuine temporal order, and the internal manner in which the pixels of a single piece are traversed (either forward or backward) is not properly defined either. Two chains of concatenated matching contour pieces on opposite sides, which were created with a continuous set of strokes and produced a single connectivity component, can be incorrectly represented by a static image. Specifically, the resulting static image presents a deceptively diverse picture of the contour. In this case, one element of the external contour exists, a single integrated portion of contour pieces that surrounds the whole body (one segment per connectivity component), and several elements of the internal
+Fig. 3. Four artificial loops, each created by two sets of consecutive strokes that introduce a separate contact point away from their concatenation interface, sandwiching a blocked artificial “hole” between them. The different loops suggest various alternatives of sets of stroke combinations: (a) two natural subloops (“holes”), (b) a pole and a natural subloop (“hole”), (c) a natural subloop (“hole”) and a simple line, and (d) two poles. In addition, the expected blocked artificial “hole” in (a) is not visible in the offline representation. All loops partition the axis by presenting two interface points in diverse locations—the entrance and exit, on the left and right sides, respectively.
+contours, a collection of contour fragments that surround each “hole.” Nevertheless, each and every visible contour piece derived from the static image is a genuine contour piece produced in real time.
+Normally, contour pieces of consecutive strokes also follow one another on the external edge of the resulting static image. One chain of concatenated contour pieces appears on the upper side of the external edge, while their complements appear on the lower side.
+However, abnormalities/singularities arise around junctions where two strokes intersect and cross each other. In this case, some contour pieces are covered and permanently lost, leaving an inked gap between pairs of consecutive contour parts. The neighbor of a contour piece at the intersection point does not actually follow it. Instead, the consecutive contour part would be found elsewhere along an edge of the resulting static image. Given the continuous nature of cursive handwriting, an intersection implies a close outline, i.e., a loop, so the next pieces of the contour on one side would appear inside the resulting “hole.” The contact between such allegedly neighboring contour pieces is referred to as a discontinuity point.
+As a first step toward regaining the separation to two distinguished sides, it is advisable to divide the external contour into upper and lower. Without limiting generality, the external contour begins at the original starting point chosen by the writer (up to an exact location on the perimeter of a loop). Likewise, one can presume the authentic final point. The original finishing point partitions the external contour into upper and lower: let the prefix up to the original finishing point constrain the upper external contour, and let the suffix from this point on describe the lower external contour. Pieces surrounding ascenders (descenders) can be further partitioned to left and right around the piece’s uppermost (lowermost) local maximum (minimum) point.
+Fig. 5 presents the external (upper þ lower) and internal contour pixels of the word “flat.”
+The Multipartite Matching Approach enables either the association of corresponding opposite-sided contour pieces or the validation of such a presumed matching hypothesis, to bridge/concatenate same-sided consecutive contour pieces across junctions, and to locate lost internal contours.
+Both opposite-sided contour piece association and lost internal contour location rely on measurements of mutual distances and shape similarity between contour pieces. Samesided consecutive contour piece bridging/concatenation
+across junctions use smoothness in slope/gradient changes and trend.
+The Multipartite Matching Approach utilizes a dual representation of contour pieces—pixel-based and sectionbased. In this case, a section is a short straight line that represents the smooth representation for the group of consecutive pixels located in the interval between its starting and ending points. Above this, we develop a multilayer theory about inner and intercontour piece relations, derived from both representations in parallel—see the map in Fig. 6. The first level presents the basic attributes of an atomic entity—a single pixel or section, respectively. The second and third levels describe local and remote relations between pairs of touching and distant atomic entities, respectively, among which are turning angle and direction, distance, and shape similarity. The fourth level brings several operators that denote the existence of association between pairs of atomic entities, the possibility of legal concatenation between pairs of atomic entities, and the prediction of whether a lost contour fragment occurs between two chains of consecutive atomic entities of contour pieces.
+In the following sections, we elaborate on the labeling of the various contour parts—upper, lower, left and right, the isomorphism between pixels and sections, and the four layers of information derived from and computed based on contour representations.
+One may also refer to other papers that have suggested contour-based methods for various tasks in the document and handwriting processing and recognition fields [21], [25], [44].
+
+3.2 Representation
+Given a static image, the external contour is derived by surrounding the word’s body segment in a clockwise manner, keeping the neighboring background pixels to the left at all times, in a way that each on-the-edge pixel is visited at least once. In a similar way, each and every internal contour element is the collection of minimal ordered lists of on-the-edge adjacent pixels that surround a “hole” in the word’s image, given each on-the-edge pixel is visited at least once. Natural ascending (sub-)loops are surrounded in a counterclockwise manner. Similarly, natural descending (sub-)loops are surrounded in a clockwise manner. The method of surrounding artificial “holes” is not properly defined. Pixel adjacency occurs in accordance with the 8-neighbor rule. The white pixels in Fig. 7a
+represent the external and internal contours of the character “a,” derived from the word “flat.”
+In our view, a complementary functional representation for a piece of contour (other than an ordered list of adjacent pixels) is a set of concatenated sections, where each section is a (short) straight line that begins from and ends at a pixel of the genuine set. This representation appears as a smoothed version, based on the trade-off of eliminating noise and significant but tiny fluctuations.
+Fig. 7b provides the equivalent section-based representation to the external and internal pixel-based contours of the character “a,” derived from the word “flat.”
+
+3.3 Isomorphism
+Section c ¼ ½p1; pn —a straight line that connects p1 and pn is the smooth representation of an ordered list of neighboring pixels fp1; . . . ; png if and only if each one of the replaced pixels is located not more than 1 pixel (or some other predefined constant) away:
+kpi ck 1 1 i n; ð1Þ
+where the euclidean distance is the metric that measures the distance between a pixel and the straight line representing the section.
+The minimal set of concatenated sections fc1; . . . ; cMg ¼ f½p1;begin; p1;end ; . . . ; ½pM;begin; pM;end g provides the isomorphic section-based representation for the pixel-based genuine format of a contour piece fp1; . . . ; pNg, where p1;begin ¼ p1 and pM;end ¼ pN if and only if
+pi;begin 2 fp1; . . . ; pNg; pi;end 2 fp1; . . . ; pNg; pi;end ¼ piþ1;begin 1 i M and 8pj 2 fpi;begin; . . . ; pi;endg kpj cik 1 1 i M:
+ð2Þ
+See Fig. 7b for further illustration.
+
+3.4 Atomic Entities and Basic Attributes
+The atomic entity of the pixel-based format of a contour piece is one point represented by a two-dimensional vector: p ¼ ðx; yÞ. Hence, the description of a pixel provides a single basic attribute—its location in the image space.
+The atomic entity of the section-based format of a contour piece is one short straight line represented by two enclosing pixels: c ¼ ½pbegin; pend ¼ ½ðxbegin; ybeginÞ; ðxend; yendÞ . In this case, the description of a section provides several basic attributes—the location of all of its constituent pixels; and its shape given by the slant angle. See Fig. 7c for an
+illustration of this. Table 1 summarizes the basic attributes of the atomic entities for both the pixel-based and sectionbased representations.
+
+3.5 Relations between Atomic Entities
+3.5.1 Local
+A building block of the pixel-based model of a contour piece represents the local relation between two adjacent pixels. Hence, the pair of pixels provides a joint attribute—one of eight possible turning directions in which the preceding pixel points to the one that follows in the ordered list. A building block of the section-based model of a contour piece is the local relation between two concatenated sections (at their interface point). In this case, the pair of sections provides a joint attribute—the turning angle between the former and the subsequent in the set, given by subtraction of the current slant angle from the following one. See Fig. 7c for an illustration of this. The turning angle normalizes to the interval [0, ]. The sign of the turning angle, also referred to as the turning direction, is designated positive for left turns and negative for right ones. Table 2 summarizes local relations between pairs of touching pixels and sections, respectively.
+
+3.5.2 Remote
+A building block of the pixel-based model of a contour piece is the remote relation between two pixels on opposite sides ({external versus internal} or {upper versus lower} or {left versus right}). Hence, the pair of pixels provides a joint attribute—their mutual Geodesic distance, defined as the minimum number of body pixels that separate the two body points. Fig. 11b illustrates a shortest Geodesic path that serves the distance calculation. Similarly, the distance between a pixel and a piece of contour is given by the
+minimum distance between the pixel and each one of the
+pixels on the other piece. A Breadth First Search (BFS) algorithm calculates the
+distance matrix between pairs of pixels on opposite sides.
+The search environment would be a graph isomorphic to
+the word’s image—inked pixels associated with nodes and
+8-neighboring relations represented by edges (see [45]). A building block of the section-based model of a contour
+piece is the remote relation between two sections on
+opposite sides. In this case, the pair of sections provides
+several joint attributes—their mutual distance, which is the
+minimal distance between a pair of pixels one from each
+section, their shape similarity given by the absolute differ-
+ence between their slant angles, and their mutual projection
+coverage, which tests the potential of one section to cross the
+projection beam perpendicular to the other one (Fig. 7c),
+and vice versa. Table 3 summarizes remote relations between pairs of
+distant pixels and sections, respectively.
+
+3.6 Operators on Atomic Entities
+3.6.1 Correspondence
+In our view, two pixels from contour pieces on opposite
+sides and that are near to one another may belong
+heuristically to the same genuine stroke. Therefore, pixels
+pi and pj on opposite contour sides are presumed to be correspondence-based associated if and only if their mutual
+Geodesic distance does not equal more than the stroke-
+width:
+Correspondenceðpi; pjÞ ¼ 1 iff Pixel Distanceðpi; pjÞ stroke-width:
+ð3Þ
+One can propagate the correspondence property to a pixel-piece level as follows:
+Correspondence pi; fq1; . . . ; qngð Þ ¼ 1 iff 9k 1 k n j Correspondenceðpi; qkÞ ¼ 1: ð4Þ
+Fig. 8a shows all possible pairs of corresponding pieces within the external and internal contours and between the upper and lower sides of the external contour.
+
+3.6.2 Correlation
+Two sections may heuristically belong to the same genuine stroke if they originate from contour pieces on opposite sides, present a similar shape, are not too far apart, and have a positive projection coverage potential. Therefore, sections ca and cb on opposite contour sides are presumed to be correlation-based associated if and only if the absolute difference between their angles is less than or equal to pi over four, their mutual distance is less than or equal to
+twice the stroke-width, and there is at least one pixel on one
+section that crosses the projection beam of the other:
+Correlationðca; cbÞ ¼ 1 iffðSection Similarityðca; cbÞ =4Þ ^ ðSection Distanceðca; cbÞ 2 stroke-widthÞ^ ððProjection Coverageðca; cbÞ ¼ 1Þ_ ðProjection Coverageðcb; caÞ ¼ 1ÞÞ:
+ð5Þ
+One can propagate the correlation property to a section-
+piece level as follows:
+Correlationðca; fd1; . . . ; dmgÞ ¼ 1 iff 91 1 1 m j Correlationðca; dlÞ ¼ 1:
+ð6Þ
+Fig. 8b shows all possible pairs of correlated sections
+within the external and internal contours and between the
+upper and lower sides of the external contour.
+
+3.6.3 Continuation
+The most common assumption about the oscillating hand
+movement when practicing cursive handwriting is that it acts
+under an objective to maintain smooth strokes as much as
+possible in order to lose as little energy as possible (Gestalt’s
+assumptions and parameters in [50]). In this case, one will
+refrain from sharp turns and avoid switches of the general
+trend from convex walk to concave, or vice versa, in the
+middle of a stroke. Instead, the same turning direction will
+appear all along the stroke. It seems that psychomotor factors
+relate to this behavior. This assumption was widely utilized
+in previous work (see, for example, [8], [25], and [28]). Based on this paradigm, we have heuristically deter-
+mined that a newly created section that concatenates two
+pieces of contour into a single continuous stroke must
+preserve the same general trend of walk, either convex or
+concave, all the way from top to bottom, or vice versa,
+including the prefix of the originating piece of contour and
+the suffix of the destined one. From a practical standpoint,
+the turning direction at the interface points surrounding the
+newly created section must be preserved consistently. Hence, a newly formed section cnew ð¼ ½pa;end; pb;begin Þ creates a legitimate continuation (bridge)
+< . . . ; ca; cnew; cb; . . . >
+between two sections ca ð¼ ½pa;begin; pa;end Þ and cb ð¼ ½pb;begin; pb;end Þ on different sides of the contour around the same junction if and only if all the related turning directions
+(between the first and the newly formed sections, between
+the newly formed and second sections, in front of the first
+section, and behind the second section) are the same, and
+the newly formed section does not cross or get too close to
+background pixels, including “holes”:
+Continuationðca; cbÞ ¼ 1 iff ðturning directionðca; cnewÞ ¼ turning directionðcnew; cbÞ ¼ turning directionðca 1; caÞ ¼ turning directionðcb; cbþ1ÞÞ ^ ðcnew is inside word0s bodyÞ:
+ð7Þ
+Fig. 8b presents two possible continuations by newly
+formed sections that concatenate a section on the upper
+external contour and a section on the internal contour of an
+encapsulated “hole,” and a section on the lower external
+contour and a section on the upper external contour.
+
+3.6.4 Discontinuity
+Continuing with the smooth path paradigm, we have
+heuristically determined that a switch of the turning
+direction trend far from an extremal point, which means a
+transition from convex to concave walk, or vice versa, or a
+sharp turn between two neighboring sections, may indicate
+the existence of a discontinuity point. The latter is a possible
+position for a contour split. The interface between two neighboring sections ca and caþ1 is presumed to be a discontinuity point if and only if the turning
+direction is not the same as the turning direction between the
+first section and its predecessor, given neither the first nor the
+second section shares an extremal point, or the absolute
+turning angle is more than or equal to pi over two:
+Discontinuityðca; caþ1Þ ¼ 1 iffððturning directionðca; caþ1Þ 6¼ turning directionðca 1; caÞÞ_ ðturning angleðca; caþ1Þ > =2ÞÞ ^ ðpa;begin 6¼ extramum pointÞ ^ ðpaþ1;begin 6¼ extramum pointÞ:
+ð8Þ
+Fig. 8b shows all possible discontinuity points on the
+external contour.
+
+3.7 Computed Functions on Pieces of Contour
+3.7.1 Internal Contour Recovery
+Lacking a visible “hole,” a lost closed outline piece of an
+internal contour is characterized by the shape of a truncated
+ellipse with narrow waists—an aperture whose size approx-
+imates the stroke-width pixels at the origin, around the
+location of the genuine junction where the foregoing and
+backtracking strokes crossed each other. See, for example,
+the lost loop in Figs. 9a and 9b. Two pieces of contour on opposite sides of a blob that
+draw together an outline of an imaginary truncated ellipse
+may heuristically indicate the existence of a lost piece of an internal contour surrounding a genuine “hole.” Let < D1; . . . ; Dn > be the discrete function/vector of the pixel-based distances between every pixel on one piece of contour fp1; . . . ; png and a second piece of contour fq1; . . . ; qmg on the opposite side, where 8i, 1 i n, Di ¼ Pixel Distanceðpi; fq1; . . . ; qmgÞ: The two portions could enfold a natural “hole” if and only if a pixel exists on the first piece, for which the attached distance function/vector presents a substantial local minimum with respect to the distance values of the surrounding pixels. In this case, a substantial local minimum, used to reduce the effect of natural gaps that emerge from normal quantization noise, means that either at least one pixel separates the local minimum and the local maximum that follows it or the difference between the values at these points is at least one. The distance values measured at the local minimum and maximum are required to be less than or equal to strokewidth and above stroke-width, respectively:
+Recoverðfp1; . . . ; png; fq1; . . . ; qmgÞ ¼ 1 iff 9j i < j < kjðDi > DjÞ ^ ðDj < DkÞ ^ ððk j 2Þ _ ðDk Dj 1ÞÞ ^ ðDj stroke-widthÞ ^ ðDk > stroke-widthÞ: ð9Þ
+In addition, one may require that the other discrete function/vector, which represents the pixel-based distances between every pixel on the second piece of contour fq1; . . . ; qmg and the first piece of contour fp1; . . . ; png, will also present a substantial local minimum point around the same region. Fig. 9c presents the distance functions between the left and right sides of an external contour fragment, Figs. 9a and
+9b, respectively, around the joint local maximum (see [46]
+for elaborations).
+
+4 MODULAR SOLUTION AND SYSTEM
+4.1 Overview
+Natural and artificial loops are always separated between
+tarsi and axis, respectively, so the preliminary module of a
+complete loop investigation solution/system partitions the
+external contour into these two types. Next, axial loops can
+be located and formed based on matches between pairs of
+ascenders and descenders. For each one of these artificial
+loops, any encapsulated “hole” is classified, validated, and
+labeled. Thus, natural “holes” and subloops are distin-
+guished and identified. Then, both hidden natural loops
+and subloops are recovered on tarsi and within enclosing
+walls of axial loops, respectively. See the flowchart in
+Fig. 10.
+
+4.2 Separating between Axis and Tarsi
+The external contour partitions into axis and tarsi areas by
+using the Correspondence operator between every pixel on
+the upper side and all of the pixels on the lower side, and
+vise versa. For every significant chain of consecutive
+external contour pixels, where neither corresponds to the
+other side of the external contour, it would be considered a
+piece of tarsus. Let fp1; . . . ; png and fq1; . . . ; qmg be the pixel-based representation of the upper and lower contours, respectively, then the subset fpi; . . . ; pjg is a possible ascender if and only if
+ðCorrespondenceðpk; fq1; . . . ; qmgÞ ¼ 0Þ ^ ðj i stroke-widthÞ i k j;
+ð10Þ
+and the subset fqr; . . . ; qsg is a possible descender if and only if
+ðCorrespondenceðqt; fp1; . . . ; pngÞ ¼ 0Þ ^ ðs r stroke-widthÞ r t s:
+ð11Þ
+The remaining pixels on both sides of the external
+contour denote the axis parts. See Fig. 11a for a full illustration of the extracted
+ascenders and descenders in white. In this case, the
+stroke-width proportional threshold was five pixels.
+
+4.3 Forming Axial Loops
+A pair of two matching opposite-sided tarsi on the upper
+and lower contours, an ascender and a descender, forms an
+axial loop if and only if no proven axial substroke occurs
+between their roots on the axis. In this case, a proven axial
+substroke requires correspondence between pixels to the
+right of the ascender and others to the left of the descender,
+respectively, or vice versa. Therefore, the ascender fpi; . . . ; pjgmatches the descender fqr; . . . ; qsg for a common axial loop if and only if
+8k k < i ðCorrespondenceðpk; fq1; . . . ; qr 1gÞ ¼ 0Þ^ 8k j < k ðCorrespondenceðpk; fqsþ1; . . . ; qmgÞ ¼ 0Þ^ 8t t < r ðCorrespondenceðqt; fp1; . . . ; pi 1gÞ ¼ 0Þ^ 8t s < t ðCorrespondenceðqt; fpjþ1; . . . ; pngÞ ¼ 0Þ: ð12Þ
+The complete perimeter of the axial loop is accepted by
+the concatenation of the left- and rightmost pixels of the
+ascender and the descender, pi with qs and pj with qr, by the weighted shortest Geodesic path, biased in favor of the on-
+the-edge pixels. Fig. 11b illustrates an axial loop formation by connecting
+the left and right ends of a pair of matching ascender and
+descender.
+
+4.4 Distinguishing Encapsulated Natural “Holes” and Identifying Natural Subloops
+A natural “hole” encapsulated within an axial loop is designated using the Continuation operator between the upper or lower external contour (separated to preceding and following sections) and the internal “hole”-based contour. We suggest that a natural “hole” refers to every segment of internal contour that presents a continuation potential with the relevant side of the external contour in the proper manner.
+Let fc1; . . . ; cug and fe1; . . . ; evg be the section-based representations of the upper and lower external contours, respectively, where the subsets fca; . . . ; cbg and feg; . . . ; ehg are a pair of matching ascender and descender that forms an axial loop, then the encapsulated segment of internal contour ff1; . . . ; fwg is a possible natural “hole” if and only if
+9z 1 z wj ð9o 1 o a 1jContinuationðco; fzÞ ¼ 1Þ_ ð9o bþ 1 o ujContinuationðfz; coÞ ¼ 1Þ_ ð9o 1 o g 1jContinuationðeo; fzÞ ¼ 1Þ_ ð9o hþ 1 o vjContinuationðfz; eoÞ ¼ 1Þ:
+ð13Þ
+When the first condition is satisfied, i.e., the natural “hole” is a continuation of the current upper left part of the external contour, then the axial loop’s left enclosing stroke is an upper left ascending natural subloop (see Fig. 8b). In a similar way, the second, third, and fourth conditions refer to upper right ascending, lower left descending, and lower right descending natural subloops at the right, left, and right enclosing strokes, respectively.
+
+4.5 Validating Hypothesized Natural Subloops
+Since an encapsulated natural “hole” refers to a natural subloop, where the latter constructs one of the walls of the hosting axial loop, some significant relation must exist between matching parts of the internal and external contours at that environment. In particular, an upper left ascending natural subloop must associate with the left side of the ascender half of the axial loop, an upper right ascending natural subloop must associate with the right side of the ascender half of the axial loop, and descending natural subloops must associate with the originating side of
+the descender half of the axial loop. The meaning of association in this context denotes correspondence (Fig. 8a) and/or correlation (Fig. 8b) between the matching parts of the internal and external contours at the pixel and/or section level, respectively. The complete natural subloop validation is given in Appendix A, which can be found on the Computer Society Digital Library at http://doi.ieee computersociety.org/10.1109/TPAMI.2008.68.
+
+4.6 Prioritizing Hypothesized Natural Subloops
+Given the artificial loop model, in which a natural subloop forms one and only one of the loop’s enclosing walls, two or more hypothesized natural subloops cannot coexist when both associate with the same side of the hosting axial loop ({left, right}) or share the same encapsulated “hole.” The complete natural subloop prioritization is given in Appendix B, which can be found on the Computer Society Digital Library at http://doi.ieeecomputersociety.org/10.1109/ TPAMI.2008.68.
+
+4.7 Recovering Internal Hidden Subloops
+A hidden subloop encapsulated within an axial loop is recovered using the Recover function between the internal contour of a proven artificial “hole” and a related piece of the surrounding external contour on the relevant of the four subsides ({upper, lower} X {left, right}). A hidden subloop would refer to every blob enfolded between matching pieces of the internal and external contour that offer an internal contour recovery potential.
+Let f bottom; . . . ; topg be the set of pixels on the left or right side of the internal contour and let fpmatching bottom; . . . ; pmatching topg be the set of pixels on the matching nearest piece of external contour, then a hidden subloop exists between the two if and only if
+ðRecoverðf bottom;...; topg;f matching bottom;...; matching topgÞ¼1Þ_ ðRecoverðf matching bottom;...; matching topg;f bottom;...; topgÞ¼1Þ: ð14Þ
+When investigating a vertical-oriented blob, it requires that ymatching bottom ¼ ybottom and ymatching top ¼ ytop; in case of a horizontal-oriented blob, the x coordinates of the matching points prove identical.
+
+4.8 Recovering On-Tarsus Hidden Loops
+An on-tarsus hidden loop is recovered using the Recover function between the left and right sides of the surrounding piece of external contour. A hidden subloop may refer to every tarsus with no visible “hole” that presents a recovery potential between its two sides.
+Let fppreceding extremity; . . . ; pboundaryg and fpboundaryþ1; . . . ; pfollowing extremityg be the sets of pixels on the left and right sides of the external contour surrounding a tarsus, where both pieces touch at one end (the boundary) and are trailed to the closest extremity points at the other end. A hidden natural loop exists between the two if and only if
+ðRecoverðfppreceding extremity; . . . ; pboundaryg; fpboundaryþ1; . . . ; pfollowing extremitygÞ ¼ 1Þ_ ðRecoverðfpboundaryþ1; . . . ; pfollowing extremityg; fppreceding extremity; . . . ; pboundarygÞ ¼ 1Þ:
+ð15Þ
+In contrast to the preferred boundary between the left and right parts of a tarsus constructing an axial loop, the first alternative is not a discontinuity point but rather the presumed location of the end-point acting as the symmetry axis. Usually, this would be the top or bottom point for ascender and descender, respectively. See Figs. 9a and 9b with the on-tarsus hidden loop, plus the left and right trailed sides of the surrounding contour.
+
+5 EXPERIMENTAL RESULTS
+5.1 Protocol
+We will evaluate the proposed loop investigation algorithm on three tasks that demonstrate the robustness of our algorithm to find the isomorphism between static images of loops and the ground truth online trajectory. To continue our earlier analysis of this isomorphism, see Sections 1 and 2, we have selected the following three key tasks:
+. classification of “holes” encapsulated in axial loops, . identification (recovery) of hidden natural loops located on tarsi, and . identification (recovery) of hidden natural subloops encapsulated in axial loops.
+The first task is equivalent to a full axial loop resolution because collapsed artificial “holes” can also be recovered in this way. The handwritten samples input for each experiment derived from images of pure cursive words, where loop investigation is highly crucial. The labeling process needed to create the ground truth for comparison purposes is labor intensive, so the amount of work that could be accomplished in a reasonable time has been limited. Under these circumstances, it is acceptable to test some aspects of robustness by sharing the three evaluated tasks with two databases. In this way, both cross-database and cross-task within the same database comparisons were achieved. For example, in each of the two databases, the resolution of the images differed. As a result, the stroke-widths also differed. An extended session in which each experiment would be performed on all the available data sets falls beyond the scope of this work. Nonetheless, this paper reports all the experiments conducted to test the abovementioned three tasks and does not filter inferior results. All thresholds either remain constant or vary in accordance with a single parameter—the stroke-width. The latter parameter is neither writer dependent nor word related. Instead, it is shared by all the images of a database and should be estimated only once per database. For this purpose, we select the most popular value of a histogram measuring the distances between pixels on the external and internal sides of the contour, respectively. Without limiting generality, any stroke-width dependent parameter may be fine-tuned by shifts of a few pixels—" < stroke-width. In a similar way, negligible shifts of several degrees may occur in angle-oriented parameters. Eventually, a single fixed constant value will be established for each threshold per database. In this case, one may consider calculating the optimal value on a disjoint training set and applying it to the remaining test set.
+
+5.2 Data
+5.2.1 Experiment 1: Encapsulated “Hole” Classification
+The experiment was conducted on 344 samples of the most frequent axial loop-oriented characters, o s and a s, that occurred in the middle of pure cursive words and did not suffer from unrelated noisy phenomena typical to first and last letters. All samples originated from the same directory of the IRONOFF database [47], which includes a significant collection of cursive words. Forty-seven writers penned 1-20 words each. The IRONOFF database provides the online signal and a gray-scale image, taken simultaneously with the digitizing process, per sample. The offline bitmap image representation was achieved by mapping all grayscale values below a selected threshold to 0, and all those above it to 1. The same threshold applied to all images in the database. This threshold was manually selected because it was an adaptation of the data to the required input format and not part of the tested algorithm. Strokes approximately five pixels wide were eventually achieved.
+The 344 samples contained 540 “holes” according to the following distribution: 287 natural, 241 artificial, and 12 superfluous, see Figs. 3 and 4.
+Table 4 provides the distribution of the 344 axial loops as a function of our natural subloop configuration mentioned in Section 2 and with respect to the condition of the artificial “hole” {hidden, visible} that shared a common encapsulation.
+
+5.2.2 Experiment 2: Hidden Loop Identification
+The experiment was conducted on 1,273 pure cursive words taken from the Rumelhart’s data set [48], an extension of the HP data set found in the UNIPEN collection [49]. Six writers participated with 170–223 words each. In this case, the offline bitmap image representation of a word was produced artificially by a linear concatenation of all neighboring pixels between every pair of pen-down, penup operations. Each line was three pixels thick on the average, so for every pixel along its central mass, approximately one pixel on each side appears along the gradient directions. Quantization aspects and intentional noise provided real conditions on the edges. See Fig. 12 for illustration.
+Given a total number of 10,131 tarsi, 1,211 (12 percent) were found irrelevant as being part of an axial loop, and 1,478 (14.6 percent) were disqualified because they had branches or were convex, i.e., twisted and ended away from the top or bottom point. Another 1,447 (14.3 percent) were uninteresting because they surrounded on-tarsus visible loops. Fig. 13 illustrates several examples for each one of the
+abovementioned filtered tarsus types. The remaining
+5,995 tarsi were distributed as follows: 547 real hidden
+loops, 469 large hidden loops, and 4,979 poles (either small
+hidden loops or no loop), see Fig. 1.
+
+5.2.3 Experiment 3: Hidden Natural Subloop Identification
+A group of a-s acting as first letters was tested in the last
+experiment. The specific directory of the IRONOFF data-
+base [47] provided only a limited group of relevant words.
+Eventually, 95 words were collected from more than
+40 writers, who produced one to four samples each.
+Nevertheless, eight of these words were manually disqua-
+lified because they were ambiguous. In addition, some of
+the remaining labels were overruled by our objective
+assessment of the true class that represents a given stroke
+(e.g., a very long hidden natural subloop that definitely
+stands for a pole). The remaining 87 letters were distributed
+between the two natural “hole”-less configurations: 51
+hidden loops and 36 poles, see Fig. 14.
+
+5.3 Results
+5.3.1 Experiment 1: Encapsulated “Hole” Classification
+Given 259 of 287 authentic natural subloops (90.2 percent)
+were successfully detected, false alarms happened in 18 of
+253 (7.1 percent) instances, where authentic artificial or
+superfluous “holes” were mistakenly labeled as natural.
+TABLE 4 Axial Loop Distribution
+1Including a single “hole” that shares both sides like an ascending\descending natural on-tarsus loop.
+This produces a total “hole” identification rate of 91.5 per-
+cent (494/540). The complete axial loop recognition rates appear in
+Table 5. In 80.2 percent of the axial loops, all encapsulated
+“holes” were classified properly and associated with the
+correct side.
+
+5.3.2 Experiment 2: Hidden Loop Identification
+Given 517 of 547 authentic real hidden loops (94.5 percent)
+and 341 of 469 authentic large hidden loops (72.7 percent)
+were successfully detected, false alarms happened in 563 of
+4,979 (11.3 percent) instances, where authentic poles were
+mistakenly labeled as hidden loops. This produces a total
+concave tarsus classification rate of 88 percent (5,274/5,995).
+
+5.3.3 Experiment 3: Hidden Natural Subloop Identification
+Given 36 of 51 authentic hidden natural subloops (70.6 per-
+cent) were successfully detected, false alarms occurred in 10
+of 36 (27.8 percent) instances, where authentic poles were
+mistakenly labeled as hidden subloops. This produces a
+total nonquestionable stroke interpretation rate of 71.3 per-
+cent (62/87).
+
+5.4 Discussion
+5.4.1 Experiment 1: Encapsulated “Hole” Classification
+Approximately one third of the misrecognized axial loops, 6.4 percent, could not have been resolved by the proposed algorithm, because they do not behave according to the artificial loop paradigm and present twists in place of continuous smooth strokes—see Figs. 15a and 15b. One particular writer produced most of these troublesome instances.
+In an additional 2.9 percent of the cases, the existing natural subloop could not have been designated by the proposed algorithm because the presumed continuation does not satisfy the smooth inclination condition.
+This extraordinary situation, illustrated in Fig. 15c, occurs when an unexpected sharp turn is made in the middle of the stroke. In this case, the assumption that one maintains smooth strokes to lose as little energy as possible (Section 3.6.3) was violated.
+Noise offers explanation for the remaining portion of failure cases. In 1.2 percent, the neighboring character attaches to the substantial side of the axial loop, shadowing the origination of the required continuation (concatenation). A similar phenomenon was observed in another 1.7 percent of the investigated loops, where extra ascenders exist between the natural subloop and the axis. See an exemplar in Fig. 15d.
+
+5.4.2 Experiment 2: Hidden Loop Identification
+A vast majority of the misdetections/false alarms relates to quantization difficulties that affect the visualization of large hidden loops in contrast with thin poles. Sometimes, similar circumstances cause confusion between a real hidden loop and a thick pole that has a trapeze shape. The transformation of a pair of true diagonal lines, denoting the left and right sides of the (external) contour of a tarsus, into two sets of discrete pixels is not well defined. As one can see in Fig. 16, two parallel lines, even those representing a cusp shape, could produce fluctuations in the mutual distance functions. As a result, hidden loops and poles can be substituted.
+Fig. 14. The two natural “hole”-less configurations of axial loops acting as first letter a-s. A hidden natural subloop forms the right enclosing stroke of the artificial loop on the left. The loop on the right utilizes a pole type of enclosing right stroke.
+In some cases, the scanning and digitizing resolution fails to distinguish the actual hidden loops. In other words, the identified large hidden loops may have been perceived as real, i.e., with a visible “hole,” if the resolution was higher. The misrecognized hidden loops, however, are probably not actual. When the resolution increases, the signal-to-noise ratio of the Recover function can also be improved by demanding higher differences between the local minimum and maximum points. From a different point of view, 3.5 percent of the mistakenly recovered blobs contained small hidden loops that may be considered ambiguous.
+
+5.4.3 Experiment 3: Hidden Natural Subloop Identification
+In two of five misinterpreted loops, the reasons for failure match those of Experiment 2. However, most of the
+confused strokes, approximately 16 percent of the error rate, concern bad handling of collisions between the origin of the left stroke and the body of the right one.
+Figs. 17a and 17b present two examples of misdetections, where the critical parts of a genuine hidden natural subloop were concealed. Figs. 17c and 17d illustrate the potential of false alarms caused by interference of the other stroke.
+
+6 DISCUSSION
+We have proposed a novel contour-based handwriting analysis approach. The discussed method showed excellent results on various loop resolution scenarios, including axial loop understanding and collapsed loop recovery. Although we did not present experimental results that demonstrate the direct impact of our algorithm on word recognition and writer modeling systems, the theoretic analysis and
+supporting references we described offer ample evidence of the importance of loop interpretation as a preprocessing step in such applications. In this case, when utilizing the suggested method, one may be provided with additional valuable information that may distinguish among loopbased handwritten patterns that appear similar in their topological and geometrical structure in advance.
+Furthermore, we found strong evidence that loop under-
+standing supports character recognition. In this case, we
+learned that the frequency of some common structures
+changes dramatically between letters. Writer identification/
+verification is supported similarly by the proposed algo-
+rithm, given that the correspondence between writers and
+styles of loops is high. The robustness of the proposed
+algorithm was demonstrated using two databases that
+provided samples in different resolutions and stroke-
+widths. In particular, the method demonstrated its practi-
+cality for use with low-resolution images.
+Future work would generalize the suggested method
+and expand the framework of events that can be treated.
+Improved recovery capabilities can be achieved by utilizing
+the preliminary dehooking technique that was partially
+practiced and discussed in the context of the hidden natural
+subloop identification on the first letter a-s. In that way,
+subbranches, like the two sides of a t-bar, might be filtered.
+For the same purpose, it would be beneficial to have the
+ability of tracing genuine end-points that are neither the
+uppermost nor the lowermost pixels in order to handle
+convex tarsi such as c-strokes and open s-s. A complete
+implementation of this approach to the beginning and
+ending letters of a word also requires an adaptation of the
+axial loop model in addition to the abovementioned
+dehooking preprocess.
+The presented algorithm is highly relevant to other tasks
+and applications in the field of handwriting analysis. We
+strongly believe the advanced tools developed here, along
+with the contour-based concept and guidelines, may prove
+useful in other fields of logical image understanding, where
+one can define a set of constraining rules on the visible
+edges and their interconnections. Examples could include
+medical visualizations, urban landscape interpretation, and
+automatic target recognition.
+
+References
+[1]J.C. Simon,O. BaretRegularities and Singularities in Line PicturesInt’l J. Pattern Recognition and Artificial Intelligence, vol. 5, nos. 1-2, pp. 57-77, 1991.1991
+[2]R. Plamondon,S.N. SrihariOn-Line and Off-Line Handwriting Recognition: A Comprehensive SurveyIEEE Trans. Pattern Analysis and Machine Intelligence, vol. 22, no. 1, pp. 63-84, Jan. 2000.2000
+[3]A. VinciarelliA Survey on Off-Line Cursive Word RecognitionPattern Recognition, vol. 35, no. 7, pp. 1433-1446, 2002.2002
+[4]T. Steinherz,E. Rivlin,N. IntratorOff-Line Cursive Script Word Recognition—A SurveyInt’l J. Document Analysis and Recognition, vol. 2, nos. 2-3, pp. 90-110, 1999.1999
+[5]L. Schomaker,E. SegersFinding Features Used in the Human Reading of Cursive HandwritingInt’l J. Document Analysis and Recognition, vol. 2, nos. 2-3, pp. 13-18, 1999.1999
+[6]V. Govindaraju,R.K. KrishnamurthyHolistic Handwritten Word Recognition Using Temporal Features Derived from Off- Line ImagesPattern Recognition Letters, vol. 17, no. 5, pp. 537-540, 1996.1996
+[7]V. Govindaraju,D. Wang,S.N. SrihariUsing Temporal Information in Off-Line Word RecognitionProc. US Postal Service Fifth Advanced Technology Conf., pp. 529-543, 1992.1992
+[8]P.M. Lallican,C. Viard-Gaudin,S. KnerrFrom Off-Line to On-Line Handwriting RecognitionProc. Int’l Workshop Frontiers in Handwriting Recognition, pp. 303-312, 2000.2000
+[9]H. Bunke,M. Roth,E.G. Schukat-TalamazziniOff-Line Cursive Handwriting Recognition Using Hidden Markov ModelsPattern Recognition, vol. 28, no. 9, pp. 1399-1413, 1995.1995
+[10]H. Bunke,M. Roth,E.G. Schukat-TalamazziniOff-Line Recognition of Cursive Script Produced by a Cooperative WriterProc. Int’l Conf. Pattern Recognition, pp. 383-386, 1994.1994
+[11]S.N. Srihari,Z. ShiForensic Handwritten Document Retrieval SystemProc. Int’l Workshop Document Image Analysis for Libraries, pp. 188-194, 2004.2004
+[12]K. Frank,L.R.B. Schomaker,C. Veenhuis,L.G. Vuurpijl,M. Van Erp,I. GuyonWANDA: A Common Ground for Forensic Handwriting Examination and Writer IdentificationENFHEX News—Bull. European Network of Forensic Handwriting Experts, vol. 1, pp. 23-47, 2004.2004
+[13]C. Hertel,H. BunkeA Set of Novel Features for Writer IdentificationProc. Int’l Conf. Audio- and Video-Based Biometric Person Authentication, pp. 679-687, 2003.2003
+[14]J. Hochberg,K. Bowers,M. Cannon,P. KellyScript and Language Identification for Handwritten Document ImagesInt’l J. Document Analysis and Recognition, vol. 2, nos. 2-3, pp. 45-52, 1999.1999
+[15]N.E. Ben Amara,F. BouslamaClassification of Arabic Script Using Multiple Sources of Information: State of the Art and PerspectivesInt’l J. Document Analysis and Recognition, vol. 5, no. 4, pp. 195-212, 2003.2003
+[16]K. Han,I.K. SethiHandwritten Signature Retrieval and IdentificationPattern Recognition Letters, vol. 7, no. 1, pp. 83-90, 1996.1996
+[17]V.S. NalwaAutomatic On-Line Signature VerificationProc. IEEE, vol. 85, no. 2, pp. 215-239, 1997.1997
+[18]R. Sabourin,J.P. Drouhard,E.S. WahShape Matrices as a Mixed Shape Factor for Off-Line Signature VerificationProc. Int’l Conf. Document Analysis and Recognition, pp. 661-665, 1997.1997
+[19]R. SabourinOff-Line Signature Verification: Recent Advances and PerspectivesProc. Brazilian Symp. Document Image Analysis, pp. 84-98, 1997.1997
+[20]S. Chen,S.N. SrihariUse of Exterior Contours and Word Shape in Off-Line Signature VerificationProc. Int’l Conf. Document Analysis and Recognition, pp. 1280-1284, 2005.2005
+[21]J.C. SimonOff-Line Cursive Word RecognitionProc. IEEE, vol. 80, no. 7, pp. 1150-1161, 1992.1992
+[22]R.G.J. Meulenbroek,A.J.W.M. Thomassen,P.H.H.M. van Lieshout,S.P. SwinnenThe Stability of Pen-Joint and Interjoint Coordination in Loop WritingActa Psychologica, vol. 100, nos. 1- 2, pp. 55-70, 1998.1998
+[23]G. Boccignone,A. Chianese,L.P. Cordella,A. MarcelliRecovering Dynamic Information from Static HandwritingPattern Recognition, vol. 26, no. 3, pp. 409-418, 1993.1993
+[24]R. Plamondon,C.M. PriviteraThe Segmentation of Cursive Handwriting: An Approach Based on Off-Line Recovery of the Motor-Temporal InformationIEEE Trans. Image Processing, vol. 8, no. 1, pp. 80-91, 1999.1999
+[25]D.S. Doermann,A. RosenfeldRecovery of Temporal Information from Static Images of HandwritingInt’l J. Computer Vision, vol. 15, nos. 1-2, pp. 143-164, 1995.1995
+[26]D.S. Doermann,A. RosenfeldThe Interpretation and Reconstruction of Inferring StrokesProc. Int’l Workshop Frontiers in Handwriting Recognition, pp. 41-50, 1993.1993
+[27]S. JaegerOn the Complexity of CognitionProc. Int’l Workshop Frontiers in Handwriting Recognition, pp. 291-302, 2000.2000
+[28]Y. Kato,M. YasuharaRecovery of Drawing Order from Single-Stroke Handwriting ImagesIEEE Trans. Pattern Analysis and Machine Intelligence, vol. 22, no. 9, pp. 938-949, Sept. 2000.2000
+[29]Y. Qiao,M. Nishiara,M. YasuharaA Novel Approach to Recover Writing Order from Single Stroke Offline Handwritten ImagesProc. Int’l Conf. Document Analysis and Recognition, pp. 227-231, 2005.2005
+[30]T.S. Cheng,C. Chiang,S.M. Roan,H.C. FuFeature- Preserving Thinning Algorithm for Optical Character RecognitionProc. SPIE—Character Recognition Technologies, pp. 279-290, 1993.1993
+[31]L. Lam,S.W. Lee,C.Y. SuenThinning Methodologies: A Comprehensive SurveyIEEE Trans. Pattern Analysis and Machine Intelligence, vol. 14, no. 9, pp. 869-885, Sept. 1992.1992
+[32]B.K. Jang,R.T. ChinAnalysis of Thinning Algorithms Using Math. MorphologyIEEE Trans. Pattern Analysis and Machine Intelligence, vol. 12, no. 6, pp. 541-551, June 1990.1990
+[33]T. Caesar,J. Gloger,A. Kaitenmeier,E. MandlerRecognition of Handwriting Word Images by Statistical MethodsProc. Int’l Workshop Frontiers in Handwriting Recognition, pp. 409-416, 1993.1993
+[34]L. Lam,C.Y. SuenAn Evaluation of Parallel Thinning Algorithms for Character RecognitionIEEE Trans. Pattern Analysis and Machine Intelligence, vol. 17, no. 9, pp. 914-919, Sept. 1995.1995
+[35]R. Plamondon,M. Bourdeau,C. Chouinard,C.Y. SuenValidation of Preprocessing Algorithms: A Methodology and Its Application to the Design of a Thinning Algorithm for Handwriting CharactersProc. Int’l Conf. Document Analysis and Recognition, pp. 262-269, 1993.1993
+[36]R. Plamondon,C.Y. Suen,M. Bourdeau,C. BarriereMethodologies for Evaluating Thinning Algorithms for Character RecognitionInt’l J. Pattern Recognition and Artificial Intelligence, vol. 7, no. 5, pp. 1247-1270, 1993.1993
+[37]T. Steinherz,N. Intrator,E. RivlinA Special Skeletonization Algorithm for Cursive WordsProc. Int’l Workshop Frontiers in Handwriting Recognition, pp. 529-534, 2000.2000
+[38]J.C. Pettier,J. CamillerappScript Representation by a Generalized SkeletonProc. Int’l Conf. Document Analysis and Recognition, pp. 850-853, 1993.1993
+[39]V. Pervouchine,G. Leedham,K. MelikhovThree-Stage Handwriting Stroke Extraction Method with Hidden Loop RecoveryProc. Int’l Conf. Document Analysis and Recognition, pp. 307-311, 2005.2005
+[40]I.S.I. Abuhaiba,M.J.J. Holt,S. DattaProcessing of Binary Images of Handwritten Text DocumentsPattern Recognition, vol. 29, no. 7, pp. 1161-1177, 1996.1996
+[41]I.S.I. Abuhaiba,S. Datta,M.J.J. HoltProcessing of Text Documents: Straight Line Approximation and Lost Loop RecoveryProc. Int’l Conf. Document Analysis and Recognition, pp. 1157- 1160, 1995.1995
+[42]D.S. DoermannDocument Image Understanding: Integrating Recovery and InterpretationPhD dissertation, Univ. of Maryland, 1993.1993
+[43]S. Madhvanath,G. Kim,V. GovindarajuChaincode Contour Processing for Handwritten Word RecognitionIEEE Trans. Pattern Analysis and Machine Intelligence, vol. 21, no. 9, pp. 928- 932, Sept. 1999.1999
+[44]T. Steinherz,E. Rivlin,N. Intrator,P. NeskovicAn Integration of Online and Pseudo-Online Information for Cursive Word RecognitionIEEE Trans. Pattern Analysis and Machine Intelligence, vol. 27, no. 5, pp. 669-683, May 2005.2005
+[45]D.S. Doermann,N. Intrator,E. Rivlin,T. SteinherzHidden Loop Recovery for Handwriting RecognitionProc. Int’l Workshop Frontiers in Handwriting Recognition, pp. 375-380, 2002.2002
+[46]C. Viard-Gaudin,P.M. Lallican,S. Knerr,P. BinterThe IRESTE On/Off (IRONOFF) Dual Handwriting DatabaseProc. Int’l Conf. Document Analysis and Recognition, pp. 455-458, 1999.1999
+[47]D.E. RumelhartTheory to Practice: A Case Study—Recognizing Cursive HandwritingComputational Learning and Cognition: Proc. Third NEC Research Symp., pp. 177-196, 1993.1993
+[48]I. Guyon,L. Schomaker,R. Plamondon,M. Liberman,S. JanetUnipen Project of On-Line Data Exchange and Recognizer BenchmarksProc. Int’l Conf. Pattern Recognition, pp. 29-33, 1994.1994

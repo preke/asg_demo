@@ -1,0 +1,220 @@
+Similarity Computation Based on Feature Extraction for Off-line Chinese Signature Verification
+Ji Jun-wen,Lu Zheng-ding,Chen Xiao-su
+jijunwen@mail.hust.edu.cn,Rosy7811@public.wh.hb.cn,x_s_chen@mail.hust.edu.cn
+
+Abstract
+In this paper we present a new method for off-line Chinese signature verification. The approach is based on feature extraction of every segment segmented from the signature image. After preprocessed and segmented, the signature image is segmented to some segments. Every segment is represented by a set of seven features. By using these segments and its features, the degree of similarity between the questioned sample and the n genuine signature samples is computed. Only a little number (3 to 5) of genuine samples for each writer is needed by using a simplified version of question document expert’s classifier. Experimental results show our approach is promising to distinguish random and simple forgeries from genuine signatures effectively.
+
+1. Introduction
+As one of the personal verification in our daily life, signature verification has many metrics, such that signatures are easy to be acquired; the verification is non-intrusive and is widely accepted by people. Therefore signature verification plays an important role in the personal verification field and attracts more and more researchers to work in this field [1-2].
+Two-classes of signature verification system are usually distinguished: on-line system for which signature data are captured during the writing process, which makes available the static features and the dynamic features like velocity, acceleration and pressure etc, and off-line system for which signature data takes place on a static image captured once the writing process is over, which only makes available the static features [3].
+Many approaches are used for solving the involved automatic off-line signature verification problems [4~10]. In general, the proposed techniques use either a type of features (global, local, statistical, geometric, pseudo dynamic etc), or a combination of different types of features [4~5], which extracted from the signature images.
+A simple and efficient approach is introduced that can be applied to off-line Chinese signature verification. The approach is based on feature extraction of segment of the signature skeleton and the analysis of the matching between two compared signatures’ skeletons. Each extracted segment is represented by three sets of features. In the first set of features, there are two features: its horizontal and vertical center of the segment. Secondly, the number of points that have four kinds of directions neighbors is counted. Lastly, the relative grays of the segment. This information is efficiently compared with the corresponding patterns stored in the signature reference database using the method introduced in ref. [11]. The degree of similarity between the test sample and the n genuine samples stored in the signature reference database is computed.
+
+2. Signature Database
+To support our approach of off-line Chinese signature verification, a database of handwriting samples from 40 participants was collected, every writer has 30 samples. The sample collection was performed in 6 times (5 signatures per times) in two months. The writers were asked to use as muchvariation in the signature size as they should ever use in real circumstances. The collection was subdivided into two parts. The first part, composed
+978-0-7695-3735-1/09 $25.00 © 2009 IEEE DOI 10.1109/FSKD.2009.597
+291
+of 8 writers, was used in the training stage. In this stage the best values of parameter: T (minimal distance threshold value between two compared signature segments) is experimentally determined. The second part included the rest was used in the testing stage and as a reference database. A set of 25 samples per writer was used in testing (25*32 genuine samples), with a subset of 3 to 5 genuine samples as a reference (3~5*32 genuine samples). The testing database was expanded by the addition of forgeries, specifically, a set of 8 simple forgeries (8*32) and 5 simulated forgeries (5*32) for each writer.
+
+3. Preprocessing, Segmentation and Feature Extraction
+3.1. Preprocessing
+The signature images scanned are subjected to a set of processing sequence: binarization, normalizing, thinning [12]. Figure 1 shows the preprocessing.
+.
+
+3.2. Segmentation
+In our method, the verification is based on the segments of signature skeleton. First there are some definitions should be explained.
+Let S is the thinned signature; P is a point on the S, then the black point is:
+End points: end point is defined as a point in thinning signature that has only one 8-neighbor is black point, 1)( =PN b .
+Cross points: cross point is a point in signature
+skeleton, which has at least three 8-neighbors are black points, 3)( ≥PNb .
+Connected points: connected point is a point in signature skeleton, which has at least two 8-neighbors are black points, 2)( =PNb .
+The main sequence of the segmentation algorithm is labeling the connected components. The component that has only two end points and no cross points is a segment naturally. The others that have at least two end points and some cross-points are segmented to smaller segments by tracking the pixels of the components.
+
+3.3. Feature Extraction
+After preprocessed and segmented, the signature is represented by a series of segments. Every segment is represented by a set of seven features. Let “s(x, y)” is the image of the segment s, M is the width of the signature and N is the height, therefore, first of all, there are two features reflect the geometric center of the segment s, they are:
+(1) Relative horizontal center of the segment sxC is defined as:
+M yxs
+yxsx C N
+y
+M
+x
+N
+y
+M
+xs x /
+),(
+),(
+1 1
+1 1
+∑∑
+∑∑
+= =
+= = ⋅ = (1)
+(2) Relative vertic1e center of the segment syC is defined as:
+N yxs
+yxsy C N
+y
+M
+x
+N
+y
+M
+xs y /
+),(
+),(
+1 1
+1 1
+∑∑
+∑∑
+= =
+= = ⋅ = (2)
+Next, there are other four features reflect the track
+of the segment s. They are (1) the number ( shP ) of points which have horizontal neighbor, shown in figure 4, (2) the number ( svP ) of points which have vertical neighbor, shown in figure 4, (3) the number ( spP ) of points which have positive diagonal neighbor, shown in figure 4, and (4) the number ( snP ) of points which have negative diagonal neighbor, shown in figure 4.
+∑∑ = =
+= N
+y
+M
+x
+s hs h
+yxs
+PR
+1 1 ),(
+(3)
+∑∑ = =
+= N
+y
+M
+x
+s vs v
+yxs
+P R
+1 1
+),(
+(4)
+∑∑ = =
+= N
+y
+M
+x
+s ps p
+yxs
+P R
+1 1 ),(
+(5)
+∑∑ = =
+= N
+y
+M
+x
+s ns n
+yxs
+P R
+1 1
+),(
+(6)
+Figure 4. Four kinds of neighbor
+Finally, the last one feature reflects the stroke thickness of the segment s. Stroke thickness is an important property of Chinese signature which is useless in western handwriting. The stroke thickness of the segment sW is defined as:
+∑∑
+∑∑
+= =
+= =
+⋅
+⋅ = N
+y
+M
+x
+N
+y
+M
+x s s
+yxfx
+yxfx W
+1 1
+1 1
+),(
+),( (7)
+Where the ),( yxfs denote the grays of the segment s of the normalized signature, and the
+),( yxf denote the grays of the image of the normalized signature.
+
+4. Similarity computation
+In the experiments, the samples have been classified to W1 and W2, the W1 is composed of genuine samples, and the W2 is composed of forgeries, include random, simple and skilled forgeries. An expert on questioned documents [11] is used to verify a signature sample is genuine or non-genuine. Let ( igS ) is a set of genuine signature samples, ( qS ) is a set of questioned samples. This approach is simplified to compute the degree of similarity ),...2,1( nisimiqg = between the questioned sample and the n genuine signature samples respectively， and the last similarity degree qSIM is
+the weighted average of the ),...2,1( nisimiqg = , which is defined as:
+Let },...2,1|{},,...2,1|{, nkkjnkkisimij =∈=∈ d enote the 2n similarity degree in the n genuine signature samples. Then qSIM is given by the equation
+n qgn i qgiqgq simsimsimSIM ×+⋅⋅⋅+×+⋅⋅⋅+×= λλλ 1 1 (8) The iλ is define as:
+100),,2,1(,
+1 1
+1 =⋅⋅⋅= ×− − = ∑∑ ∑
+= =
+= iin
+i
+n
+j iiij
+ii
+n
+j ij
+i simni simnsim
+simsim λ (9)
+Where the },...2,1|{},,...2,1|{, nkkjnkkisimij =∈=∈ denote the 2n similarity degree in the n genuine signature samples.
+As previously described, after the preprocessing, segmentation and feature extraction, the signature is represented by a series of segments. Every segment is represented by a seven dimensions vector which denotes the seven features of the segment. For a pair of signatures, each segment in signature A is found the most similar corresponding segment in signature B by using a Euclidean feature matching approach. Let there are n segments in signature A and m segments in signature B. For each segment (segment i ) in signature A, the 3*m Euclidean distances are computed as
+mjCCCCd jy i y j x i xij ≤≤−+−= 1,)()( 221
+(10)
+mjRRRRRRRRd jn i n j p i p j v i v j h i hij ≤≤−+−+−+−= 1,)()()()( 22222 (11)
+mjwwd jiij ≤≤−= 1, 3 (12)
+Then the corresponding of i segment in signature A is q segment in signature B.
+⎪ ⎩
+⎪ ⎨
+⎧
+= = = = 2222 2222
+2222
+},,min{, },,min{, },,min{,
+isisilik
+ilisilik
+ikisilik dddds ddddl ddddk q
+where, k, l and s are the serial number of three segments in signature B, and these three segments in signature B have the three smallest distance with signature A. i.e.
+11 ijit dd ≤ , ( };,,{ slkt ∈ ],1[ mj ∈ and slkj ,,≠ ).
+For each segment in signature A, the value iv are defined as:
+⎪⎩
+⎪ ⎨ ⎧
+>=++ <++ = Tddd Tddd v
+iii
+iii
+iqiqiq
+iqiqiq i 321
+321
+,0 ,1
+(14)
+If 1=iv means the i segment in signature A is matching with a segment ( iq ) in signature B, on the other hand, if 0=iv means the i segment in signature A can not find the matching segment in signature B; T is a distance threshold which is experimentally decided in training stage.
+Let abmat represents the number of matching segments of signature A. abmat is given as
+∑ =
+= n
+i iab vmat 1 . (15)
+The bamat represents the number of matching segments of signature B. Then, the similarity degree between signature A and B is computed as
+}100,100min{ ××= m mat n mat sim baabab
+(16)
+The distance threshold value T in equation 14 is experimentally determined at the training stage. Sixteen signatures (2*8) took out from the first part of the signatures database consisted on the training set. In this stage, only the degree of the similarity between two signatures, which may be written by same writer or different writers, is computed. After experimental tests show that the best value of T is 0.44, which the difference of the average similarity degree of two signatures from the same writer reaches the minimum value and the difference of the average similarity degree of two signatures from different writers reaches the maximum value.
+To evaluate the approach, there are two types of errors, which are the false rejection rate (FRR) and false acceptance rate (FAR). FRR error has occurred when samples by the same writer are identified as
+different writers. FAR error has occurred when samples by two different writers are identified as same writer.
+
+5. Experimental Results
+Two experiments respectively use 3 and 5 numbers of the genuine samples (second database). Table 1 and Table 2 show the results of these experiments. In every experiment the general error rates are controlled by a threshold parameter (T) that serves to achieve a balance between acceptance and rejection. The good results for random forgeries verification is obtained even though only 3 genuine samples used. Along with the increasing of the number of reference for each writer the two types of error rate fell down. The high accepted skilled forgeries indicate the lack for skilled forgeries verification using this method.
+
+6. Conclusion and Future Work
+In this paper, we have presented our approach to verify off-line Chinese signatures; the approach is based on feature extraction of every segment of the signature image and the analysis of the matching between two compared signatures’ images. There are many features in a signature, the position information; the track information and the stroke thickness information of the segments are used to compare two segments extracted from two different signatures. To evaluate the system two experiments were done. The
+(13)],1[},,{ mslk ⊂
+results show that only 3 to 5 genuine samples are sufficient for every writer, and the correct rate of this system rises with the increase of the number of the genuine samples collected in different times. The FRR rate rises with the increase of the distance threshold value T while the FAR rate falls.
+The high accepted level of skilled forgeries reflects the lack of this method to distinguish skill forgery from genuine samples. So, to extract other features like pseudo-dynamic features and join to this method is our work in future. Moreover, how to intelligently calculate the distance threshold value T is our work in future too.
+
+7. References
+[1] M. K. Kalera, S. Srihari, and A. Xu. Off-line signature verification and identification using distance statistics. Journal of Pattern Recognition and Artificial Intelligence, 18(7):1339-1360, 2004. 
+[2] F.Leclerc and R.Plamondon, Automatic signature verification: The state of the art 1989-1993, IJPRAI, vol. 8, no. 3, pp. 643-660, 1994. 
+[3] G.Dimauro, S.Impedovo, M.G. Lucchese, R.Modugno and G.Pirlo, Recent advancements in automatic signature verification, Proceeding of IWFHR-9, pp. 179 – 184, 2004. 
+[4] S. Armand, M. Blumenstein, and V. Muthukkumarasamy. Off-line signature verification using the enhanced modified direction feature and neural-based classification. In 2006 International Joint Conference on Neural Networks, pages 684-691, 2006. 
+[5] R.Sabourin, G.Genest and F.Prêteux, Off-line Signature Verification by Local Granulometric Size Distributions, IEEE Trans. PAMI, vol.19, no. 9, pp. 976—988, 1997. 
+[6] R.Bajaj and S.Chaudhury, Signature Verification using Multiple Neural Classifiers, Pattern Recognition, vol. 30, no. 1, pp. 1-7, 1997. 
+[7] H.Baltzakis and N.Papamarkos, A New Signature Verification Technique Based on a Two-Stage Neural Network Classifier, Engineering Applications of Artificial Intelligence, No.14, 2001. 
+[8] E.J.R. Justino, F.Bortolozzi and R.Sabourin, Off-Line Signature Verification Using HMM for Random, Simple and Skilled Forgeries, Proceeding of ICDAR, pp. 105-110, 2001. 
+[9] E.J.R. Justino, El A.Yacoubi, F.Bortolozzi and R.Sabourin,” An off-line signature verification system using hidden Markov model and cross-validation, Proceedings XIII Brazilian Symposium on Computer Graphics and Image Processing, pp. 105 – 112, 2000. 
+[10] E.J.R. Justino, F.Bortolozzi and R.Sabourin, An Off-line Signature Verification Method Based on SVM Classifier andGraphometric Features, The 5th International Conference on Advances in Pattern Recognition, Calcutta, 2003. 
+[11] C. Santos, E.J.R. Justino, F.Bortolozzi and R.Sabourin, An Off-Line Signature Verification Method Based on the Questioned Document Expert’s Approach and a Neural Network Classifier, Proceeding of IWFHR-9, pp. 498 – 502, 2004. 
+[12] L. Lam, S.W. Lee and C.Y. Suen, Thinning methodologies-a comprehensive survey, IEEE Trans. PAMI, vol. 14, no. 9, pp. 869 – 885, 1992.

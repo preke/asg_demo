@@ -1,0 +1,159 @@
+Input Feature Selection by Mutual Information Based on Parzen Window
+Nojun Kwak,Chong-Ho Choi
+
+
+Index Terms—Feature selection, mutual information, Parzen window.
+æ
+
+1 INTRODUCTION
+MUTUAL information is considered as a good indicator of relevance between two random variables [1]. Recently, efforts to adopt mutual information in feature selection problems resulted in a series of researches [2], [3], [4]. Because the computation of mutual information between continuous variables is a very difficult job requiring probability density functions (pdf) and involving integration of those functions, mutual information feature selector (MIFS) [2], and its variants [3], [4] used histograms in approximating the pdfs to avoid these complexities. Thus, the performance can be degraded as a result of large errors in estimating the mutual information. In addition, MIFS methods have another limitation in that these methods do not provide a direct measure to judge whether to add additional features or not. More direct calculation of mutual information is attempted using the quadratic mutual information in the feature transformation field [5], [6], [7], but the relationship between Shannon’s mutual information and the quadratic mutual information is not clear so far.
+In this paper, a new feature selection method with the mutual information maximization scheme is proposed for classification problems. In calculating the mutual information between the input features and the output class, instead of dividing the input space into several partitions, we use the Parzen window method to estimate the input distribution. With this method, more accurate mutual information is calculated giving better performance than other methods.
+In the following section, the basics of information theory and the Parzen window method are briefly presented. In Section 3, we propose a new feature selection method and in Section 4, the proposed algorithms are applied to several classification problems to show their effectiveness. And finally, conclusions follow in Section 5.
+
+2 PRELIMINARIES
+2.1 Entropy and Mutual Information
+The entropy is a measure of uncertainty of random variables. If a discrete random variable X has X alphabets and the pdf is pðxÞ ¼ PrfX ¼ xg; x 2 X , the entropy of X is defined as
+The information found commonly in two random variables is of
+importance in our work, and this is defined as the mutual
+information between two variables:
+IðX; Y Þ ¼ X x2X X y2Y pðx; yÞ log pðx; yÞ pðxÞpðyÞ : ð3Þ
+If the mutual information between two random variables is large
+(small), it means two variables are closely (not closely) related. The
+mutual information and the entropy have the following relation:
+IðX; Y Þ ¼ HðY Þ ÿHðY jXÞ: ð4Þ
+For continuous random variables, though the differential
+entropy and mutual information are defined as HðXÞ ¼ ÿ Z pðxÞ log pðxÞdx
+IðX; Y Þ ¼ Z pðx; yÞ log pðx; yÞ
+pðxÞpðyÞ dxdy; ð5Þ
+it is very difficult to find pdfs (pðxÞ; pðyÞ; pðx; yÞ) and to perform the integrations. Therefore, we usually divide the continuous input
+feature space into several discrete partitions and calculate the
+entropy and mutual information using the definitions for discrete
+cases. The inherent error that exists in this process is of concern in the
+computation of entropy and mutual information of continuous
+variables.
+
+2.2 The Parzen Window Density Estimate
+The Parzen window density estimate can be used to approximate the probability density pðxÞ of a vector of continuous random variables X [8]. (From now on, the boldfaced letters represent
+vectors.) It involves the superposition of a normalized window
+function centered on a set of random samples. Given a set of n d-dimensional training vectors D ¼ fx1; x2; ; xng, the pdf estimate of the Parzen window is given by
+p̂ðxÞ ¼ 1 n Xn i¼1 ðx ÿ xi; hÞ; ð6Þ
+where ð Þ is the window function and h is the window width parameter. Parzen showed that p̂ðxÞ converges to the true density if ð Þ and h are selected properly [8]. The window function is required to be a finite-valued nonnegative density function whereZ
+ðy; hÞdy ¼ 1; ð7Þ
+and the width parameter is required to be a function of n such that
+lim n!1
+hðnÞ ¼ 0; ð8Þ
+and
+lim n!1
+nhdðnÞ ¼ 1: ð9Þ
+For window functions, the rectangular and the Gaussian
+window functions are commonly used. The Gaussian window
+function is given by
+. N. Kwak is with the School of Electrical Engineering and Computer Science, Seoul National University, Seoul, Korea. E-mail: triplea@csl.snu.ac.kr. . C.-H. Choi is with the School of Electrical Engineering and Computer Science and the Automation and Systems Research Institute, Seoul National University, Seoul, Korea. E-mail: chchoi@csl.snu.ac.kr.
+Manuscript received 29 Aug. 2001; revised 3 Feb. 2002; accepted 8 May 2002. Recommended for acceptance by J. Weng. For information on obtaining reprints of this article, please send e-mail to: tpami@computer.org, and reference IEEECS Log Number 114866.
+0162-8828/02/$17.00 ß 2002 IEEE
+ðz; hÞ ¼ 1 ð2 Þd=2hdj j1=2
+exp ÿ z T ÿ1z
+2h2
+; ð10Þ
+where is a covariance matrix of a d-dimensional vector of random variables z.
+
+3 MAXIMIZING MUTUAL INFORMATION WITH PARZEN WINDOW
+3.1 Problem Formulation
+The success of a feature selection algorithm depends critically on how much information about the output class is contained in the selected features. Using Fano’s inequality [1], the minimal probability of incorrect estimation PE of class C using inputs X is lower bounded by
+PE HðCjXÞ ÿ 1 logN ¼ HðCÞ ÿ IðX;CÞ ÿ 1 logN : ð11Þ
+Because the entropy of class HðCÞ and the number of classes N is fixed, the lower bound of PE is minimized when IðX;CÞ becomes the maximum. Thus, it is necessary for good feature selection methods to maximize the mutual information IðX;CÞ.
+Battiti [2] formalized this concept of selecting the most relevant k features from a set of n features in the following FRn-k problem and adopted a greedy selection scheme to solve this problem.
+(FRn-k). Given an initial set F with n features and an output class C, find the subset S F with k features that minimizes HðCjSÞ, i.e., that maximizes the mutual information IðS;CÞ, where S is a k-dimensional random vector whose components are the elements of S.
+In this scheme, starting from the empty set of selected features, we add the best available input feature to the selected feature set one by one until the size of the set reaches k.
+The ideal greedy selection algorithm using mutual information (MI) is realized as follows:
+1. (Initialization) set F ÿ “initial set of n features,” S ÿ “empty set.” 2. (Computation of the MI with the output class) 8fi 2 F , compute Iðfi;CÞ. 3. (Selection of the first feature) find the feature that maximizes Iðfi;CÞ, set F ÿF n ffig; S ÿffig. 4. (Greedy selection) repeat until desired number of features are selected.
+a. (Computation of the joint MI between variables) 8fi 2 F , compute Iðfi; S;CÞ. b. (Selection of the next feature) choose the feature fi 2 F that maximizes Iðfi; S;CÞ, and set
+F ÿF n ffig; S ÿffig:
+5. Output the set S containing the selected features.
+To compute the mutual information, we must know the pdfs of input and output variables, but this is difficult in practice, so the histogram method has been used in estimating the pdfs. But, the histogram method needs extremely large memory space in calculating mutual information. For example, in selecting k features problem, if the output classes are composed of Kc classes and we divide the jth input feature space into Pj partitions to get the histogram, there must beKc kj¼1Pj cells to compute Iðfi; S;CÞ. In this case, even for a simple problem of selecting 10 important features, Kc 1010 memories are needed if each feature space is divided into 10 partitions. Therefore, realization of the ideal greedy selection algorithm is practically impossible by estimating the pdfs with histogram. To avoid this practical obstacle, alternative methods [2], [3], [4] use only joint pdfs of two variables in calculating mutual informations. Although these methods report good results on some
+problems, these are prone to errors because they do not use direct mutual information. To overcome these problems, we propose a new method for computing the mutual information in the following section.
+
+3.2 Calculation of Mutual Information with Parzen Window
+In classification problems, the class has discrete values while the input features are usually continuous variables. In this case, rewriting the relation of (4), the mutual information between the input features X and the class C can be represented as follows:
+IðX;CÞ ¼ HðCÞ ÿHðCjXÞ:
+In this equation, because the class is a discrete variable, the entropy of the class variable HðCÞ can be easily calculated as in (1). But, the conditional entropy
+HðCjXÞ ¼ ÿ Z X pðxÞ XN c¼1 pðcjxÞ log pðcjxÞdx; ð12Þ
+where N is the number of classes, is hard to get because it is not easy to estimate pðcjxÞ.
+Now, we present a new method to estimate the conditional entropy and the mutual information by the Parzen window method. By the Bayesian rule, the conditional probability pðcjxÞ can be written as
+pðcjxÞ ¼ pðxjcÞpðcÞ pðxÞ : ð13Þ
+If the class has N values, say 1; 2; ; N , we get the estimate of the conditional pdf p̂ðxjcÞ of each class using the Parzen window method as
+p̂ðxjcÞ ¼ 1 nc X i2Ic ðx ÿ xi; hÞ; ð14Þ
+where c ¼ 1; ; N ; nc is the number of the training examples belonging to class c; and Ic is the set of indices of the training examples belonging to class c. Because the summation of the conditional probability equals one, i.e.,
+XN k¼1 pðkjxÞ ¼ 1;
+the conditional probability pðcjxÞ is
+pðcjxÞ ¼ pðcjxÞPN k¼1 pðkjxÞ ¼ pðcÞpðxjcÞPN k¼1 pðkÞpðxjkÞ :
+The second equality is by the Bayesian rule (13). Using (14), the estimate of the conditional probability becomes
+p̂ðcjxÞ ¼ P
+i2Ic ðx ÿ xi; hcÞPN k¼1 P i2Ik ðx ÿ xi; hkÞ ; ð15Þ
+where hc and hk are class specific window width parameters. Here, we used p̂ðkÞ ¼ nk=n instead of true density pðkÞ. If we use the Gaussian window function (10) with the same window width parameter and the same covariance matrix for each class1 (15) becomes
+p̂ðcjxÞ ¼ P i2Ic expðÿ ðxÿxiÞT ÿ1ðxÿxiÞ
+2h2 ÞPN k¼1 P i2Ik expðÿ ðxÿxiÞT ÿ1ðxÿxiÞ 2h2 Þ:
+ð16Þ
+1. For multiclass classification problems, there may not be enough samples such that the error for the estimate of class specific covariance matrix can be large. Thus, we use the same covariance matrix for each class throughout this paper.
+Now in the calculation of the conditional entropy (12) with n training samples, if we replace the integration with a summation of the sample points and suppose each sample has the same probability, we get
+ĤðCjXÞ ¼ ÿ Xn j¼1 1 n XN c¼1 p̂ðcjxjÞ log p̂ðcjxjÞ; ð17Þ
+where xj is the jth sample of the training data. With (16) and (17), we get the estimate of the mutual information.
+The computational complexity for (17) is propotional to n2 d. When there is a computational problem because of large n, we may use the clustering method [9] or the sample selection method [10] to speed up the calculation. The methods based on histograms require computational complexity and memory proportional to qd, where q represents number of quantization levels. Note that the proposed method does not require excessive memory, unlike the histogram based methods.
+With this estimation, the FRn-k problem can be solved by the greedy selection algorithm represented in the previous section. Note that the dimension of a input feature vector x starts from one at the beginning and increases one by one as a new feature is added to selected feature set S.
+
+3.3 Properties of the Proposed Method
+In the proposed mutual information estimation, the selection of the window function and the window width parameter is very important. As mentioned in Section 2, the rectangular window and the Gaussian window is normally used for the Parzen window function. In our simulation, we used the Gaussian window rather than the rectangular window because it does not contain any discontinuity. For the window width parameter h, we used k=logn as in [11], where k is a positive constant and n is the number of the samples. This choice of h satisfies the conditions (8) and (9).
+To see the properties of the proposed algorithm, let us consider the typical four points XOR problem. Let x ¼ ðx1; x2Þ be a continuous input feature vector and the samples for x are given (0,0), (0,1), (1,0), (1,1). The term c is the discrete output class which takes a value in fÿ1; 1g. In the Parzen window method, each sample point influences the conditional probability throughout the entire feature space. The influence ðx ÿ xi; hÞ of a sample point xi is drawn according to the polarity of its corresponding class. We call it a class specific influence field, which is similar to an electric field produced by a charged particle. The influence fields generated by given four sample points in the XOR problem are shown in Fig. 1. In the figure, the slope and the range of the influence field are determined by the window width parameter h. The smaller h is, the sharper the slope and the narrower the range of influence becomes. Fig. 1 was drawn with h ¼ 12logn , where n is the number of sample points which is four in this case. With this h, the higher (lower) estimate for the conditional probability of class c being ÿ1 or 1 for each sample point is 0.90 (0.10) by (16). With (17), the conditional entropy estimate Ĥðcjx1; x2Þ becomes 0.465, and the entropy HðcÞ is 1 by (1). Thus, the estimate of the mutual
+information between two input features and the output class Îðc;x1; x2Þ (¼ HðcÞ ÿ Ĥðcjx1; x2Þ) is 0.535. The significance of Îðc;x1; x2Þ being greater than zero will become clear later.
+In Fig. 2, we provide the conditional probability of class 1 calculated by (16) on the input feature space. Note that we can get a Baye’s classifier if we classify a given input to class 1 when pðc ¼ 1jxÞ > 0:5 and to class ÿ1 when pðc ¼ 1jxÞ < 0:5. This classifier system is a type of Parzen classifier [9], [12], [10], [13]. Since the classifier system is not our concern, we do not go further with this issue.
+In the process of the greedy selection scheme, the mutual information Iðx1; cÞ, Iðx2; cÞ between the variables x1, x2 and the class c is zero, while the estimate of the mutual information Îðc;x1; x2Þ between the output class and both input features is far greater than zero. Thus, we know that using both features gives more information about the output class than using only one of the variables in the greedy selection scheme with the Parzen window. But, in the conventional feature selection methods such as MIFS [2] and MIFS-U [3], we do not get this knowledge because these methods do not use the mutual information of multiple variables. Instead, to avoid using too many memory cells in calculating mutual information with the histogram method, they make use of some measure on redundancy between variables which can be obtained by calculating the mutual information between two input features. These methods report good performances in several problems, but they are prone to errors in highly nonlinear problems like XOR problem and have to resort to some other methods like Taguchi method [4].
+One more advantage of the proposed method is that it provides a measure that indicates whether to use additional features or not. Though it is quite difficult to estimate how much the performance will increase with one more feature by the increase of the mutual information, we can at least get a lower bound of error probability by the Fano’s inequality and can compare the increments of mutual information or the error probability which will aid the decision whether to add more features or not.
+
+4 EXPERIMENTAL RESULTS
+In this section, we applied the greedy selection algorithm with Parzen window to some of the classification problems and show the effectiveness of the proposed method.
+In all the following experiments, we set h ¼ 1logn , where n is the sample size of a particular data set as in [11]. Because the off diagonal terms in the covariance matrix can be prone to large errors and need great computational efforts, we used only diagonal terms in the covariance matrix for simplicity if not otherwise stated.
+In addition, to expedite the computation, we restricted the influence range of a sample point to 2 h for each dimension, i.e., made the influence to zero in the outer domain of 2 h from the sample point, where is a standard deviation of the corresponding feature. This can greatly reduce the computational effort, especially when there are already enough selected features. For convenience, we will refer to the proposed method as PWFS (Parzen window feature selector) from now on.
+
+4.1 Sonar Data Set [14]
+This data set was constructed to discriminate between the sonar returns bounced off a metal cylinder and those bounced off a rock, and it was used in [2] and [4] to test the performances of their feature selection methods. It consists of 208 patterns including 104 training and testing patterns each. It has 60 input features and two output classes: metal and rock. As in [2], we normalized the input features to have the values in [0,1] and allotted one node per each output class for the classification. We divided each input feature space into 10 partitions to calculate the entropies and mutual information. We do not know which features are important a priori, so we selected 3 12 features (top 5 percent 20 percent) among the 60 features, and trained the neural network with the set of training patterns using these input features. Multilayer perceptrons (MLP) with one hidden layer were used and the hidden layer had three nodes as in [2]. The conventional back-propagation (BP) learning algorithm was used with the momentum of 0.0 and learning rate of 0.2. We trained the network for 300 epochs in all cases as Battiti did [2].
+For comparison, we used two types of PWFS for this data set; first one only uses diagonal terms in the covariance matrix (Type I), and the other uses full covariance matrix (Type II). We present the selection order and the mutual information estimate ÎðS;CÞ for PWFS in Fig. 3 In the figure, the left bars show the results of Type I and the right bars show those of Type II. Here, C and S are as defined in Section 3.1. In the figure, the number on top of each bar represents the index of selected feature. We can see the estimate of the mutual information is saturated after 10 (9) features were selected with Type I (Type II) thus, we used 10 (9) features and did not use more features in PWFS. Note that the selected features of Type I and Type II give nearly the same ÎðS;CÞ and are the same when the number of selected features is small.
+In Table 1, we compare the performance of PWFS with those of the conventional MIFS and MIFS-U. In addition, we also report the result of stepwise regression [15]. The results of MIFS, MIFS-U, and stepwise regression are from [4]. In the table, all the resulting
+classification rates are the average values of 10 experiments and the corresponding standard deviations are shown in the parentheses.
+From the Table 1, we can see that PWFS produced better performances than the others and the performances of Type I and Type II do not differ much.
+
+4.2 Vehicle Data Set [16]
+The purpose of the data set is to classify a given silhouette as one of four types of vehicle, “Opel,” “Saab,” “bus,” and “van,” using a set of features extracted from the silhouette. The vehicle may be viewed from one of many different angles. There are 18 numeric features that were extracted from the silhouettes. Total number of examples are 946, which includes 240 Opel, 240 Saab, 240 bus, and 226 van. Among these, we used 200 data as a training set and the other 646 data as a test set.
+We compared PWFS with MIFS and MIFS-U. The stepwise regression cannot be used because this is a classification problem with more than two classes. The classification was performed using MLP with a the standard BP algorithm. Three hidden nodes were used with learning rate of 0.2 and zero momentum. We trained the MLP for 300 iterations, 10 times for each experiment. Table 2 is the classification rates of various numbers of selected features. The numbers in the parentheses are the standard deviations of 10 experiments. The result show that PWFS is better than the other algorithms for vehicle data set.
+
+4.3 Other UCI Data Sets
+We tested PWFS for various data sets in the UC-Irvine repository [14] and compared the performances with those of MIFS and MIFS-U. Table 3 contains brief information of the data sets used in this paper. For these data sets, we have selected several features, and the results are shown in Tables 4, 5, 6, and 7. As classifier systems, we used the decision tree classifier C4.5 [16] for “letter” and “breast cancer” data sets and the nearest neighborhood classifier with neighborhood size of three for “waveform” and “glass” data sets. In the experiments, we used 75 percent as the training set and the other 25 percent as the test set for “letter” data, 50 percent as the training set and the other 50 percent as the test set for “breast cancer,” 30 percent as the training set and 70 percent as the test set for “waveform.” Since the number of instances is relatively small in “glass” data set, we used the 10-fold cross-validation for this data set. In most experiments, we can see that PWFS exhibits better performances than MIFS and MIFS-U.
+
+5 CONCLUSIONS
+In this paper, we have proposed a method for calculating mutual information between continuous input features and discrete output class and applied this to a greedy input feature selection algorithm for classification problems. Although the mutual information is a very good indicator of the relevance between variables, the reasons why it is not widely used is its computational difficulties, especially for continuous multiple variables. The proposed method make use
+TABLE 1 Classification Rates with Different Numbers of Features for Sonar Data Set (%)
+(The numbers in the parentheses are the standard deviations of 10 experiments.)
+of the Parzen window in getting the conditional density in a feature space. With this method, we can compute the mutual information between output class and multiple input features without requiring a large amount of memory.
+The computational complexity of the proposed method is proportional to the square of the given sample size. This might be a limiting factor for huge data sets, but with a simple modification that confines each influence field in a finite area, we can greatly reduce the computational efforts. Furthermore, it is expected that a clustering or sample selection method can be used to overcome this limitation.
+We applied the method for several classification problems and obtained better performances than those of the conventional methods such as MIFS, MIFS-U, and the stepwise regression.
+
+ACKNOWLEDGMENTS
+This work is partly supported by the Brain Neuoinfromatics Research Program from the Korean government.
+
+References
+[1]T.M. Cover,J.A. ThomasElements of Information TheoryJohn Wiley & Sons1991
+[2]R. BattitiUsing Mutual Information for Selecting Features in Supervised Neural Net Learning,IEEE Trans. Neural Networks,1994
+[3]N. Kwak,C.-H. ChoiImproved Mutual Information Feature Selector for Neural Networks in Supervised Learning,Proc. 1999 Int’l Joint Conf. Neural Networks,1999
+[4]N. Kwak,C.-H. ChoiInput Feature Selection for Classification Problems,IEEE Trans. Neural Networks,2002
+[5]D. Xu,J.C. PrincipeLearning from Examples with Quadratic Mutual Information,IEEE Signal Processing Soc. Workshop,1998
+[6]K. Torkkola,W.M. CampbellMutual Information in Learning Feature Transformations,Proc. Int’l Conf. Machine Learning,2000
+[7]K. TorkkolaNonlinear Feature Transforms Using Maximum Mutual Information,Proc. Int’l Joint Conf. Neural Networks,2001
+[8]E. ParzenOn Estimation of a Probability Density Function and Mode,Annals of Math. Statistics,1962
+[9]G.A. Babich,O.I. CampsWeighted Parzen Window for Pattern Classification,IEEE Trans. Pattern Analysis and Machine Intelligence,1996
+[10]K. Fukunaga,R.R. HayesThe Reduced Parzen Classifier,IEEE Trans. Pattern Analysis and Machine Intelligence,1989
+[11]C. Meilhac,C. NastarRelevance Feedback and Category Search in Image Databases,Proc. IEEE Int’l Conf. Content-Based Access of Video and Image Databases,1999
+[12]Y. Muto,H. Nagaseand YHamamoto, “Evaluation of a Modified Parzen Classifier in High-Dimensional Spaces,” Proc. 15th Int’l Conf. Pattern Recognition, vol. 2, pp. 67-702000
+[13]Y. Hamamoto,S. Uchimura,S. TomitaOn the Behavior of Artificial Neural Network Classifiers in High-Dimensional Spaces,IEEE Trans. Pattern Analysis and Machine Inteligence,1996
+[14]P.M. Murphy,D.W. AhaUCI Repository of Machine Learning Databases,For more information contact ml-repository@ics.uci.edu or http://www.cs.toronto.edu/~delve/,1994
+[15]N.R. Draper,H. SmithApplied Regression Analysissecond ed. New York: John Wiley & Sons1981
+[16]R. QuinlanC45: Programs for Machine Learning. San Mateo, Calif.: Morgan Kaufmann1993
+[17]J.P. SiebertIEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE.1987

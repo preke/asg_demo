@@ -1,0 +1,283 @@
+Online Signature Verification and Recognition: An Approach Based on Symbolic Representation
+D.S. Guru,H.N. Prakash
+
+
+Abstract
+In this paper, we propose a new method of representing online signatures by interval-valued symbolic features. Global features of online signatures are used to form an interval-valued feature vectors. Methods for signature verification and recognition based on the symbolic representation are also proposed. We exploit the notions of writer-dependent threshold and introduce the concept of feature-dependent threshold to achieve a significant reduction in equal error rate. Several experiments are conducted to demonstrate the ability of the proposed scheme in discriminating the genuine signatures from the forgeries. We investigate the feasibility of the proposed representation scheme for signature verification and also signature recognition using all 16,500 signatures from 330 individuals of the MCYT bimodal biometric database. Further, extensive experimentations are conducted to evaluate the performance of the proposed methods by projecting features onto Eigenspace and Fisherspace. Unlike other existing signature verification methods, the proposed method is simple and efficient. The results of the experimentations reveal that the proposed scheme outperforms several other existing verification methods, including the state-of-the-art method for signature verification.
+
+1 INTRODUCTION
+AN online signature is a behavioral biometric used forpersonal authentication to complete automated transactions, gaining control of computing facilities or physical entry to protected areas. An online signature is more robust compared to an offline signature as it stores dynamic features [1] like azimuth, elevation, and pressure signals in addition to position trajectories. Nevertheless, it is unlikely that even skilled forgers could imitate online signatures along with their dynamic properties.
+Generally, the signature biometric problem has two distinct perspectives: 1) verification and 2) recognition. In verification, features of a test signature are contrasted with features of a limited set of signatures of the class whose identity is claimed, whereas, in recognition, the presence of an identity of a test signature in the database is ascertained. Recognition involves feature-matching stage that extends to entire database.
+Online signature verification can generally be divided into two groups: 1) parametric and 2) functional. In a parametric approach, a set of parameters abstracted from the signal represents a signature pattern and the parameters of the reference and test signatures are compared to decide if the test signature is authentic. In this approach, a signature is described compactly so that the enrollment data size is considerably small and constant. More importantly, this method of representation is more stable against the variations in local regions, which are common in signatures. In the literature, we can find hundreds of parameters proposed for signature verification. Several parameters are obtained from time function of the dynamic signals captured by digitizing tablets. Some of the most extensively used parameters are position, displacement, speed, acceleration [2], [3], number of pen ups and pen downs [3], pen down time ratio [2], Wavelet transform [4], Fourier transform [5], and direction-based [18] parameters. On the other hand, in a function-based approach, the time sequences describing local properties of online signatures are analyzed. In this approach, a signature is characterized by a time function (e.g., position trajectory, velocity, acceleration, pressure, direction of pen movement, and azimuth) [6], [7], [8]. In general, function-based systems show better performance than the parameter-based systems but require time-consuming matching/comparison procedures. However, the work [28] shows that the parametric approaches are equally competitive when compared to function-based approaches.
+During matching, the authenticity of a test signature is evaluated by comparing its features against those stored in the knowledgebase. Each matching technique is based on a suitable similarity (or dissimilarity) measure. The matching techniques based on Dynamic time warping (DTW) [8], [9], [10], [11], [12], Hidden Markov Model (HMM) [13], [14], [15], Support vector machine (SVM) [16], [17], and Neural Networks (NN) [18], [19], [20] are commonly used.
+When parameters are used as features, the euclidean [6], [7] distance is the most commonly used dissimilarity measure. When functions are considered, the matching techniques must take into account the variations of signing durations. Elastic matching such as Dynamic Time Warping [8], [9], [10] is the best one for this purpose. However, the time complexity of DTW is of Oðn2Þ.
+On the other hand, the HMM has also attracted many researchers. An HMM performs stochastic matching of a model and a test signature using a sequence of probability distributions of the features along the signature. This statistical theory of learning has an ability to absorb the variability and similarity between the patterns. The main limitations of HMMs are high computational complexity and large memory requirements. The number of parameters to be set in HMM is more and making a large assumption about the data (regarding transition probabilities and distributions) is required. In addition, large positive data are required to train an HMM.
+Another popular matching technique used for signature matching is the SVM. With a set of examples from two classes, an SVM finds the hyperplane that maximizes the distance from either class to the hyperplane and separates the largest number of points belonging to the same class on the same side. Therefore, the misclassification error of data in both the training set and test set is minimized. In [17], comparison of SVM classifiers with HMM classifiers in terms of the number of samples used for training and verification using different types of forgeries is carried out. Under both conditions, SVM appears to produce better results. However, the main limitations of SVMs are high algorithmic complexity and extensive memory requirements in large-scale tasks.
+Signature verification schemes based on Neural Network are also proposed [18], [19], [20]. Although, the neural network-based approaches have the capabilities in generalization, the drawback is the need for a large number of genuine and forgery signatures for training, which is not always practically viable.
+There are several other approaches used in signature biometry: the split and merge mechanism [21], an elastic local-shape-based model for handwritten curves [22], a scheme based on similarity measurement of logarithmic spectrum [23], a method for estimating similarity between the input signature and the reference set using string matching [24], a relaxation matching technique [25], a multiexpert system for signature verification [26], a combination of vector quantization and dynamic time warping by means of score fusion [27], fusion of function-based methods [28], etc.
+In this brief survey on signature verification, we understand that almost all works rely on common threshold or global threshold. To the best of our knowledge, the concept of writer-dependent threshold is exploited only in [24]. Writer-dependent threshold is shown to provide better results than a global threshold. In our work, in addition to adapting writer-dependent threshold, we introduce the concept of feature-dependent threshold for further improvement in results (toward achieving lower equal error rate).
+In this work, we propose a simple and novel approach for signature representation based on symbolic data. By the use of the proposed representation and by exploiting the concept of writer-dependent threshold and feature-dependent threshold, we address both the problems of verification and recognition of online signatures. The recent developments in the area of symbolic data analysis have proven that the real-life objects can be better described by the use of symbolic data, which are extensions of classical crisp data [29]. Symbolic data appear in the form of continuous ratio, discrete absolute interval and multivalued, multivalued with weightage, quantitative, categorical, etc. [30]. The concept of symbolic data analysis has been extensively studied in the field of cluster analysis [29], [31] and it has been proven both theoretically and experimentally that the clustering approaches based on symbolic data outperform conventional clustering techniques. More details and applications of symbolic data can be found in [32]. Recently, a symbolic representation model for 2D shapes has been proposed [33] and it is also shown that symbolic representation effectively captures shape information and the corresponding retrieval methodology outperforms conventional representation techniques [33]. In signature representation, since sample signatures of each person possess significant variations, features extracted from such samples too vary considerably. Therefore, we felt that it would be more meaningful to capture these variations in the form of interval-valued features and provide an effective representation for signatures. To the best of our knowledge, no work has been reported in the literature which uses symbolic representation for signatures. With this backdrop, in our previous work [42], we made an initial attempt toward application of symbolic data concepts for signature verification. In this paper, the same work is extended in many directions. By exploiting the concept of feature-dependent threshold and writer-dependent thresholds, we have obtained significant reduction in equal error rate. Further, the proposed approach is simple and easy to realize. Overall, the following are the contributions of this work:
+. a new method of symbolic representation for online signatures; . methods for signature verification and recognition, based on a novel similarity measure; . exploitation of the concept of writer-dependent threshold; . introduction of feature-dependent threshold; . conduction of extensive experiments for both verification and recognition on a large database of 16,500 signatures of 330 individuals (MCYT_ signature database); . achieving a remarkable reduction in EER when compared to the best contemporary works.
+All in all, the proposed model being a stand-alone and first of its kind in the literature of signature verification/ recognition is expected to open up a new dimension for further research in the field of signature biometrics by the use of symbolic data.
+The rest of the paper is structured as follows: In Section 2, the proposed method of symbolic representation, verification, and recognition of online signatures are presented. In Section 3, the details of the signature verification and recognition experimentations along with results are summarized. A comparative study is presented in Section 4. In Section 5, the proposed approaches of signature verification
+and recognition are applied on the features projected onto Eigenspace and Fisherspace. Finally, Section 6 follows with conclusions.
+
+2 PROPOSED MODEL
+The proposed model has two stages: symbolic representation of signatures followed by symbolic matching for verification and recognition. In this section, we propose a new method for representing signature in a database using interval-valued features. Subsequently, we present the corresponding signature verification and recognition models.
+
+2.1 Symbolic Representation
+The proposed symbolic representation of signatures is based on representing global features of online signatures of a class in the form of interval-valued data.
+Generally, a signature database consists of several signature samples of individuals collected over a period. Signature samples of each individual form a class and there will be several such classes of signatures in a database because of many individuals. Features of sample signatures of a class have considerable intraclass variations. Thus, we propose to have an effective representation to capture these variations through their assimilation by the use of intervalvalued feature vector called symbolic feature vector as follows.
+Let ½S1; S2; S3; . . . ; Sn be a set of n samples of a signature class say Cj, j ¼ 1; 2; 3; . . . ; N (N denotes the number of individuals) and let Fi ¼ ½fi1; fi2; fi3; . . . ; fim be the set of m features characterizing the signature sample Si of the classCj. Let jk, k ¼ 1; 2; . . . ;m, be the mean of the kth feature values obtained from all n samples of the class Cj, i.e.,
+jk ¼ 1
+n Xn i¼1 fik: ð1Þ
+Similarly, let jk, k ¼ 1; 2; . . . ;m, be the standard deviation of the kth feature values obtained from all n samples of the class Cj, i.e.,
+jk ¼ 1
+n Xn i
+fik jk 2" #12 : ð2Þ
+Now, we recommend to capture intraclass variations in each kth feature value of the jth class by the use of intervalvalued feature ½f jk; fþjk , where
+f jk ¼ jk jk and fþjk ¼ jk þ jk; ð3Þ
+where jk feature-level threshold is a function of jk, given by jk ¼ jk for some scalar . The parameter is used to constrain the upper and lower limit for each feature. Thus, the feature-level threshold jk would help us in capturing the intraclass variations in each feature which is independent of the other features with the support of variable width intervals. Each interval ½f jk; fþjk representation depends on the mean and standard deviation of respective individual features. The interval ½f jk; fþjk represents the upper and lower limits of a feature value of a signature class in the knowledgebase. Usage of common threshold has the disadvantage that the characteristics of different individuals are not taken
+into account. Some individuals may have very consistent writing style, which usually results in small dissimilarity in feature values, while others may have very inconsistent or complicated style, which results in higher dissimilarity in feature values. Therefore, our idea is to capture these variations with variable interval representations for each feature of an individual independent of other individuals and even from the other features of the same individual. The feature-dependent threshold is used to adapt the verification process to the properties of features of each individual. In principle, feature-dependent threshold can be derived from the enrollment data. This individual’s feature-dependent threshold forms a good measure to compare the features of a test signature with that of the reference signatures during verification and recognition stages.
+Now, the reference signature for the class Cj is formed by representing each feature (k ¼ 1; 2; 3; . . . ;m) in the form of an interval and is given by
+RFj ¼ f½f j1; fþj1 ½f j2; fþj2 ; . . . ; ½f jm; fþjm g: ð4Þ
+It shall be noted that, unlike conventional feature vector, this is a vector of interval-valued features and this symbolic feature vector is stored in the knowledge base as a representative of the jth signature class. Similarly, we recommend computing symbolic feature vectors (reference signatures) for all of the individual classes (j ¼ 1; 2; 3; . . . ; N) and store them in the knowledge base for future verification/recognition requirements. Thus, the knowledge base has N number of symbolic vectors, each corresponding to a class. The examples of feature vectors (of type crisp) for two sample signatures 1 and 2 (one from class 1 and another from class 2) and symbolic feature vectors of class 1 and class 2 are shown in Table 1 for 10 online features.
+
+2.2 Signature Verification
+The signature verification technique proposed in this work considers a test signature, which is described by a set of m feature values of type crisp (because the computed global features are of type crisp as there is only one signature sample), and compares it with the corresponding intervaltype feature values of the respective symbolic reference signature (of the claimed identity) stored in the knowledge base to ascertain the authenticity.
+Let Ft ¼ ½ft1; ft2; ft3; . . . ; ftm be an m-dimensional feature vector describing a test signature. Let RFj be the reference signature of the claimed identity described by an interval-
+valued symbolic feature vector as explained in Section 2.1.
+During signature verification process, each kth feature value
+of the test signature is compared with the corresponding
+interval in RFj to examine whether the feature value of the test signature lies within the corresponding interval. The
+number of features of a test signature which fall inside the
+corresponding interval of the respective reference signature
+is defined to be the degree of authenticity. We introduce an
+acceptance count Ac as a measure of degree of authenticity for the test signature to decide if it is authentic:
+Ac ¼ Xm k¼1 Cðftk; ½f jk; fþjk Þ; ð5Þ
+where
+Cðftk; ½f jk; fþjk Þ ¼ 1 if ðftk f jk and ftk fþjkÞ; 0 otherwise:
+ð6Þ
+All of the features of a test signature falling into its respective
+feature interval of the reference signature contribute a value 1
+toward acceptance count and there will be no contribution
+from other features which fall outside the interval.
+
+2.2.1 Common Threshold
+A common threshold has the advantage that all the feature
+values from all training signatures can be used to find an
+optimal value. If the acceptance count Ac is greater than a predefined threshold T , then the test signature is recom-
+mended to be an authentic, otherwise as a forgery. The
+features values of the queries and corresponding reference
+signatures of all individuals are compared and threshold
+value is selected based on minimum error criterion.
+However, the threshold T could even be made writer/
+individual dependent by deriving it from features of training
+samples of each class, as explained in the next section.
+
+2.2.2 Writer-Dependent Threshold
+Writer-dependent threshold is used to adapt the system to
+features of each individual. The writer-dependent threshold
+can be derived from training data. For reliable estimate, the
+writer-dependent threshold system requires more training
+data. Generally, one starts with common threshold and then
+modifies it for each writer according to writer-specific
+component [24].
+The proposed writer-dependent thresholds are derived as follows: Using training signatures (genuine), the reference signatures are formed as explained in Section 2.1. The writerdependent thresholds are derived from training signatures. Let ½S1; S2; S3; . . . ; Sn1 be n1 training signatures, which is a subset of n available samples of a class. The remaining signatures are used for testing. (There are N classes in the database, i.e., Cj, j ¼ 1; 2; 3; . . . ; N .) Then, feature values of each training signature are compared with feature values (interval type) of its reference signature to find acceptance count (Ac), as explained in Section 2.1. For each training signature, we get Ac. For each class, we get n1 acceptance counts, say Acp
+p¼1;2;3...n1. We have found a range of potential
+thresholds, like maximum (Acp), minimum (Acp), and average (Acp), to verify the system for optimal performance. Let Avg be average of Acp and it is computed as follows:
+Avg ¼ Xn1 r¼1 Acp=n1:
+The proposed system shows optimal performance at a potential threshold which is a function of Avg, given by T ¼ :ðAvgÞ for some scalar . This automatic writer-dependent threshold T ¼ :ðAvgÞ is used to change the operating point of our system for each individual according to the number of features required for each individual to be matched to qualify as genuine.
+
+2.3 Signature Recognition
+The signature recognition technique proposed in this work considers the test signature (imposter), which is described by a set of m feature values of type crisp and compares it with
+the reference signatures of all classes in the knowledge base. That is, the recognition is a 1: N comparison problem. Let Ft ¼ ½ft1; ft2; ft3; . . . ; ftm be an m-dimensional feature vector representing a test signature. LetRFj be a reference signature for the jth class represented by an interval-valued feature vector, as described in Section 2.1. Signature recognition strategy is to compare the test signature Ft with all the reference signatures RFj, j ¼ 1; 2; . . . ; N , in the knowledge base to obtain the acceptance count Ac for each reference signature. The test signature is said to belong to the class with which it has a maximum acceptance count with the condition that the maximum count be greater than the predefined threshold (T ) and, otherwise, it is considered as an imposter. In general, the threshold T could be either common or writer dependent. We could use acceptance count (5) to find the class with which a query signature has a maximum match (acceptance count) for the purpose of signature recognition. But, when the database happens to be large, there is a possibility for a test signature to possess the same maximum acceptance count with two or more reference signatures. Under such circumstances, we recommend to resolve the conflict by the use of the following similarity measure which computes the similarity value between a test signature and each of the conflicting classes, say the jth class:
+Total Sim ðFt; RFjÞ ¼ Xm K¼1 Simðftk; ½f jk; fþjk Þ: ð7Þ
+Here, ½f jk; fþjk represents the kth feature interval of the jth conflicting class and
+Simðftk; ½f jk; fþjk Þ ¼ 1 if ðftk f jk and ftk fþjkÞ
+max 11þjftk f jkj ; 1 1þjftk fþjk j
+otherwise; 8>< >:
+ð8Þ
+where is a normalizing factor. It shall be noted from (8) that, for the conflicting class, the contribution toward similarity is not only by ftk, which lies within the interval ½f jk; fþjk , but also by ftk, which lies outside the interval. It shall also be noted that under such situations, if the value ftk lies within the interval, then the contribution of that feature toward the similarity is 1 (high); otherwise, the contribution of that feature toward similarity depends on the extent to which the value ftk is closer to either lower limit f jk or the upper limit f þ jk. The contribution of the feature value which falls outside the interval toward similarity decreases as ftk lies away from either the upper limit fþjk or the lower limit f jk and, in all such cases, the contribution is less than one (< 1). This similarity function is thus recommended to be used while deciding a reference class to which a test signature belongs if there are two or more reference classes possessing the same acceptance count with the test signature. Sometimes, it may so happen that the contribution for the similarity from the features, which fall outside the interval, will be more than that of the features which fall within the intervals. In such cases, we can set to some scalar (< 1) to reduce the impact of these features. The parameter is very much useful in the cases
+where feature values vary over a wide range. In such cases, the value of has to be chosen empirically for each feature which is not normalized.
+
+2.4 Computational Complexity
+In this section, we present the computational complexity of the proposed methods of signature verification and recognition. Let m be the number of features per signature (reference feature vector is of an interval type and query feature vector is of type crisp) and let N be the total number of reference signatures. In verification stage, we compare a query with only the reference signature of the class of the claimed identity. Matching a crisp value with the lower and upper bounds of an interval involves two comparisons (two units of time). Thus, comparing m features of a query signature with the corresponding features (lower bound and upper bound of interval features) of a reference signature is of order ð2mÞ.
+In the recognition stage, we compare the query features with all N reference signatures in the database. So, the computational complexity of the recognition process is ð2mNÞ. In case of conflicts, as we use the similarity measure given in (8), the recognition task requires additional time units. Therefore, the number of operations required to compute the similarity is 9m (two additions, two subtractions, two multiplications, two divisions, and one logical operation). Thus, the total time required to decide the class of the test signature is Oð2mN þ 9mMÞ, where M is the number of conflicting classes.
+
+3 EXPERIMENTATION
+In this section, we present the details of the data set used and experiments conducted during the course of research along with the obtained results.
+The data set. The MCYT_signature subcorpus [41] consists of online signature samples of 330 individuals. For each individual, there are 50 signatures in all: Out of these, 25 are genuine and 25 are forgeries. Thus, in all, it forms a signature database of 8,250 (i.e., 330 25) genuine and 8,250 (i.e., 330 25) forged online signatures (total 16,500 signatures).
+A sample of online signature of the MCYT_ signature subcorpus along with the captured values of x, y, pressure azimuth, and elevation are shown in Fig. 1. We have used a set of 100 global features of online signatures (MCYT_ database) for our experimentations. The details of these
+100 features of online signatures can be found in the works [3], [36], [37], [38].
+
+3.1 Experimental Setup
+We have used the two sets of MCYT_signature databases for our experimentations:
+1. MCYT_signature subcorpus-100 (DB1): Subcorpora consisting signatures of first 100 individuals. 2. MCYT_signature subcorpus-330 (DB2): The whole database consisting signatures of all 330 individuals.
+The strategy of using a small and a large data set helps us to set up the system with a reduced set of users. Once the system is trimmed, the experimentations are performed on the whole database. This procedure is advantageous as it reduces computational time and avoids risk of over training [27]. This strategy also helps us to compare our results with that of the works already carried out with subcorpora under similar conditions of experiments.
+Each of the MCYT_signature subcorpora is further split into training and test sets. We trained the system under two conditions: 1) with a small training set of five genuine signatures of each individual and 2) with a big training set of 20 genuine signatures of each individual. These two conditions are respectively shown as skilled_5 and skilled_20 in both Tables 2 and 3. The test set consists of the remaining samples of genuine signatures and all the forgery signatures in both conditions. Our procedure is similar to the international signature verification competition SVC 2004 [40], with the data set being larger.
+In the case of consideration of random forgeries (i.e., imposters claiming others’ identities using their own signatures), the training set and genuine testing set remain same as above, but the imposter test set comprises one
+signature of every other user (and it is denoted, respectively, as random_5 and random_20 in Tables 2 and 3).
+We randomly select the training signatures (out of 25 genuine signatures per class), and use the remaining genuine signatures and all the forgeries for testing.
+
+3.2 Threshold Selection
+In general, a set of sample signatures (training) set should be chosen and compared with the respective reference signatures of all individuals in the knowledgebase to arrive at error rate for the system. The training set is selected randomly for each trial. The process is repeated several times to arrive at the optimal value for both common and writer-dependent thresholds. We have used all 100 features [36], [37] for optimal performance of the system and, thus, the value of m is set to 100.
+
+3.2.1 Common Threshold Selection
+Only the training set should be used to obtain the thresholds. Using training signatures (genuine), the reference signatures are formed as explained in Section 2.1. Then, the feature values of the same training signatures are compared with features of the corresponding reference signature to decide the minimum number of features (which decides the value for threshold) of test signatures that should match with that of the reference signatures for optimal EER. Our experimentations using the training set show that 50 percent (see Fig. 2a; 49.9 is rounded off to 50) of features of the test signature should match with the corresponding features of the respective reference signature in order to obtain a lower EER. That is, if all 100 features are used, then, for a test signature to qualify as genuine, at least 50 (T ¼ 50) features should match with that of the reference signature. We have arrived at this average value for threshold through 15 trials
+with randomly selected training signatures for each trial. We have empirically fixed the threshold T ¼ m=2 (common threshold) for our experiments, so that EER is minimum. The variations of FRR and FAR against the threshold are shown in Fig. 2b. The plots of FAR and FRR for each individual for a few values of threshold ðT ¼ 45;T ¼ 50;T ¼ 55Þ are also shown in Fig. 2. The feature-level threshold parameter (3), which allows variable-width representation for a feature value is set so that the EER is minimum. Minimum EERs are
+obtained by varying feature-level threshold parameter . Thus, the operating point for our experimentation is set empirically by fixing up the values for T and .
+
+3.2.2 Writer-Dependent Threshold Selection
+The writer-dependent thresholds are derived empirically as proposed in Section 2.2.2. For our experimentations, we have found that ¼ 0:7 results in lowest error rate. The sample values of writer-dependent threshold for 10 individuals are shown in Table 4.
+The writer-dependent thresholds for the 100 individuals are shown in Fig. 3a for a trial with DB1 (for skilled_20). Figs. 3b and 3c, respectively, show the plots of FAR and FRR for each individual with respect to the corresponding writer-dependent threshold.
+
+3.3 Experimental Results
+For the purpose of evaluating the proposed method, in this work we adopt EER , the error rate at which both FAR and FRR are equal [24]. The EER is generally adopted as a unique measure for characterizing the performance level of a biometric system and it indicates the security level provided by the biometric system.
+The experiments are repeated 15 times. For every trial, the training set is randomly selected. The minimum, the maximum, and the average values of EERs for all 15 trials are presented in Table 5 for the experiments with common threshold and writer-dependent threshold on both the databases. Verification improvements can be clearly observed with writer-dependent thresholds.
+The error trade-off curves for a common threshold and writer-dependent threshold are shown in Figs. 4a and 4b for DB1 (skilled_20) and DB2 (skilled_20), respectively, considering all the 100 features which are ranked according to the interuser class separability [36]. The corresponding values of FAR and FRR versus threshold are also tabulated in Table 6 for DB1 and in Table 7 for DB2.
+The verification performance (EER) under varying number of features according to decreasing rank of separability is shown in Figs. 5a and 5b for DB1 (skilled_20) and DB2 (skilled_20), respectively, and the corresponding values are tabulated in Table 8. It is clear from Fig. 5 that the top ranking 60 features have significant influence on the performance of the system than the low ranking 40 features as the top 60 ranked features greatly contribute toward the reduction of EER.
+Out of interest, we evaluated the performance of the proposed model by removing the data pertaining to K users with lower performance. Here, we have considered the average error rate (AER: average of individual FRR and FAR) as a measure of individual performance. Then, the equal error rate of the proposed model is computed by removing one user at a time in decreasing order of individual performance (AER). The effects of EER of the proposed model on deleting the data pertaining to K users with lower performance are shown in Fig. 6a for common threshold and in Fig. 6b for writer-dependent threshold under varying K. The EER decreases as the data pertaining to K users with lower performance are removed from the database. It is observed that in case of DB1, for about 46 users, the system has EER with respect to common threshold and, for about 40 users, it has EER with respect to writer-dependent threshold. Thus, the proposed model works with zero EER for nearly 54-60 percent users. Moreover, it is observed that the model based on writerdependent threshold has relatively better performance.
+
+3.4 Signature Recognition Results
+We have carried out recognition experiments using five genuine signatures per person for training and another five genuine signatures per person for testing. We have conducted experiments on both the data sets: DB1 and DB2. This implies a total of (100 100 5) tests on DB1 and (330 330 5) tests on DB2. Initially, we conducted recognition experiments on DB1 and DB2 using Ac as a similarity measure proposed in (6). Table 9 presents the recognition rates on both DB1 and DB2. In this experimentation, as far as
+DB1 with writer-dependent threshold is concerned, there
+were no conflicting classes for any test signature. However,
+there were some conflicting classes for test signatures on DB1 with common threshold and on DB2 with both the thresholds. To resolve these conflicts, we used the similarity measure proposed in (8) and observed an increase in recognition rates in case of DB1 with common threshold and DB2 with both the thresholds. The recognition rates obtained after resolving the class conflicts are tabulated in Table 9. This increase in recognition rates indicates that our added measure (8) for resolving conflicts has a greater significance in achieving better results.
+The variations in recognition rates with change in the value of feature threshold for T ¼ m=2 (common threshold) and for T ¼ ðAvgÞ (writer-dependent threshold with ¼ 0:7) are shown in Fig. 7a. In Fig. 7b, the variations in recognition rates against common threshold (T) is shown for both DB1 and DB2. From Fig. 7b, we can understand that the system has better performance at T ¼ m=2 for both DB1 nd DB2.
+Further, similar to the experiments conducted in the case of signature verification to evaluate the performance of the proposed model by removing K users with lower performance, here also we have carried out similar experiments. The effects of recognition rates on deleting the data pertaining toK users with lower performance in the increasing order of individual recognition rate are shown in Fig. 8a for common threshold and in Fig. 8b for writer-dependent threshold. It could be observed that the proposed model can work with 100 percent recognition rate for 40-60 percent of users on an average for different trails.
+
+4 COMPARATIVE STUDY
+In this section, we compare the results of the proposed method of signature verification with that of the other global feature-based contemporary models.
+The MCYT_signature database DB1 (subcorpus of 100 individuals) is used by many researchers to have the same platform, so that comparison of techniques of signature verification can be made easy and convincing. As we have also used the same data set, in this section, our interest is to project the superiority of our symbolic approach when compared to several other existing models of signature verification. Thus, our focus is to present here the extracts of the best results reported in the works [37], [38], and [39], along with the results of the proposed models. Table 10 lists
+Fig. 3. (a) Writer-dependent threshold values for a trial with DB1 (skilled_20). (b) Individual FAR for the writer-dependent threshold. (c) Individual FRR for the writer-dependent threshold.
+out the best (lowest) EER reported for various approaches
+in addition to that of our model. The entry “-” in Table 10
+denotes that the corresponding result is not reported in the
+respective work. We state that we have not implemented
+and tested the other models but present the best results of
+those models available in [37], [38], [39]. It is noted from
+Table 10 that the proposed model has very less EER when
+compared to the model based on Parzen window classifier
+(PWC), which is claimed to be the state-of-the-art model for
+signature verification. It shall even be nice to see that
+principal component analysis description model (PCAD)
+has an EER of 4.2 for skilled_20, which is less than PWC.
+Even against PCAD, our model shows an EER of 3.8 and this is 9 percent reduction in EER compared to PCAD. Moreover, we restate that as a stand-alone system, our model is very simple to realize and has a negligible verification time requirement and, thus, suits real-time online applications.
+
+5 DISCUSSION
+Out of interest, the proposed method is applied not only on the original features but also on the features obtained by projecting original features onto an Eigenspace using PCA and Fisherspace using Fisher linear discriminants (FLD).
+TABLE 9 Recognition Results Using Similarity Measure Proposed in (6) and (8)
+Fig. 7. Plot of recognition rates under varying feature-dependent threshold for: (a) common threshold and individual threshold. (b) Recognition rates under varying common threshold (T) with ¼ 1.
+We have conducted a series of experiments categorized into
+the following five different methods: Method 1 (Using original features): Here, the proposed
+method of symbolic representation and verification is
+applied directly on the original features. Method 2 (Class-specific PCA): The proposed method is
+applied on the features obtained by projecting original
+features onto Eigenspace using class-specific PCA [34]. In
+this case, Eigenspace is computed by identifying the
+eigenvectors of the covariance matrix derived from the
+features of a set of signature samples of a class. This results
+in N Eigenspaces because of N users. Method 3 (Conventional PCA): The proposed method is
+applied on the features obtained by projecting original
+features onto Eigenspace using conventional PCA [34]. In
+this case, Eigenspace is created by identifying the eigenvec-
+tors of the covariance matrix derived from the features of all
+signature samples of all classes. Here, only one Eigenspace
+(matrix of eigenvectors) is derived for all classes. Method 4 (Class-specific FLD): The proposed method is
+applied on the features obtained by projecting original
+features onto Fisher space using FLD [35]. In this method,
+Fisher basis vectors are computed from the feature vectors
+of signature samples by considering genuine and forgeries
+as two classes for every user. This results in N Fisher spaces
+because of N users. Method 5 (Conventional FLD): The proposed method is
+applied on the features obtained by projecting original
+features onto Fisher space using two-class FLD. In this
+method, signatures of a test class forms one class and
+remaining signatures of all classes are considered as
+another class to identify the Fisher basis vectors for
+computing FLD. For each test class, it forms a two-class
+problem for computation of FLDs. This results in N Fisher
+space for N users. In the cases of PCA-based verification (Methods 2 and 3),
+the respective projected features are used to compute the
+interval-type (symbolic) feature vector, which is used as
+reference signature to represent a class of signatures, as
+explained in Section 2.1. A separate Eigenspace (matrix of
+eigenvectors) for each class of signatures and the associated
+reference signature are stored in the knowledgebase for
+later verification purposes. Subsequently, during verifica-
+tion process, the features of test signatures are projected
+onto corresponding Eigenspace (ordered eigenvectors are
+available in the knowledgebase) and these projected
+features are then compared with interval-valued-type
+symbolic features of corresponding reference signature
+stored in knowledgebase.
+In the cases of FLD-based verification (Methods 4 and 5),
+the respective projected features are used to compute the
+interval-type (symbolic) feature vector, which is used as
+reference signature to represent a class of signatures, as
+explained in Section 2.1. The Fisher basis vectors and the
+associated reference signatures are stored in the knowledge-
+base for later verification purposes. Subsequently, during
+verification, the features of test signatures are projected onto
+Fisher basis vectors (available in the knowledgebase) and
+these projected features are then compared with interval-
+valued-type symbolic features of reference signature stored
+in knowledgebase. The verification performances (in terms of EER) of
+all five methods with common threshold and also with
+writer-dependent threshold on DB1 and DB2 are tabulated
+in Tables 11 and 12.
+The error trade-off curves are shown in Fig. 9a for a common threshold and in Fig. 9b for writer-dependent threshold for DB1 (skilled_20) using all the 100 features for all the five methods.
+We have also tested methods 1-5 for recognition purpose, and the obtained recognition rates are tabulated in Table 13 for common threshold and writer-dependent threshold.
+The above discussion reveals that the application of the proposed models (both verification and recognition methods) directly on the original features shows better performance when compared to their application on either PCA-based or FLD-based projected features. However, the performances of Method 2 (Class-specific PCA) and Method 5 (Conventional FLD) are still better than many other existing contemporary models.
+
+6 CONCLUSIONS AND FUTURE WORK
+In this paper, we made a successful attempt to explore the applicability of symbolic data concepts for signature verification and recognition. We have proposed a method for symbolic representation of online signatures useful for verification and recognition. We exploited the concept of writer-dependent threshold, and in addition, introduced the concept of feature-dependent threshold to achieve remarkable reduction in equal error rate. The extensive experiments conducted show that the proposed symbolic representation scheme, in addition to being simple to realize, has achieved a considerable reduction in EER, and thus outperforms the other contemporary models. Overall, the following are the contributions of this work:
+. a new method of symbolic representation for online signatures; . methods for signature verification and recognition, based on a novel similarity measure; . exploitation of the concept of writer-dependent threshold; . introduction of feature-dependent threshold; . conduction of extensive experiments for both verification and recognition on a relatively large database; . attaining EER ¼ 3:8 against the best reported PCAD method EER ¼ 4:2, and thus achieving 9 percent reduction in EER.
+In this work, we used only global features for representation. Exploration of an alternative method of symbolic representation of signatures using local features could be interesting. Exploration of histogram representation for signature shall be an interesting extension of this current
+work. An added advantage of the proposed work appears to be that the model could be tuned up to accommodate frequent deletion and insertion of users/signature samples. These are our future immediate targets.
+All in all, the proposed model being a stand-alone system and first of its kind in the literature of signature verification/recognition is expected to open up a new dimension for further research in the field of signature biometrics by the use of symbolic data concepts.
+
+ACKNOWLEDGMENTS
+A part of this paper was initiated when D.S. Guru was at the PRIP Lab at Michigan State University. He wishes to acknowledge the support rendered by Professor Anil K Jain and also his help in getting the MCYT data set through Julian Fierrez Aguilar, Biometric Research Lab-AVTS, Madrid, Spain. The authors also thank Dr. Julian Fierrez Aguilar for his support.
+
+References
+[1]W. Nelson,E. KishonUse of Dynamic Features for Signature VerificationProc. IEEE Int’l Conf. Systems, Man and Cybernetics, vol. 1, pp. 201-205, 1991.1991
+[2]W.T. Nelson,T. HastieStatistical Methods for On-Line Signature VerificationPattern Recognition and Artificial Intelligence, vol. 8, pp. 749-770, 1994.1994
+[3]L.L. Lee,T. Berger,E. AviczerReliable On-Line Signature Verification SystemsIEEE Trans. Pattern Analysis and Machine Intelligence, vol. 18, no. 6, pp. 643-649, June 1996.1996
+[4]D. Letjman,S. GeogeOn-Line Handwritten Signature Verification Using Wavelet and Back Propagation Neural NetworksProc. Int’l Conf. Document Analysis and Recognition, pp. 596-598, 2001.2001
+[5]Q.Z. Wu,S.Y. Lee,I.C. JouOn-Line Signature Verification Based on Logarithmic SpectrumPattern Recognition, vol. 31, no. 12, pp. 1865-1871, 1998.1865
+[6]G. Dimauro,G. Impedevo,G. PirloComponent Oriented Algorithms for Signature VerificationInt’l J. Pattern Recognition and Artificial Intelligence, vol. 8, pp. 771-794, 1994.1994
+[7]R. Sabourin,G. Genset,F. PreteuxOff-Line Signature Verification by Local Granulometric Size DistributionIEEE Trans. Pattern Analysis and Machine Intelligence, vol. 19, no. 9, pp. 976-988, Sept. 1997.1997
+[8]B. WirtzStroke Based Time Warping for Signature VerificationProc. Third Int’l Conf. Document Analysis and Recognition, vol. 1, pp. 179-182, 1995.1995
+[9]M. Parezeau,R. PlamendonA Comparative Analysis of Regional Correlation, Dynamic Time Warping and Skeleton Matching for Signature VerificationIEEE Trans. Pattern Recognition and Machine Intelligence, vol. 12, no. 7, pp. 710-717, July 1990.1990
+[10]B. Fang,C.H. Leung,Y.Y. Tang,K.W. Tse,P.C.K. Kwok,Y.K. WongOff-Line Signature Verification by Tracking of Feature and Stroke PositionPattern Recognition, vol. 36, pp. 91-101, 2003.2003
+[11]H. Feng,C.C. WahOn-Line Signature Verification Using a New Extreme Point Warping TechniquePattern Recognition Letters, vol. 24, pp. 2943-2951, 2003.2003
+[12]P. Fang,Z.C. Wu,F. Shen,Y.J. Ge,B. FangImproved DTW Algorithm for Signature Verification Based on Writing ForcesProc. Int’l Conf. Intelligent Computing, pp. 631-640, 2005.2005
+[13]R. Kashi,J. Hu,W.L. Nelson,W. TurinA Hidden Markov Model Approach to On-Line Handwritten Signature VerificationInt’l J. Document Analysis and Recognition, vol. 1, pp. 102-109, 1998.1998
+[14]D. Muramatsu,M. TakashiAn HMM On-Line Signature Verification AlgorithmProc. Int’l Conf. Audio and Video Based Person Authentication, pp. 233-241, 2003.2003
+[15]J. Coetzer,B.M. Herbst,J.A. PreezOff-Line Signature Verification Using Discrete Radon Transform and a Hidden Markov ModelEURASIP J. Applied Signal Processing, vol. 4, pp. 559-571, 2004. 1072 IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE, VOL. 31, NO. 6, JUNE 2009 TABLE 13 Recognition Rates of Methods 1-5 with Common Threshold (CT) and Writer Dependent Threshold (WT)2004
+[16]K. Alister,B. YanikogluIdentity Authentication Using Improved On-Line Signature Verification MethodPattern Recognition Letters, vol. 26, no. 18, pp. 2400-2408, 2005.2005
+[17]E.J.R. Justino,F. Bortolazzi,R. SabourinA Comparison of SVM and HMM Classifiers in the Off-Line Signature VerificationsPattern Recognition Letters, vol. 26, no. 9, pp. 1377-1385, 2005.2005
+[18]J.P. Draouhard,R. Sabourin,M. GodboutA Neural Network Approaches to On-Line Signature Verification Using Directional PDFPattern Recognition, vol. 29, pp. 415-424, 1996.1996
+[19]R. Bajaj,S. ChaudharySignature Verification Using Multiple Neural ClassifiersPattern Recognition, vol. 30, pp. 1-87, 1997.1997
+[20]K. Haung,Y. HongOff-Line Signature Verification Based on Geometric Feature Extraction and Neural NetworkPattern Recognition, vol. 30, no. 1, pp. 9-17, 1997.1997
+[21]Q.-Z. Wu,S.Y Lee,I.C. JouOn-Line Signature Verification Based on Split and Merge Matching MechanismPattern Recognition Letters, vol. 18, pp. 665-673, 1997.1997
+[22]V.S. NalwaAutomatic On-Line Signature VerificationProc. Third Asian Conf. Computer Vision, vol. 1, pp. 10-15, 1997.1997
+[23]Q.-Z. Wu,S.-Y. Lee,I.-C. JouOn-Line Signature Verification Based on Logarithmic SpectrumPattern Recognition, vol. 31, no. 12, pp. 1865-1871, 1998.1865
+[24]A.K. Jain,F. Griess,S. ColonnelOn-Line Signature VerificationPattern Recognition, vol. 35, pp. 2963-2972, 2002.2002
+[25]K. Huang,Y. HongOff-Line Signature Verification, Using Structural Feature CorrespondencePattern Recognition, vol. 35, pp. 2467-2477, 2002.2002
+[26]L. Bovino,S. Impdevo,G. Pirlo,L. SarcinellaMultiexpert Verification of Hand-Written SignatureProc. Int’l Conf. Document Analysis and Recognition, pp. 932-936, 2003.2003
+[27]F.-Z. MarcosOn-Line Signature Recognition Based on VQ- DTWPattern Recognition, vol. 40, no. 3, pp. 981-992, 2007.2007
+[28]J.F. Aguilar,S. Krawczyk,J.O. Garcia,A.K. JainFusion of Local and Regional Approaches for On-Line Signature VerificationProc. Int’l Workshop Biometric Recognition System, pp. 188-196, 2005.2005
+[29]K.C. Gowda,E. DiaySymbolic Clustering Using New Dissimilarity MeasurePattern Recognition, vol. 24, pp. 567-578, 1991.1991
+[30]D.S. Guru,K. Bapu,P. NagabhushanMultivalued Type Proximity Measure and Concept of Mutual Similarity Value Useful for Clustering Symbolic PatternsPattern Recognition Letters, vol. 15, pp. 769-790, 2000.2000
+[31]L. Billard,E. DidaySymbolic Data Analysis: Conceptual Statistics and Data Mining2006
+[32]D.S. Guru,H.S. NagendraswamySymbolic Representation of Two-Dimensional ShapesPattern Recognition Letters, vol. 28, pp. 144-155, 2006.2006
+[33]R.O. Duda,P.E. Hart,D.G. StorkPattern Classification, second ed2002
+[34]J.F. AguilarAdopted Fusion Schemes for Multimodal Biometric AuthenticationPhD thesis, Biometric Research Lab-AVTS, 2006.2006
+[35]L. NanniExperimental Comparison of One-Class Classifiers for On-Line Signature VerificationNeurocomputing, vol. 69, pp. 869- 873, 2006.2006
+[36]L. Nanni,A. LuminiAdvanced Methods for Two-Class Problem Formulation for Online Signature VerificationNeurocomputing, vol. 69, pp. 854-857, 2006.2006
+[37]L. Nanni,A. LuminiEnsemble of Parzen Window Classifiers for On-Line Signature VerificationNeurocomputing, vol. 68, pp. 217-224, 2005.2005
+[38]Y.H. Chang,Y. Xiong,S. Geirge,R. Kashi,T. Mutsomoto,G. RigollSVC2004: First International Signature Verification CompetitionProc. Int’l Conf. Biometric Authentication, pp. 16-22, July 2004.2004
+[39]J. Ortega-Garcia,J. Fierrez-Aguliar,D. SimonMCYT Baseline Corpus: A Bimodal DatabaseProc. IEE Vision, Image, and Signal Processing, pp. 395-401, 2003.2003

@@ -1,0 +1,109 @@
+On-line Signature Verification by Stroke-Dependent Representation Domains
+D. Impedovo,G. Pirlo
+pirlo@di.uniba.it
+
+Abstract
+In this paper a new system for dynamic signature verification is presented. It is based on the consideration that each region of an handwritten signature can convey personal characteristics in diverse domains. Therefore, a multi-expert approach is considered in which each stroke of the signature is evaluated in the most profitable domain of representation. The experimental results demonstrate the effectiveness of the proposed approach.
+
+1. Introduction
+Biometry offers potentials for verifying the identity of a subject by the analysis of physical and behavioural characteristics. Physical characteristics can be obtained from finger-print, palm-print, face gestures, retina, or DNA. Behavioural characteristics can be obtained from key-stroke dynamics, speech, hand-written signature. Among others, hand-written signature is one of the most interesting means for automated personal verification. Signature is the customary way of identifying an individual in our society and it is well-accepted by every user for legal attestation and administrative certification [1, 2]. In addition, along with the growth of the internet, automatic signature verification is being considered with new interest. The creation of specific laws and regulations, which have been approved in many countries [3,4], and the attention that several national associations and international institutes have given to the standardization of signature data interchange formats [5,6] are evidence of the renewed attention in this field. The aim of these efforts is to facilitate the integration of signature verification technologies into other standard equipment to form complete solutions for a wide range of commercial applications such as banking, insurance, health care, ID-security, document management, ecommerce and retail point-of-sale (POS) [7].
+Unfortunately, handwritten signatures are very complex biometric traits since they are the result of a complex process based on a sequence of predetermined actions, stored in the human brain, and realised by the writing systems of the signers (arms and hands) through ballisticlike movements. Therefore, also signatures written by the same person can be very different depending on the physical and psychological state of the writer. Thus, automatic
+signature verification involves aspects from a wide range of disciplines, as computer science, engineering, psychology, neuroscience, human anatomy and system science and several comprehensive survey papers reporting the development of the field have been published [8, 9, 10, 11]. In order to face with the enormous variability of signatures, multi-expert approach has been often considered and several systems have been proposed in the literature which combine verifiers based on different sets of features, using parallel [12], serial [13] or hybrid [14, 15] strategies.
+This paper presents a multi-expert system for dynamic signature verification. The system uses a segmentation technique of hand-written signatures well-suited for multiexpert verification since it provides compatible strokeoriented descriptions of the test and the reference signatures. Successively, the most profitable domain of representation of each stroke is determined on the basis of its stability characteristics. In other words, each stroke is verified in the domain of representation (i.e. displacement, velocity, acceleration, pressure, direction of pen movement, etc.) in which it is more stable. In this domain, in fact, it is expected that verification is more accurate than in other domains in which the signer is highly variable. The final decision is obtained by simple or weighted averaging of the local decisions on the authenticity of each individual stroke. The experimental results show the effectiveness of the proposed approach.
+The paper is organised as follows: Section 2 describes the multi-expert process of signature verification. Section 3 presents the segmentation technique. The selection of the best domain of representation for each stroke and the process of stroke verification is described in Section 4. Section 5 presents the process of decision combination. The experimental results are presented in Section 6.
+
+2. Multi-expert Signature Verification
+In this work the acquisition of a hand-written signature is performed in on-line mode by an electronic tablet providing the position of the tip of the pen on the tablet and the pen-up / pen-down signal.
+After acquisition, signatures are suitably normalised in position, size, and time-duration [13]. The segmentation of a test signature is performed according to a dynamic segmentation technique. In other words the segmentation
+978-0-7695-4221-8/10 $26.00 © 2010 IEEE DOI 10.1109/ICFHR.2010.102
+623
+of the test signature is performed according to the characteristics of the reference specimens, in order to obtain compatible stroke-oriented descriptions for the test and the reference signatures. In particular, in this work, three reference signatures have been considered for each signer, as proposed elsewhere [16, 17].
+In the feature extraction phase, each stroke of the test signature is analyzed individually and its stability is estimated in different domains of representation (function features). In this paper, three simple domains of representations have been considered: displacement, velocity and acceleration [3]. Then, each stroke is verified in the domain in which it is more stable, since verification accuracy is expected to be good. For the purpose, it is compared to the corresponding strokes of the (three) reference signatures belonging to the individual whose identity must be verified.
+The verification of the entire test signature is obtained by combining stroke verification results, by simple or weighted averaging [18, 19].
+
+3. Signature Segmentation by DP
+Dynamic Programming (DP) can be used to segment the test signature in a way compatible to the reference signatures, despite possible variations among specimens due to personal variability in signing [20, 21, 22]. For this purpose, an extreme point warping technique has been proposed, that warps the set of relevant extreme points of the signature [20]. Another techniques uses a two twolevel procedure. The first level acts of the points of local maximum in the vertical direction, which are considered to be highly significant. The second level works on the points of local minimum in the vertical direction [21, 22].
+
+3.1 First-level segmentation.
+At the first level DP is applied to the whole signature, based on the analysis of the local maxima in the vertical direction. Let St be the test signature and S1,S2,S3 three reference signatures, as Figure 1 shows. The segmentation technique compares the sequences of the local maxima of St and S1,S2,S3 (marked by “*”). Precisely, let Mt(i), i=1,…,NtMAX be the sequence of the local
+maxima of St, Mr(i), i=1,…,NrMAX be the sequence of the local
+maxima of Sr , r=1,2,3; DP detects the warping function W*(Mt,Mr)=(i1,j1), (i2,j2),.., (ik,jk),.., (iK,jK) (k,ik,jk integers, so that 1≤k≤K, 1≤ik≤NtMAX, 1≤jk≤NrMAX), which satisfies monotonicity, continuity and boundary conditions and makes minimum the quantity [14]:
+∑ = ⋅ +
+= K
+1k kk rt )j,d(i1)M,D(M MAX r MAX t NN ,
+where d(ik,jk) is the Euclidean distance between Mt(ik) and Mr(jk).
+Successively, the set of directly matched local maxima are identified [21]. Let Mt(p) be coupled to Mr(q) by W*(Mt,Mr), Mt(p) and Mr(q) are directly matched if the following conditions are satisfied: (a) ∀p'=1,…,NtMAX, p'≠p: Mt(p') is not coupled to Mr(q); (b) ∀q'=1,…,NrMAX, q'≠q: Mr(q') is not coupled to Mt(p). In Figure 1 the directly matched local maxima are coupled by a continuous line:
+from W*(Mt,M1) we obtain the sets of directly matching points BtW*(Mt,M1) for St, B1W*(Mt,M1) for S1:
+BtW*(Mt,M1) ={Mt(1),Mt(2), Mt(4), Mt(9), Mt(11)}, B1W*(Mt,M1)={M1(1),M1(2),M1(5),M1(11),M1(14)};
+from W*(Mt,M2) we obtain the sets of directly matching points BtW*(Mt,M2) for St, B2W*(Mt,M2) for S2:
+BtW*(Mt,M2) = {Mt(1), Mt(2), Mt(3), Mt(4), Mt(8), Mt(9), Mt(11)} B2W*(Mt,M2) ={M2(1), M2(2), M2(3), M2(4), M2(8), M2(9), M2(12)}; from W*(Mt,M3) we obtain the sets of directly matching points BtW*(Mt,M3) for St, B3W*(Mt,M3) for S3:
+BtW*(Mt,M3) ={Mt(1), Mt(2), Mt(3), Mt(4), Mt(7), Mt(8), Mt(9), Mt(10), Mt(11)} B3W*(Mt,M3)={M3(1), M3(2), M3(3), M3(4), M3(6), M3(7), M3(8),M3(9), M3(10)}.
+The analysis of the directly matched points allows an unambiguous identification of segmentation points on the test and reference signatures [21]. A direct matching point Mt(p) of St is a segmentation point if and only if an index qr ∈ {1,…,NrMAX} exists so that Mt(p) is directly matched to Mr(qr), ∀r=1,2,3. Moreover, for each segmentation point Mt(p) of the test signature, the corresponding points Mr(qr), r=1,2,3, are used to split the reference specimens. In other words, for the test signature St, the set of segmentation points is: Bt = BtW*(Mt,M1) ∩ BtW*(Mt,M2) ∩ BtW*(Mt,M3) , and the set of segmentation points for Sr (r=1,2,3) is: Br ={ Mr(q) ∈BrW*(Mt,Mr) | Mr(q) is coupled to Mt(p)∈Bt }. Figure 2 reports the first level segmentation results. The set of segmentation points is:
+Bt= {Mt(1),Mt(2),Mt(4),Mt(9),Mt(11)}, B1= {M1(1), M1(2), M1(5), M1(11), M1(14)}; B2= {M2(1), M2(2), M2(4), M2(9), M2(12)}; B3= {M3(1), M3(2), M3(4), M3(8), M3(10)}.
+
+3.2 Second-level segmentation.
+At the second level DP is used to split each segment into basic strokes, on the basis of the local minima in the vertical direction. Analogously to the first-level segmentation, DP is applied to each corresponding segment of the test and the reference signatures to obtain the final stroke-oriented description of St and S1,S2,S3.
+
+4. Local Verification Decision
+In this paper the verification of a signature is performed starting from the verification of its strokes, according to similar approaches in the literature [23, 24, 25]. Local verification (i.e. verification at the stroke level) is here performed by first selecting the most profitable representation domain for the verification of each stroke. Successively, Dynamic Time Warping (DTW) is used for matching, in the selected domain of representation, each stroke against the corresponding strokes of the reference signatures.
+For that concerning the selection of the best representation domain in which the verification of each stroke must occur, the local stability of the signer is here considered. Precisely, the representation
+domain in which a stroke is more stable is considered, since it is expected that stroke verification can be more accurate in this domain. In this direction a local stability function is defined, obtained by using DTW to match a genuine signature against other authentic specimens [26, 27, 28]. Each matching is used to identify the Direct Matching Points (DMPs), that are unambiguously matched points of the genuine signature. Thus, a DMP can indicate the presence of a small stable region of the signature, since no significant distortion has been locally detected. More formally, let S1,S2,S3 be the reference signatures we compute, in each representation domain, the optimal warping functions W*(S1,S2) and W*(S1, S3) by DTW.
+From W*(S1,S2) the Direct Matching Points (DMP) of S1 with respect to S2 are identified (i.e. the points of S1 that have a one-to-one coupling with a point of S1). Similarly it is possible to derive, W*(S1,S3) the DMP of S1 with respect to S3. Of course, a DMP indicates the existence of a small part of the signature S1 that is roughly similar to the corresponding part of the signature Si,i=2,3, in the specific representation domain. Therefore, for each sample of S1, a score is introduced according to its type of coupling with respect to the points of Si,i=2,3. For instance, let us consider the p-th sample of S1 (i.e. S1(p)), we can use the following score:
+Scorei(S1(p))=1, if S1(p) is a DMP with respect to Si,i=2,3.
+Therefore the Local Stability Index (LSI) for the sample S1(p) is given by:
+LSI(S1(p))= [ Score2(S1(p)) + Score3(S1(p)) ] / 2
+whereas for a whole stroke (from sample S1(ba) to sample S1(pb) of the test signature) is given by
+LSI(S1(pa,pb))= ∑ =+−
+b
+a
+p
+ppab
+pSLSI pp ))(( 1
+1 1 .
+Of course, for each stroke its stability is detected in different representation domains (displacement, velocity and acceleration, in this work) and the domain in which the stability is the highest is selected for verification.
+Once for each stroke of the test signature, the most profitable representation domain is selected, the stroke verification process can start. In particular a stroke of the test signature is compared against each corresponding stroke of the reference signatures and the best matching is considered (i.e. the distance value achieved by DTW). More precisely, the confidence value C(Stroke_i), for the Stroke_i, is determined as C(i)=V(Stroke_i)/ T (Stroke_i) where:
+V(Stroke_i) is the minimum distance of Stroke_i from the corresponding strokes of the reference signatures S1,S2,S3; T(i) is the maximum distance among the corresponding strokes of the reference signatures. The verification decision R(Stroke_i) is obtained by the following rule [19]:
+R(Stroke_i)=1 if C (i) ≤1 (i.e. Stroke_i is authentic);
+R(Stroke_i)=0 otherwise (i.e. Stroke_i is false).
+
+5. Decision Combination
+Two soft rules are used for decision combination at the signature level. Let Rt be the verification decision for the test signature St, where: Rt(i)=1 means that St is authentic, Rt(i)=0 means that St is false.
+The value of Rt is determined as follows [19]: 1. Simple_Ave is the simple average of the decisions at the stroke level.
+)_(1)(_ 1 iStrokeR N RAveSimple N i t ∑ = =
+2. Weight_Ave is the average of the decisions at the stroke level, weighted by the length of each stroke. It determines the percentage of the test signature that is authentic:
+)_()_(1)(_ 1 iStrokeLiStrokeR L RAveWeight N i t t ⋅= ∑ =
+where Lt is the length of the test signature and L(Stroke_i) is the length of Stroke_i, i=1,2,…,N.
+
+6 Experimental Results
+For testing the multi-expert system, authentic signatures and skilled forgeries were collected in controlled writing sessions. Fifteen writers were engaged to collect the authentic signatures and other fifteen people produced the forged samples. Every writer signed in a rectangle of 4 cm x 12 cm on the graphic tablet (sampling frequency: 110 Hz). In each session, the writer had about ten minutes to practice with the electronic tablet and five minutes to affix up to five signatures. The forgers attended the writing sessions and trained themselves in imitating the genuine signatures. After enrolment, a database of fifty genuine signatures and fifty (skilled) forgeries were available for each writer. Three extra genuine signatures were collected for reference.
+Table 1 reports the verification results at the stroke level, in terms of False Rejection Rate (FRR) and False Acceptance Rate (FAR). In this case each stroke has been evaluated in the domain of representation in which its stability is the highest.
+Table 2 reports the Equal Error Rate (EER) of the multi-expert system, which is the error rate where the FRR and the FAR are equal. In this case it seems that simple averaging provide the best results.
+These results demonstrate the potential of using multiple-domains of representation for stroke-based signature verification. In this direction more investigations are necessary. Conclusion A new multi-expert system for dynamic signature verification is presented in this paper. The system is based on a stroke-oriented description of hand-written signatures suitable for multi-expert verification. Each stroke is verified into the representation domain in which the author is more stable. The final decision is performed by combining verification decision at stroke level, according to simple and weighted averaging.
+The experimental results demonstrate the effectiveness of the proposed system and lead to investigate more accurately on the potential of strokebased signature verification by using multiple domains of representation.
+
+References
+[1]A.K. Jain,L. Hong,S. PankantiBiometric IdentificationCommunication of the ACM,2000
+[2]C. Vielhauer,J. DittmannBiometrics for User Authentication : Encyclopedia of Multimediaed. B. Furth, Springer-Verlag, Berlin2006
+[3]W.S. Wijesoma,K.W. Yue,K.L. Chien,T.K. ChowOnline Handwritten Signature Verification for Electronic Commerce over the InternetWI 2001, LNAI 2198, Springer- Verlag Berlin Heidelberg, N. Zhong et al. (Eds.)2001
+[4]H. Lei,S. Palla,V. GovindarajuMouse based Signature Verification for Internet based TransactionsSPIE Symposium on Electronic Imaging Science and Technology Electronic Imaging Vision, San Jose, CA, Jan. 2005, SPIE Proceedings Series, Vol. 56732005
+[5]O. Urèche,R. PlamondonDocument Transport, Transfer, and Exchange, Security and Commercial AspectsProc. ICDAR ’99,1999
+[6]R. Plamondon,G. LoretteAutomatic Signature Verification and Writer Identification - The State of the ArtPattern Recognition 1989
+[7]F. Leclerc,R. PlamondonSignature verification: The state of the Art 1989-1993IJPRAI1994
+[8]D. Impedovo,G. PirloAutomatic Signature Verification – State of the ArtIEEE Transactions on Systems, Man and Cybernetics - Part C: Applications and Review,2008
+[9]S. Impedovo,G. PirloVerification of Handwritten Signatures: an OverviewProc. 14 International Conference on Image Analysis and Processing 2007
+[10]R. Plamondon,W. GuerfaliThe generation of handwriting with delta-lognormal synergiesBiological Cybernetics1998
+[11]G. Dimauro,S. Impedovo,G. Pirlo,G. CongedoSignature Verification through a Dynamical Segmentation techniqueProc. 3th IWFHR1993
+[12]R. Plamondon,P. Yergeau,J.J. BraultA multi-level signature verification system”, in “From Pixels to Features III”, ed. S.Impedovo and J.C.Simon1992
+[13]G. Dimauro,S. Impedovo,G. Pirlo,A. SalzoA multi-expert signature verification system for bankcheck processingIJPRAI, World Scientific Publishing1997
+[14]Y. Sato,K. KogureOn-line signature verification based on shapemotion and writing Pressure”, Proceedings 6 ICPR1982
+[15]I. Yoshimura,M. YoshimuraOn-line signature verification incorporating the direction pen movement - An experimental examination of the effectiveness“From Pixels to Features III”, eds. S. Impedovo and J.C. Simon, Elsevier Publishing1992
+[16]V. Di Lecce,G. Dimauro,A. Guerriero,S. Impedovo,G. Pirlo,A. SalzoA Multi-Expert System for Dynamic Signature VerificationMultiple Classifier System,2000
+[17]L. Bovino,S. Impedovo,G. Pirlo,L. SarcinellaMulti-Expert Verification of Hand-Written Signatures”, 7 International Conference on Document Analysis and Recognition (ICDARIEEE Computer Society,2003
+[18]H. Feng,C.C. WahOnline signature verification using a new extreme points warping techniqueElsevier Science Direct, Pattern Recognition Letters,2003
+[19]G. Congedo,G. Dimauro,A.M. Forte,S. Impedovo,G. PirloSelecting Reference Signatures for On-Line Signature VerificationLNCS, Vol. 974, Springer-Verlag, C. Braccini, L. De Floriani and G. Vernazza (Eds.), San Remo, Italy1995
+[20]V. Di Lecce,G. Dimauro,A. Guerriero,S. Impedovo,G. Pirlo,A. Salzo,L. SarcinellaSelection of Reference Signatures for Automatic Signature Verification5 International Conference on Document Analysis and Recognition (ICDAR- 5), Bangalore, India, Sept. 20-221999
+[21]J. Fierrez-Aguilar,S. Krawczyk,J. Ortega-Garcia,A.K. JainFusion of local and regional approaches for on-line signature verification,’presented at the Proc. Int.Workshop Biometric Recognit. Syst. (IWBRS), Beijing,2005
+[22]J. Fierrez-Aguilar,L. Nanni,J. Lopez-Penalba,J. Ortega- Garcia,D. MaltoniAn on-line signature verification system based on fusion of local and global information,’’ (Lecture Notes in Computer Science 3546), in Audio- and Video-Based Biometric Person Authentication (AVBPA)2005
+[23]J. Richiardi,H. Ketabdar,A. DrygajloLocal and global feature selection for on-line signature verification,’Proc. 8th Int. Conf. Doc. Anal. Recognit. (ICDAR-8), Seoul,2005
+[24]G. Congedo,G. Dimauro,S. Impedovo,G. PirloA new methodology for the measurement of local stability in dynamical signatures”, 4 International Workshop on Frontiers in Handwriting Recognition1994
+[25]K. Huang,H. YanStability and style-variation modeling for on-line signature verificationPattern Recognition,2003

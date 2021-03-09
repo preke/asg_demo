@@ -1,0 +1,20 @@
+
+Gokhan Memik,Nikos Bellas
+
+
+Organizing Committee General Co-Chairs Silviu Chiricescu, Motorola Phil May, Motorola
+Program Co-Chairs Mikko Lipasti, Wisconsin-Madison Gokhan Memik, Northwestern
+Workshops and Tutorials Chair Tim Sherwood, UC-Santa Barbara
+Finance Chair Sek Chai, Motorola
+Publicity and Web Chair Suleyman Sair, NC State
+Local Arrangements Chair Russ Joseph, Northwestern
+Publications Chair Nikos Bellas, Motorola
+Paper Submissions Chair K. Sankaralingam, Wisconsin-Madison
+Registration Chair Zhichun Zhu, Illinois-Chicago
+Student Advocate Joseph Zambreno, Iowa State
+Steering Committee
+Richard Belgard, Consultant (Chair) Bob Colwell, Consultant Tom Conte, NC State Kemal Ebcioglu, Global Supercomputing Wen-mei Hwu, UIUC Scott Mahlke, Michigan Bill Mangione-Smith, Intellectual Ventures Yale Patt, UT Austin Eric Rotenberg, NC State John Shen, Nokia Mateo Valero, UPC Program Committee Erik Altman, IBM Murali Annavaram, Nokia Rich Belgard, Consultant Nikos Bellas, University of Thessaly Pradip Bose, IBM David Brooks, Harvard Alok Choudhary, Northwestern Tom Conte, NC State Evelyn Duesterwald, IBM Kanad Ghose, SUNY, Binghamton Antonio Gonzalez, Intel/UPC Russ Joseph, Northwestern Norm Jouppi, HP
+David Kaeli, Northeastern Mahmut Kandemir, Penn State Stefanos Kaxiras, University of Patras Rakesh Kumar, UIUC Kevin Lepak, AMD Gabriel Loh, Georgia Tech Scott Mahlke, Michigan Bill Mangione-Smith, Intellectual Ventures Milo Martin, University of Pennsylvania Jose Martinez, Cornell University Andreas Moshovos, Toronto Onur Mutlu, Microsoft Research Yale Patt, Texas Milos Prvulovic, Georgia Tech Glenn Reinman, UCLA Eric Rotenberg, NC State Amir Roth, University of Pennsylvania Yanos Sazeides, University of Cyprus Mike Schlansker, HP Mike Shebanow, Nvidia John Shen, Nokia Research - Palo Alto Kent Wilken, UC-Davis Adi Yoaz, Intel
+x
+
+References

@@ -1,0 +1,114 @@
+Energy-Efficient Resource Provisioning with SLA consideration on Cloud Computing
+Jian-Sheng Liao,Chi-Chung Chang,Yao-Lun Hsu,Xiao-Wei Zhang,Kuan-Chou Lai,Ching-Hsien Hsu
+kclai@mail.ntcu.edu.tw,chh@chu.edu.tw
+
+Keywords-component; Cloud Computing; Virtualization; Energy Saving; Resource Provisioning; Service Level Agreement
+I. INTRODUCTION Cloud computing [1] has become one of the most popular research topics. It aims to simplify the use of software and hardware through Internet for providing flexible and expansible services by using the pay-as-you-go model, e.g., the Amazon Elastic Compute Cloud (on Amazon EC2) [2]. Recently, as the scale and performance of IT data centers grow, data centers often become less efficient in using system resources. As a result, outgoings and energy consumption increase at a fixed growing rate. Therefore, it is an important issue to effectively reduce energy consumption, to improve profits and not to violate the service-level agreement (SLA).
+The virtualization technology [3][4][5] in cloud computing becomes a solution to using the resources in data centers effectively and flexibly. The virtualization technology allows multiple users to execute applications on the same physical machine with guaranteed performance. Resource consolidation caused by virtualization could enhance resource utilization and reduce energy consumption.
+However, VM consolidation may bring unexpected load changes, and violate the SLA [17]. Therefore, it is an important issue for cloud provider to support energy-efficient resource provisioning with guaranteed SLAs. In order to solve these problems, this study proposes an energy-efficient resource provisioning technology with SLA consideration for virtual machine scheduling.
+Energy-efficient virtual machine management could evaluate the energy consumption of virtual machines in different physical machines and make the resource allocation decision to reduce energy consumption. The customer’s SLA
+requirement could also be evaluated in different physical machines aiming to choose the shortest response time of the virtual machine on a physical machine while meeting the requirement of the SLA. When the job requirement is satisfied and the resources on the physical machine are enough, the resource monitoring system triggers the consolidation for migrating the virtual machines to different physical machines for enhancing the resource efficiency and reducing energy consumption.
+This study adopts the Openstack [16] to evaluate our proposed strategy compared with other proposed ones. Experimental results show that our proposed strategy could reduce energy consumption without violating SLA.
+The rest of this study is organized as follows: Section II discusses related works. Section III presents the system architecture and the detail of the algorithm. Section IV demonstrates experimental results. Conclusions are finally given in Section V.
+II. RELATED WORK Reducing energy consumption attracts a great attention in IT system industry and the research community; the rapid growth of the scale of data centers enlarges energy consumption significantly [18]. A previous work [7] proposes a study for multiple customers to share the same physical resources. Another work [8] considers heterogeneous workloads. However, their studies fail to consider the energy consumption. G. Khanna et al. [9] propose a dynamic management approach by which a physical machine is triggered when a machine is overloaded or under-loaded. M. Bichler et al. [10] propose a study to limit the number of virtual machines on a physical machine to ensure that some virtual machines are assigned to different physical servers with limited migration. A recent research [13] mentions the live placement approach. This method could not only reduce energy consumption, but also allocate resource dynamically to balance load for improving the works proposed by [14]. Another previous research [15] considers the deadline to reduce the waste of resources without dropping jobs while violating pre-defined SLAs.
+1530-2016/12 $26.00 © 2012 IEEE DOI 10.1109/ICPPW.2012.31
+206
+III. SYSTEM ARCHITECTURE This section introduces the proposed system architecture based on the assessment model of energy consumption. The proposed architecture considers the customer’s SLA requirement with energy-optimized configuration and triggers the scheduling algorithm. In addition, the scheduling algorithm considers the completion time in order to ensure the minimized energy consumption.
+The system architecture is shown in Figure 1. The resource management layer is responsible for dealing with customer's job requirement. It consists of energy estimate, SLA monitor, VM scheduling, resource monitor, resource discovery, and job scheduling components. And, the datacenter layer consists of different heterogeneous physical and virtual machines with different energy consumption and different processing power.
+Figure 2 shows the system workflow. When the job is submitted to the cloud provider, the cloud provider allocates the appropriate virtual machine for this job. Our strategy will select the most energy-efficient physical machine for the placement of the virtual machine according to the submitted job. When a job is completed, it would be switched to a sleep mode for maintaining a rapid re-use status.
+The majority of power consumption is occupied by the CPU utilization. Therefore, this work mainly studies the impact between CPU utilization and energy consumption. Because different platforms have different energy consumption, this study evaluates the energy consumption for physical machines in advance; and then, the energy consumption is estimated according to the CPU utilization. Figure 3 shows the energy consumption of two different platforms.
+Let E be the energy consumption of each physical machine,
+, (1) where P(u) is the power consumption of each processor and u is the current utilization. T is the time period in the machine.
+Therefore, the power consumption cost of the whole system is defined as
+, (2) where is a Boolean value, when means that the physical machine is turn-off; and means that the physical machine is turn-on.
+The gained profit of the IaaS provider is defined as follows: !" # $%& # '''''''''''''''''''''''''''''''''''''''''' # ()* +,-&$ (3) where is the leased price of the physical machine,'' !" is the start time of accessing service. $%& is the end time of accessing service. ()* +,-&$ is the penalty cost of violating SLA.
+(5)
+(6)
+(7) In general, satisfying QoS is a very important issue in the cloud environment. This study focuses not only on the computational jobs, but also on the non-computational jobs, such as web servers, storage servers and so on. Therefore, we proposes an approach to use the minimum number of physical machines, while meeting user's QoS without violating SLA for saving energy. The study considers three kinds of resources: CPU, memory and storage disk. The problem of allocating these three kinds of resources onto the minimal number of physical machines is a packing problem, which is an NP problem. In this study, we propose a heuristic approach to allocate resources onto the minimal number of physical machines.
+The penalty of violating SLA is defined as
+()* +.$ -/"0$123 (4)
+
+45 "$6/ "$ # !77-0! $8 9:; "$6/ "$ < !77-0! $ '''''''''''''''''''''''''''''''''''''''''''''''''''''''; = >
+where "$6/ "$'is require time of executing a job with sufficient resources. !77-0! $ is time of allocating sufficient resources to this job. 9: is the penalty of violating SLA.
+Figure 4(a) shows a demonstration of applying the round-robin approach to allocate limited resources to VMs. In this demonstration, the round-robin manner distributes virtual machines to different hosts in order to balance load. However, the number of hosts could be reduced for saving energy. When the VMs are consolidated onto fewer hosts, as shown in Figure 4(b), the unused hosts could be turned off and save energy.
+In order to obtain the optimal host of allocating VMs, the number of unused processors in a host is defined as
+(?@9 )*?@9 # A ) @?@9 # B C?@9
+and the amount of the unused memory size is defined as
+(? )*? # A ) @? # B C?
+and the amount of unused storage disk is defined as
+(?C D )*?C D # A ) @?C D # B C?C D
+Therefore, the optimal host of allocating an incoming VM is the host with the minimal value, as show in following.
+EFGH/%?0I/JK"?0I/LM! !7?0I/J N O /%?,$,JK"?,$,L M! !7?,$,J P O /%?& QJK"?& QL M! !7?& QJ RS (8)
+where ?@9 is the requirement of the incoming virtual machine. N is the percentage of overall energy consumption donate by CPU, P is the percentage of overall energy consumption donate by memory, and R is the percentage of overall energy consumption donate by storage disk. Based on the literature [19], N is 58%, P is 28% and R is 14%, as shown in Figure 5.
+This study proposes a SLA-Based Resource Constraint VM Scheduling approach to allocate resources to the incoming VMs without violating SLAs, as shown in the following algorithm. When a user submits a request to allocate a VM to a suitable host, the proposed approach assigns a priority and checks running hosts for determining whether the remaining resources are enough for executing the incoming VM (steps 9-12). If the running hosts couldn’t satisfy the incoming VM request, a new host is turn-on for this VM (steps 13-16). If there is more than one of hosts with sufficient resources, the proposed approach selects the host with the minimal value obtained from equation (8) (step 17-18).
+Algorithm SLA-Based Resource Constraint VM Scheduling
+1. Input HostList, VmList, CurrentHostList
+2. Output allocation of VMs
+3. HostList {Host1, Host2, …, HostN};
+4. VmList {Vm1, Vm2, …, VmN};
+5. CurrentHostList null;
+6. OptimalHost null; 7. for Vm from Vm1 to VmN in VmList do{ 8. if(CurrentHostList != null){ 9. for Host from Host1 to HostN in
+CurrentHostList{ 10. if(Host.GetUnusedResource >
+Vm.GetResource) 11. EnoughHostList += Host;
+
+12. }
+13. if(EnoughHostList = null){ 14. OptimalHost
+HostList.EstimatePower_C/P; 15. CurrentHostList += High_C/P_Host; 16. } 17. else 18. OptimalHost
+EnoughHostList.GetMinResource; 19. } 20. else{ 21. OptimalHost HostList.EstimatePower_C/P; 22. CurrentHostList += High_C/P_Host;
+
+23. }
+24. allocate Vm to OptimalHost;
+
+25. }
+IV. PERFORMANCE ANALYSIS In this study, the development environment adopts Ubuntu-11.10-server-amd64, the version of the operating system core is the Linux version 3.0.0-12-server, and the KVM is applied as the hypervisor and its version is qemu-kvm-0.14.1.
+This study adopts 10 different physical machines as a heterogeneous computing environment, as shown in Table 1.
+This study adopts OpenStack as the cloud platform to provide virtual machine services supported by the Nova project. Because the number of the physical machines is limited, PC01 is assigned to be the all-in-one node, which is responsible for handling the controller, computing,
+networking and scheduling. Others are only responsible for Nova-compute. The deployment environment is shown in Figure 6.
+Figure 7 shows the comparison of power consumption among different approaches. The random approach and the round-robin approach are built-in approaches in Openstack. In this figure, the proposed algorithm obtains lower energy consumption than the other two do. As the number of VMs increases, the power consumption generated by the proposed approach also increases stably. The reason is that our approach uses fewer physical machines for executing VMs. The same situation could be observed in Figure 8.
+As shown in Figure 8, when the number of VMs increases, the number of the used PMs also increases by using these three approaches. When the round-robin approach is applied, the number of used PMs reaches saturation (i.e., 10 PMs are all in-use) as the number of VMs is 10; and when the random approach is applied, the number of the used PMs reaches saturation as the number of VMs is about 30. However, our approach could consolidate more VMs onto fewer PMs, as shown in Figure 8.
+Figure 9 shows the number of violated SLAs in different number VMs. As shown in Figure 9, the number of violated SLAs generated by our approach is very low and the increasing rate of the violating SLAs is stable. However, the number of the violated SLAs generated by the other two approaches increases quickly as the number of VMs increases. The reason is that the random and round-robin approaches don’t consider the SLA-violating condition resulting in allocating insufficient resources.
+V. CONCLUSIONS This study proposes an energy-efficient resource provisioning approach for scheduling virtual machines. Compared with the OpenStack built-in methods, we could observe that our approach indeed could consolidate more VMs onto fewer PMs without violating SLAs and waste less energy consumption. Experimental results show that the proposed approach outperforms other proposed ones in power consumption.
+In this study, only the power consumption of CPU, memory and storage disk is considered. However, there are some factors need to be considered, e.g., network, GPU, I/O
+devices, and so on. In our future works, we will take these factors into consideration for achieving more energy-saving.
+Furthermore, in this study, the live migration mechanism is not supported. We will adopt the live migration mechanism into our approach in the future works. We believe that the resource consolidation could improve the system utilization after applying the live migration.
+We also will develop and build more energy-efficient resource provisioning approaches in Openstack for performance comparison.
+ACKNOWLEDGEMENT The work of this paper is partially supported by Delta
+Electronics, Inc. under grant 101F2289A8.
+REFERENCES [1] R. Buyya, C. Yeo, and S. Venugopal, “Market-oriented cloud
+computing: Vision, hype, and reality for delivering it services as computing utilities,” in Proceedings of the 10th IEEE international conference on high performance computing and communications. IEEE, 2008, pp. 5–13.
+[2] Amazon elastic compute cloud (EC2). http://www.amazon.com/ec2 [3] I. Pratt, and A. Warfield, “Xen and the art of virtualization,” in
+Proceedings of the nineteenth ACM symposium on Operating systems principles, 2003, p. 177.
+[4] R.J. Creasy, “The origin of the vm time-sharing system,” in Proceedings of IBM Journal of Research and Development. Volume 5, September 1981, pp. 483-490.
+[5] P. Barham, B. Dragovic, K. Fraser, S. Hand, T. Harris, A. Ho, R. Neugebauery, I. Pratt, and A. Warfield, “Xen and the art of virtualization,” in Proceedings of 19th ACM Symposium on Operating Systems Principles, SOSP’03, 2003.
+[6] C. Clark, K. Fraser, S. Hand, J. Hansen, E. Jul, C. Limpach, I. Pratt, and A.Warfield, “Live migration of virtual machines,” in Proceedings of the 2nd conference on Symposium on Networked Systems Design & Implementation-Volume 2, 2005, p. 286.
+[7] D. Ardagna, M. Trubian, and L. Zhang. “SLA based resource allocation policies in autonomic environments,” in Proceedings of Journal of Parallel and Distributed Computing, v.67 n.3, pp.259-270, March, 2007.
+[8] M. Steinder, I. Whalley, and D. Chess. “Server virtualization in autonomic management of heterogeneous workloads,” in Proceedings of 10th Integrated Network Management conference, Munich, Germany, 2007.
+[9] G. Khanna, K. Beaty, G. Kar, and A. Kochut, “Application performance management in virtualized server environments,” in Proceedings of the 10th IEEE/IFIP Network Operations and Management Symposium, NOMS’06, 2006.
+[10] B. Speitkamp, and M. Bichler, “A mathematical programming approach for server consolidation problems in virtualized data centers,” in Proceedings of IEEE Transactions on Services Computing, 2010
+[11] T. Wood, P. Shenoy, A. Venkataramani, and M. Yousif, “Black-box and gray-box strategies for virtual machine migration,” in Proceedings of the 4th Symposium on Networked Systems Design & Implementation, 2007.
+[12] Paul Barham , Boris Dragovic , Keir Fraser , Steven Hand , Tim Harris , Alex Ho , Rolf Neugebauer , Ian Pratt , and Andrew Warfield, “Xen and the art of virtualization,” in Proceedings of the nineteenth ACM symposium on Operating systems principles, October 19-22, 2003, Bolton Landing, NY, USA.
+[13] Xiaotao Liu, Prashant Shenoy, and Weibo Gong, “A time series-based approach for power management in mobile processors and disks,” in Proceedings of the 14th international workshop on Network and operating systems support for digital audio and video, June 16-18, 2004.pp. 74-79.
+[14] Gerofi B, Fujita H, and Ishikawa Y, “An Efficient Process Live Migration Mechanism for Load Balanced Distributed Virtual Environments,” in Proceedings of the Cluster Computing (CLUSTER) on 2010 IEEE International Conference, 20-24 Sept. 2010, pp. 197-206.
+[15] Liting Hu, Hai Jin, Xiaofei Liao, Xianjie Xiong, and Haikun Liu., “Magnet: A novel scheduling policy for power reduction in cluster with virtual machines,” In Proceedings of the 2008 IEEE International
+Conference on Cluster Computing, September, 2008,pp.13-22. [16] http://openstack.org [17] N. Bobroff, A. Kochut, and K. Beaty. “Dynamic placement of virtual
+machines for managing SLA violations,” in Proceedings of the Integrated Network Management, 2007. IM '07. 10th IFIP/IEEE International Symposium on, pages 119--128, May 2007.
+[18] L. A. Barroso and U. Hölzle, “The case for energy-proportional computing,” in Proceedings of the IEEE Computer, vol. 40, no. 12, Dec. 2007 [19] A. Kansal, F. Zhao, J. Liu, N. Kothari, and A.A. Bhattacharya. “Virtual machine power metering and provisioning.” in Proceedings of SOCC, 2010.
+
+References
+[1]R. Buyya,C. Yeo,S. VenugopalMarket-oriented cloud computing: Vision, hype, and reality for delivering it services as computing utilitiesProceedings of the 10th IEEE international conference on high performance computing and communications. IEEE, 2008, pp. 5–13.2008
+[2]I. Pratt,A. WarfieldXen and the art of virtualizationProceedings of the nineteenth ACM symposium on Operating systems principles, 2003, p. 177.2003
+[3]R.J. CreasyThe origin of the vm time-sharing systemProceedings of IBM Journal of Research and Development. Volume 5, September 1981, pp. 483-490.1981
+[4]P. Barham,B. Dragovic,K. Fraser,S. Hand,T. Harris,A. Ho,R. Neugebauery,I. Pratt,A. WarfieldXen and the art of virtualizationProceedings of 19th ACM Symposium on Operating Systems Principles, SOSP’03, 2003.2003
+[5]C. Clark,K. Fraser,S. Hand,J. Hansen,E. Jul,C. Limpach,I. Pratt,A.WarfieldLive migration of virtual machinesProceedings of the 2nd conference on Symposium on Networked Systems Design & Implementation-Volume 2, 2005, p. 286.2005
+[6]D. Ardagna,M. Trubian,L. ZhangSLA based resource allocation policies in autonomic environmentsProceedings of Journal of Parallel and Distributed Computing, v.67 n.3, pp.259-270, March, 2007.2007
+[7]M. Steinder,I. Whalley,D. ChessServer virtualization in autonomic management of heterogeneous workloadsProceedings of 10th Integrated Network Management conference, Munich, Germany, 2007.2007
+[8]G. Khanna,K. Beaty,G. Kar,A. KochutApplication performance management in virtualized server environmentsProceedings of the 10th IEEE/IFIP Network Operations and Management Symposium, NOMS’06, 2006.2006
+[9]B. Speitkamp,M. BichlerA mathematical programming approach for server consolidation problems in virtualized data centersProceedings of IEEE Transactions on Services Computing, 20102010
+[10]T. Wood,P. Shenoy,A. Venkataramani,M. YousifBlack-box and gray-box strategies for virtual machine migrationProceedings of the 4th Symposium on Networked Systems Design & Implementation, 2007.2007
+[11]Paul Barham,Boris Dragovic,Keir Fraser,Steven Hand,Tim Harris,Alex Ho,Rolf Neugebauer,Ian Pratt,Andrew WarfieldXen and the art of virtualizationProceedings of the nineteenth ACM symposium on Operating systems principles, October 19-22, 2003, Bolton Landing, NY, USA. 2102003
+[12]Xiaotao Liu,Prashant Shenoy,Weibo GongA time series-based approach for power management in mobile processors and disksProceedings of the 14th international workshop on Network and operating systems support for digital audio and video, June 16-18, 2004.pp. 74-79.2004
+[13]B Gerofi,H Fujita,Y IshikawaAn Efficient Process Live Migration Mechanism for Load Balanced Distributed Virtual EnvironmentsProceedings of the Cluster Computing (CLUSTER) on 2010 IEEE International Conference, 20-24 Sept. 2010, pp. 197-206.2010
+[14]Liting Hu,Hai Jin,Xiaofei Liao,Xianjie Xiong,Haikun Liu.Magnet: A novel scheduling policy for power reduction in cluster with virtual machinesProceedings of the 2008 IEEE International Conference on Cluster Computing, September, 2008,pp.13-22.2008
+[15]N. Bobroff,A. Kochut,K. BeatyDynamic placement of virtual machines for managing SLA violationsProceedings of the Integrated Network Management, 2007. IM '07. 10th IFIP/IEEE International Symposium on, pages 119--128, May 2007.2007
+[16]L.A. Barroso,U. HölzleThe case for energy-proportional computingProceedings of the IEEE Computer, vol. 40, no. 12, Dec. 20072007
+[17]A. Kansal,F. Zhao,J. Liu,N. Kothari,A.A. BhattacharyaVirtual machine power metering and provisioning.Proceedings of SOCC,2010

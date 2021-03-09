@@ -1,0 +1,131 @@
+On-line Signature Verification using Graph Representation
+Kaiyue Wang,Yunhong Wang,Zhaoxiang Zhang
+wangkaiyue@ss.buaa.edu.cn,,yhwang@buaa.edu.cn,,zxzhang@buaa.edu.cn
+
+Abstract
+This paper proposes a novel approach of on-line signature verification. Firstly, on-line signatures are represented by a series of graphs, whose nodes and edges describe certain properties at sample points and relationship between points respectively. Then, graph matching techniques are introduced to compute edit distance between graphs, which measures the similarity of graphs. Finally, having been able to compare any two signatures through the last two steps, user-dependent classifiers are trained using limited genuine signatures. The proposed method is tested on SUSIG on-line signature database and shows promising performance.
+
+I. INTRODUCTION
+Signatures are widely accepted as the common method of identity verification. On-line signatures make use of the dynamic features extracted by pressure sensitive tablets or digital pens, exploiting more useful information than traditional off-line signature, thus provide more reliable protection against forgeries. Examples of traditional signatures and on-line signatures are given in Fig.1, and each point in on-line signature contains abundant information like pen position and pen-tip pressure. To verify the authenticity of signatures, signature verification problem could be attributed to a two-class pattern recognition problem, the process of which is shown in Fig.2.
+A wide range of pattern recognition methods can be applied to signature verification. As one of the most popular method in signal processing, dynamic time warping (DTW) has been applied to signatures verification in many researches. DTW allows the compression or expansion of the time axis of two time sequence representative of signatures to obtain the minimum of a given distance value [1]. It has been
+Figure 2. Framework of signature verification
+extensively used in the field of on-line signature verification and has derived a bunch of methods taking advantages of other methods [2][3][4]. Improvements have also been made to deal with DTW’s disadvantage of time consuming.
+Meanwhile, intensive research has been devoted to hidden Markov model (HMM) as well. An HMM is a double stochastic approach in which one underlying yet unobservable process may be estimated through a set of processes that produce a sequence of observations. The topological structures of left-to-right, ring and ergodic have been respectively looked into [5][6][7]. However, HMM makes a large assumption about the data, requires a lot of positive sample and needs too many parameters.
+As in many other aspects of pattern recognition, support vector machine (SVM) turns out to be a promising approach to signature verification. It maps input vectors to a higher dimensional space in which clusters may be determined by a maximal separating hyperplane. When applied to on-line signature verification, SVM gives convincing results. New kernel functions have also been proposed to improve the performance [8].
+However, it has come to our attention that some methods involving graph representation of signature and graph matching had been applied to off-line signature verification [9], while to our knowledge, there has been few works on on-line signature verification in such ways. However, there have been some trials on string matching [10], which can be seen as special cases of graph matching.
+In this paper, we propose an approach of on-line signature verification using graph representation. Represented by graphs, signatures are compared using graph matching methods. As is NP-complete, graph matching is a classic problem in the field of algorithms. Therefore, there have been many efficient graph matching algorithms that can be made use of.
+The organization of the remainder of this paper is as follows. Section 2 describes the graph representation and graph matching method adopted in our work. The details of the training and testing procedure will be given in Section 3. Section 4 demonstrates the experiment results while Section 5 draws the conclusion.
+
+II. GRAPH REPRESENTATION AND MATCHING
+A. Graph Representation of On-line Signatures
+A graph is composed of nodes and edges. It is usually denoted by G = (V,E), where V = {v1, v2, ..., vM} is the set of nodes and E = {eij = (vi, vj)} ⊆ V × V the set of edges. If there exists a weighting function w(·) that gives each node and edge a real nonnegative value, the graph is called a weighted graph, and that value is the weight of the node or edge. In some sense, the weight of a node indicates some property of the node, while the weight of an edge indicates some relationship between the two nodes connected by the edge. If the relationship between nodes is symmetric, i.e. w(eij) = w(eji), the graph is undirected, otherwise, directed.
+A n-node graph is usually represented by a n × n adjacency matrix AG = {aij}, aij defined as
+aij =
+{ w(eij) = w(vi, vj), i = j
+w(vi), i = j (1)
+According to definition, AG is symmetric if the graph is undirected.
+An on-line signature sample consists of a sequence of sample points that contains variety of features, e.g. pen position and pen-tip pressure, depending on the data acquisition device. Based on these features directly extracted from original sample, more complex features can be computed, e.g. pen velocity, acceleration, moving direction, etc.
+To represent an on-line signature S, which contains N sample points, with a graph, firstly, each sample point is seen as a node of a graph, i.e. S = {v1, v2, ..., vN}. Most of the on-line signature acquisition devices are able to directly extract features of x-position, y-position and pressure at sample points. We denote these features at vi as xi, yi and pi. Secondly, certain features are chosen to be the weight of nodes and edges. As discussed above, weight of nodes should be local features that describe properties of sample points, while weight of edges describes relationship between nodes. Therefore, a signature can be represented by a N×N
+adjacency matrix:
+AG = ⎛ ⎜⎜⎜⎝ w1(v1) w2(e12) · · · w2(e1N ) w2(e21) w1(v2) w2(e2N ) ... . . .
+... w2(eN1) w2(eN2) · · · w1(vN )
+⎞ ⎟⎟⎟⎠ (2)
+in which w1(vi) is the weighting function of nodes and w2(eij) is the weighting function of edges.
+In our work, two kinds of local features of sample points, pressure and curvature, and two kinds of relationship between samples points, angle and distance, are respectively chosen. Consequently, two types of graphs are produced as follows:
+AG1 = ⎛ ⎜⎜⎜⎝ p(v1) a(v1, v2) · · · a(v1, vN ) a(v2, v1) p(v2) a(v2, vN ) ... . . .
+... a(vN , v1) a(vN , v2) · · · p(vN )
+⎞ ⎟⎟⎟⎠ (3)
+p(vi) = pi
+a(vi, vj) = arctan[(yi − yj)/(xi − xj)] where p(vi) is the pressure of sample point vi and a(vi, vj) is the angle between vector −−→vivj and x-axis;
+AG2 = ⎛ ⎜⎜⎜⎝ c(v1) d(v1, v2) · · · d(v1, vN ) d(v2, v1) c(v2) d(v2, vN ) ... . . .
+... d(vN , v1) d(vN , v2) · · · c(vN )
+⎞ ⎟⎟⎟⎠ (4)
+c(vi) = |x′iy′′i − x′′i y′i|/(x′2i + y′2i )3/2
+d(vi, vj) = [(yi − yj)2 + (xi − xj)2]1/2
+where c(vi) is the curvature at sample point vi and d(vi, vj) is the distance between vi and vj .
+Fig.3 shows the process of representing part of a signature in the form of AG1. Now that the graph representation of signature is determined, to compare signatures is to compute the distance between corresponding graphs. To address this issue, graph matching techniques are introduced below.
+
+B. Graph Matching Techniques
+Graph matching methods can be roughly divided into two categories: exact matching that requires a strict correspondence amongst the two graphs being matched or at least amongst their subparts; inexact matching, where a matching can occur even when the graphs being compared are structurally different to some extent [11]. Due to the unavoidable variation among signatures signed by the same person, inexact matching turns out to be more suitable for signature verification.
+In the graph matching phase, as a great many of graph matching approaches do, we employ the concept of graph edit distance. In this sense, a graph can be transformed to another one through a finite sequence of graph edit operations.which can be defined differently in different circumstances. Summing up the costs of all edit operations obtains the total cost of the whole transforming process. The minimum total cost of all possible sequences is the graph edit distance between the graphs compared. Two main issues can be drawn from the description of graph edit distance above: definition of cost functions and the search of minimum-cost edit operation sequence. For efficiency, we adopted a sub-optimal algorithm [12]. Having found the sub-optimal edit path, the correspondent overall cost can be obtained by summing up the cost of each operation along this path.
+1) Cost Functions: In [13], edit operations are classified into four categories: deleting a node, inserting a node, substituting a node and substituting an edge. However, for simplification, we generalize all these operations into the same type: the change of weights.
+To further specify the cost function we adopted, for the features of pressure, curvature and distance, the cost is the absolute difference of weights before and after change, i.e.
+c1(r s → rt) = ∣∣w(rs)− w(rt)∣∣ (5)
+where w(·) can be substituted by p(·) ,c(·) or d(·), r can be a node or an edge according to specific weighting function and rs is the node or edge before change while rt is after.
+As for the feature of angle, the following cost function is used to measure the difference between angles:
+c2(r s → rt) = {|a(rs)− a(rt)| , when |a(rs)− a(rt)| < π 2π − |a(rs)− a(rt)| , otherwise
+(6) 2) Computing Edit Distance: The minimum-cost edit path can be retrieved by a tree search in the space of all possible edit paths. Although the optimal edit path can always be found using this class of algorithms, the computational complexity is exponential. To pursue higher efficiency, we adopted a sub-optimal algorithm proposed in [12]. The process of graph matching is seen as an assignment problem, i.e. assigning nodes of graph g1 to nodes of graph g2, so that the overall edit costs are minimal. One of the popular method
+to deal with assignment problem is Munkres’ algorithm [14], whose time complexity is O(n3), while that of brute force is O(nn) at the scale of n . Suppose graph g1 has n nodes, graph g2 has m nodes, vi ∈ g1 and uj ∈ g2, the cost matrix of changing weights of nodes is constructed as a n × m matrix C = {cij} = {c(vi → uj)} (7) However, if Munkre’s algorithm is directly applied to C, no edge information will be taken into account. To exploit edge information, cij is redefined as where
+cij = c(vi → vj) +min{ ∑
+c(evi → euj)} (8) The last term of the equation above implies the minimumcost edge assignment between edges connected to vi in g1 and edges connected to uj in g2. The Munkre’s algorithm is recursively computed to obtain min{∑ c(evi → euj)}. Details of the algorithm can be found in [12]. From now on, we denote the distance between two graphs as dist(·, ·).
+III. VERIFICATION WITH GRAPH REPRESENTATION
+
+A. Preprocessing
+As mentioned above, an on-line signature sample is comprised of a sequence of sample points. Since the numbers of sample points of different signatures may vary, we resampled each signature down to 100 sample points; also, signatures are normalized to avoid the impact of variation of position and scale.
+The resampled and normalized signature is then equally divided into 10 segments by the number of sample points, each segment represented by two graphs in the form of both AG1 and AG2. This actually makes a signature represented by 20 graphs, which we denote as {g1, g2, ..., g20} Fig.4. During a comparison, edit distance between corresponding graphs are respectively computed. There are two reasons to do so: first, it reduces computational complexity that the matching is carried out between smaller parts of signatures, rather than matching between graphs at the scale of the whole signatures; second, this avoids some unnecessary comparisons, for example, the comparison between the first points of one signature and the last ones of another, for they almost definitely do not match.
+
+B. Training
+Since skilled forgeries are difficult to obtain in practice, we use only 5 genuine signatures of each user to train userdependent classifiers.
+Given the training set of 5 genuine signatures of a user, we denote the kth graph of the ith signature as gki , 1 ≤ i ≤ 5, 1 ≤ k ≤ 20, i, k ∈ N. For the kth graph, distance between each pair of training signatures are computed, and the one with the smallest average distance is selected as the template:
+templatek = argmin i {( ∑ j dist(gki , g k j ))/5} (9)
+Left of the equation is the template of the kth graph of this user.
+Second, for each graph, the maximum, average and minimum distance from the template to the other 4 signatures are computed:
+maxk = max gki =templatek {dist(gki , templatek)} avgk = (
+∑ gki =templatek dist(g k i , template k))/4
+mink = min gki =templatek
+{dist(gki , templatek)} (10)
+The process of the training phase is briefly shown in Fig.5.
+C. Verification
+Given a test signature s, we adopt the following scoring strategy to verify its authenticity. First, for each of the 20
+graphs, compute the distance between the test signature and the template of the same graph:
+dk = dist(gks , template k) (11)
+Then, it is compare to maxk, avgk and mink and scored:
+score(gks ) = ⎧⎪⎪⎨ ⎪⎪⎩
+t1, d k > maxk
+t2, avg k < dk ≤ maxk t3,min k < dk ≤ avgk
+t4, d k ≤ mink
+(12)
+Having obtained scores for all 20 graphs, sum them up to get the final score:
+score(s) = ∑ k score(gks ) (13)
+The process of verification is shown in Fig.6. Obviously, the larger the score is, the more likely it is genuine. Thus, given a certain threshold, if the score is lager than it, the signature is assumed to be genuine; otherwise, forgery. The choice of {t1, t2, t3, t4} will be discussed in the following section.
+
+IV. EXPERIMENTAL RESULT
+Our approach is tested on the visual subcorpus of SUSIG on-line signature database [15], which contains 20 genuine signatures and 10 skilled forgeries of 94 users. Five genuine training signatures are randomly selected for each user. Note that there is an adaptable parameter: the score threshold that classifies signatures as genuine or forgery. By adjusting the threshold, we can obtain the equal error rate (EER) of the method, where false rejection rate (FRR) equals false acceptance rate (FAR).
+
+A. Scoring Strategies
+The issue remained from the last section is the choice of {t1, t2, t3, t4}. It is simple to come up with the strategy that chooses t1 = 3, t2 = 2, t3 = 1, t4 = 0. However, if a part of a signature is so close to the template that makes it even closer than the training samples, i.e. dk ≤ mink, a bonus can be added to the score; on the other hand, if dk > maxk, it is not likely to be similar with the template, thus, the score gets a punishment. So the second strategy is t1 = 4, t2 = 2, t3 = 1, t4 = −1.
+Tested against skilled forgeries, the second strategy shows slightly better performance than the first, but it turns out the difference between two strategies is not determinant, since the equal error rates are respectively 5.80% and 6.13% (Fig. 7). Acquired from the whole data set, Table I tells that the cases where dk ≤ mink is so few that they cannot affect the global performance, while among genuine signatures the proportion of cases where dk > maxk is considerable, if not significant, which impairs the effect of the bonus.
+
+B. Choices of Graphs
+Since we have proposed two types of graph representation of signature in Section II, first, we try to use only one of them to represent signatures, i.e. a signature is represented by 10 graphs in the form of either AG1 or AG2. Although the number of graphs describes a signature is different from that proposed in the last section, the process is likewise. Then, two types of graphs are combined to carry out further experiments, as is described in Section III. Table II gives the results of our method and Fig. 8 displays the ROC curve when tested against skilled forgeries.
+Table II EER OF DIFFERENT GRAPHS
+AG1 AG2 AG1 and AG2 EER against skilled forgeries 7.82% 12.15% 5.80% EER against random forgeries 1.26% 1.26% 1.26%
+It shows that when tested against skilled forgeries, combining AG1 and AG2 leads to better performance, while tested against random forgeries, i.e. signatures randomly chosen from other users, the results are the same.
+
+C. Comparing with Other Methods
+Our approach is compared with one of the latest researches on on-line signature verification which had been tested on SUSig database. In [16], the authors used global features consisting of Fourier Descriptors (FD) that provide a compact and fixed-length representation to fulfil the task of on-line signature verification. One thing in common between our method and FD is that they both use only a small number of genuine signatures to train the classifiers, unlike some other methods that requires forgeries to be included in the training set. The authors of [16] also combined FD with one of their earlier method which took the advantage of DTW [2] to improve the performance. Thus, we not only compare our method with FD, but also fuse it with the method proposed in [2]. Average EERs of different methods are displayed in the following table.
+
+V. CONCLUSION
+In this paper, we proposed a new method of on-line signature verification, which took into account graph representation of data and graph matching techniques. Two types of graph representation of on-line signatures were introduced, and a sub-optimal graph matching algorithm was adopted to compute edit distance between graphs. The use of graphs exploits the property of sample points and the
+relationship between different points. Experiments showed that when no forged signatures was available as negative training samples, which was the situation encountered in practice, our method outperformed the one proposed in [16]. Further improvements will be made in the future to include more features and select the ones that are more suitable for graph representation and more effective to fulfil the task.
+
+ACKNOWLEDGEMENT
+This work is funded by the National Basic Research Program of China (No. 2010CB327902), the National Natural Science Foundation of China (No. 60873158, No. 61005016, No. 61061130560) and the Fundamental Research Funds for the Central Universities.
+
+References
+[1]D. Impedovo,G. PirloAutomatic signature verification: the state of the artIEEE Trainsactions on System, Man and Cybernetics - Part C: Applications and Reviews, vol. 38, no. 5, pp. 609–635, 2008.2008
+[2]A. Kholmatov,B. YanikogluIdentity authentication using improved online signature verification methodPattern Recognition Letters, vol. 26, pp. 2400–2408, 2005.2005
+[3]M.Wirotius,J.-Y. Ramel,N.Vincentelection of points for on-line signature comparisonThe 9th International Workshop on Frontiers in Handwriting Recognition, 2004, pp. 503–508.2004
+[4]H. Lei,V.S. Palla,G. ERAn intuitive similarity measure for on-line signature verificationThe 9th International Workshop on Frontiers in Handwriting Recognition, 2004, pp. 191–195.2004
+[5]R. Kashi,J. Hu,W. NelsonA hidden markov model approach to online handwritten signature verificationInternational Journal on Document Analysis and Recognition, 1998, pp. 102–109.1998
+[6]C.T.WesselsA hybrid system for signature verificationInternational Joint Conference on Neural Networks, 2000, pp. 509–514.2000
+[7]J. Coetzer,B.M. Herbst,J.A. du PreezOffline signature verification using the discrete radon transform and a hidden markov model2004, pp. 559–571.2004
+[8]C. Gruber,T. Gruber,S. KrinningerMachines based on lcss kernel functionsIEEE Transactions on Systems, Man, and Cybernetics - Part B: Cybernetics, vol. 40, pp. 1088– 1100, 2010.2010
+[9]S. Chen,S.N. SrihariA new offline signautre verification method based on graph matchingProc. of ICPR, 2006, pp. 869–872.2006
+[10]Y. Chen,X. DingOnline signature verification using direction sequence string matchingProc. of SPIE, vol. 4875, 2002, pp. 744–749.2002
+[11]D. Conte,P. Foggia,C. Sansone,M. VentoThirty years of graph matching in pattern recognitionInternational journal of Pattern Recognition, vol. 18, no. 3, pp. 265–298, 2004.2004
+[12]K. Riesen,M. Neuhaus,H. BunkeBipartite graph matching for computing the edit distance of graphsLecture Notes in Computer Science. springer, 2007, vol. 4538, pp. 1–12.2007
+[13]H. BunkeError correcting graph matching: on the influence of the underlying cost functionIEEE Transactions on Pattern Analysis and Machine Intelligence, vol. 21, no. 9, pp. 917–922, 1999.1999
+[14]J. MunkresAlgorithms for the assignment and transportation problemsJournal of the Society for Industrial and Applied Mathematics, vol. 5, pp. 32–38, 1957.1957
+[15]A. Kholmatov,B. YanikogluSUSIG: An on-line signature database, associated protocols and benchmark resultsPattern Analysis and Applications, 2008. [Online]. Available: http://biometrics.sabanciuniv.edu/SUSIG2008
+[16]B. Yanikoglu,A. KholmatovOnline signature verification using fourier descriptorsEurasip Journal on Advances in Signal Processing, vol. 2009, pp. 1–14, 2009. 9482009

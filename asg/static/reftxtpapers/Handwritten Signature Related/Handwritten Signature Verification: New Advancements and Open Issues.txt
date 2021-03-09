@@ -1,0 +1,89 @@
+Handwritten Signature Verification: New Advancements and Open Issues
+D. Impedovo,G. Pirlo,R. Plamondon
+pirlo}@di.uniba.it,rejean.plamondon@polymtl.ca
+
+Abstract
+Recently, research in handwritten signature verification has been considered with renewed interest. In fact, in the age of e-society, handwritten signature still represents an extraordinary means for personal verification and the possibility of using automatic signature verification in a range of applications is becoming a reality. This paper focuses on some of the most remarkable aspects the field and highlights some recent research directions. A list of selected publications is also provided for interested researchers.
+
+I. INTRODUCTION
+The recent years have been characterized by the growing interest toward personal identity authentication, along with the spreading of the internet and the increased demand for security issues. Biometrics is an important field that allows personal identity authentication through the analysis of personal characteristics. Two types of biometrics means can be considered: Physiological biometrics, which involves data derived from the direct measurement of some part of the human body; Behavioural biometrics, which involves data derived from an action taken by a person. Examples of physiological biometrics include fingerprint-, face-, palmprint-, retina-based verification. Examples of behavioral biometrics are speech-, keystroke dynamics- and signaturebased verification [1].
+Among the others, handwritten signature is one of the most widespread means for personal authentication. In all developed countries, people learn to affix the signature in the early age and practiced over a period of years. So handwritten signature is a very personal pattern that originates from a complex generation process involving the instantiation of an action plan stored in the brain of the signer and its execution by his/her body (arm, hand) using suitable writing devices (pen, pencil, paper, etc.) [2, 3, 4].
+Therefore, it is not surprising that signature analysis is an extremely complex problem that involves aspects of diverse disciplines. Four comprehensive surveys that report the progress in the field of automatic signature verification respectively up to 1989, 1993, 2000 and 2008, provide a comprehensive overview of the efforts done in this research area [5, 6, 7, 72].
+The aim of this paper is to highlight some of the most relevant issues at the frontier of research in the field of automatic signature verification. Throughout the paper, some of the most promising directions of research will be pointed out and discussed.
+The organization of the paper is the following. Section 2 presents some aspects related to signature acquisition and with the use of new acquisition devices. Some of the crucial questions about signature modelling and representation are discussed in Section 3. The verification strategies are illustrated in Section 4. Section 5 introduce the problem of the assessment of signature verification systems. Some crosscultural and health issues are presented in Section 6. Section 7 briefly introduces some inquiries concerning security, privacy and regulatory matters. Section 8 reports the conclusion of the paper.
+
+VII. SECURITY, PRIVACY AND REGULATORY ISSUES
+Data security and privacy are crucial issues to be addressed for assuring a successful deployment of signature verification systems in real life applications. As matter of the fact, feature transformation approaches and biometric cryptosystems have been considered. More recently, a general hybrid approach is proposed for ensuring the protection to biometric templates, that has been applied to on-line signatures. The feature transformation part of the protection scheme relies on the use of Universal Background Models (UBMs), whereas the cryptosystem part is given by a user-adaptive version of the fuzzy commitment cryptographic protocol [66]. Eskander et al. presented a bio-cryptography system that constructs Fuzzy Vaults based on Extended Shadow Codes features extracted from off-line signature images [67].
+Legal and regulatory aspects of personal verification by handwritten signature are also very important. Significant results have been achieved recently, since governments and institutions have demonstrated a growing awareness and attention to this important field. As matter of fact, some regulatory aspects have been defined and introduced [68, 69].
+
+VIII. CONCLUSIONS
+Handwritten signature is an extraordinary product of human beings and, in the era of the internet, several questions on signature treatment for verification aims still remain open. This paper has tried to point out some of the most remarkable directions of recent research in the field of
+automatic signature verification and suggested investigation of research territories.
+
+References
+[1]R. PlamondonA Kinematic Theory of Rapid Human Movements: Part I: Movement Representation and generationBiological Cybernetics,1995
+[2]R. PlamondonA Kinematic Theory of Rapid Human Movements: Part II: Movement Time and ControlBiological Cybernetics,1995
+[3]R. PlamondonA Kinematic Theory of Rapid Human Movements: Part III: Kinetic OutcomesBiological Cybernetics,1997
+[4]F. Leclerc,R. PlamondonAutomatic signature verification: The state of the art − 1989-1993IJPRAI, Vol. 8, n1994
+[5]D. Impedovo,G. PirloAutomatic Signature Verification – State of the ArtIEEE Transactions on Systems, Man and Cybernetics – Part C: Applications and Review, vol. 38, no. 5, September 2008, pp. 609-635.2008
+[6]D. Wang,Y. Zhang,C. Yao,J. Wu,H. Jiao,M. LiuToward Forcebased Signature Verification: A Pen-Type Sensor and Preliminary ValidationIEEE Transactions on Instrumentation and Measurement, vol. 59, no. 4, April 2010, pp. 752-762.2010
+[7]M.E. Munich,P. PeronaVisual Input for Pen-Based ComputersIEEE T-PAMI,2002
+[8]D. Maramatsu,K. Yasuda,T. MatsumotoBiometric Person Authentication Method Using Camera-based Online Signature AcquisitionProc. 20 ICPR, Istanbul, Turkey, 23-26 Aug. 2010, pp. 46-50.2010
+[9]S. Shirato,D. Maramatsu,T. MatsumotoCamera-based online Signature Verification System: Effects of Camera PositionProceedings of World Automation Congress,2010
+[10]S.J. ElliottDifferentiation of Signature Traits vis-à-vis Mobile- and Table-based DigitizersETRI Journal,2004
+[11]F. Zoebisch,C. VielhauerA test tool to support brute-force online and offline signature forgery tests on mobile devicesProc. IEEE Int'l Conf. on Multimedia and Expo 2003 (ICME), vol. 3, Baltimore, USA, 2006, pp. 225-228.2003
+[12]C. Vivaracho-Pascual,J. Pascual-GasparOn the Use of Mobile Phones and Biometrics for Accessing Restricted Web ServicesIEEE T-SMC - Part C, Applications and Reviews, March 2012,2012
+[13]F. Alonso-Fernandez,J. Fierrez-Aguilar,J. Ortega-GarciaSensor interoperability and fusion in signature verification: A case study using a Tablet PCProc. Intl. Workshop on Biometric Recognition Systems (IWBRS), Springer LNCS-3781, pp. 180-187, Beijing, China, October 2005.2005
+[14]M. Martinez-Diaz,J. Fierrez,J. Ortega-GarciaIncorporating Signature Verification on Handheld Devices with User-Dependent Hidden Markov ModelsProc. ICFHR 2008, 19-21 August, 2008, Montreal, Canada, pp. 326-331.2008
+[15]K. FazioThe Effects of Constraint on a Signature’s Static and Dynamic Features”, thesis presented to the University of Ontario Institute of technology, Oshawa2011
+[16]D. Simsons,R. Spencer,S. AuerThe Effects of Constraining SignaturesJournal of the American Society of Questioned Document Examiners,2011
+[17]R. PlamondonA Kinematic Theory of Rapid Human Movements: Part I – Movement Representation and GenerationBiological Cybernetics, vol. 72, no. 4, 1995, pp. 295-307.1995
+[18]R. Plamondon,M. DjiouaA Multi-Level Representation Paradigm for Handwriting Stroke GenerationHuman Movement Science, vol. 25, no. 4-5, 2006, pp. 586-607.2006
+[19]C. O’Reilly,R. PlamondonDevelopment of a Sigma-Lognormal Representation for On-Line SignaturesPattern Recognition, Special Issue on Frontiers in Handwriting Recognition, vol. 42, 2009, pp. 3324-3337.2009
+[20]G. Dimauro,S. Impedovo,R. Modugno,G. Pirlo,L. SarcinellaAnalysis of Stability in Hand-Written Dynamic Signatures8 International Workshop on Frontiers in Handwriting Recognition (IWFHR-8), Ontario, Niagara-on-the-Lake, Canada, August 2002, pp. 259-263.2002
+[21]K. Huang,H. YanStability and style-variation modeling for on-line signature verificationPattern Recognition, vol. 36, no. 10, October 2003, pp. 2253-2270.2003
+[22]V. Di Lecce,G. Dimauro,A. Guerriero,S. Impedovo,G. Pirlo,A. Salzo,L. SarcinellaSelection of Reference Signatures for Automatic Signature Verification5 International Conference on Document Analysis and Recognition (ICDAR-5), Bangalore, India, September 20-22, 1999, pp. 597-600.1999
+[23]D. Impedovo,G. PirloOn-line Signature Verification by Stroke- Dependent Representation DomainsProc. 12 ICFHR, Kolkata, India, 16-18 November, 2010, pp. 623-627.2010
+[24]L. Bovino,S. Impedovo,G. Pirlo,L. SarcinellaMulti-Expert Verification of Hand-Written Signatures”, 7 International Conference on Document Analysis and Recognition (ICDAR-7)IEEE Computer Society,2003
+[25]R.M. GuestThe Repeatability of Signatures9 International Workshop on Frontiers in Handwriting Recognition (IWFHR-9), Kichijoji, Japan, October 2004, pp. 492-497.2004
+[26]R. GuestAge dependency in handwritten dynamic signature verification systemsPattern Recognition Letters, vol. 27, no. 10, 15 July, 2006, pp. 1098-1104.2006
+[27]Y. Kato,D. Muramatsu,T. MatsumotoA Sequential Monte Carlo Algorithm for Adaptation to Inter-session Variability in On-line Signature VerificationProc. 10th Int. Workshop on Frontiers in Handwriting Recognition (IWFHR 10), La Baule, France, October 2006.2006
+[28]M. Djioua,R. PlamondonStudying the Variability of Handwriting Patterns using the Kinematic TheoryHuman Movement Science, vol. 28, no. 5, October 2009, pp. 588-601.2009
+[29]J.-J. Brault,R. PlamondonA Complexity Measure of Handwritten Curves: Modeling of Dynamic Signature ForgeryIEEE T-SMC,1993
+[30]B. Found,D. RogersContemporary issues in forensic handwriting examination. A discussion of key issues in the wake of the Starzecpyzel decisionJournal of Forensic Document Examination,1995
+[31]N. Vincent,V. Bouletreau,H. Emptoz,R. SabourinHow to use Fractal dimension to qualify writings and writersFractals, Vol. 8,2000
+[32]S. Garcia-Salicetti,N. Houmani,B. DorizziA Client-Entropy Measure for On-Line SignaturesProc. Biometrics Symposium (BSYM 2008), 23-25 September, 2008, Tampa (FL), pp. 83-88.2008
+[33]N. Houmani,S. Garcia-Salicetti,B. DorizziA Novel Personal Entropy Measure confronted with Online Signature Verification Systems’ PerformanceProc. IEEE 2nd Int. Conf. on Biometrics: Theory, Applications and Systems (BTAS 2008), Washington, September 2008, pp. 1-6.2008
+[34]D.S. Guru,H.N. PrakashOnline Signature Verification and Recognition: An Approach Based on Symbolic RepresentationIEEE T-PAMI,2009
+[35]T.H. Rhee,S.J. Cho,J.H. KimOn-Line Signature Verification Using Model-Guided Segmentation and Discriminative Feature Selection for Skilled Forgeries6th International Conference on Document Analysis and Recognition (ICDAR-6), Seattle, Washington, USA, September 2001, pp. 645-649.2001
+[36]W.S. Wijesoma,Ma Mingming,E. SungSelecting Optimal Personalized Features for On-line Signature Verification Using GA369 71 IEEE International Conf. on Systems, Man, and Cybernetics, vol. 4, 2000, pp. 2740-2745.2000
+[37]S.H. Kim,M.S. Park,J. KimApplying Personalized Weights to a Feature Set for On-line Signature Verification3 International Conference on Document Analysis and Recognition (ICDAR-3), IEEE Computer Society, Montréal, Canada, vol. 1, August 1995, pp. 882-885.1995
+[38]J.C. Martinez-R.,R.A. SilvaOptimal prototype functions of features for online signature verificationInternational Journal of Pattern Recognition and Artificial Intelligence (IJPRAI), vol. 18, no. 7, 2004, pp. 1189-1206.2004
+[39]D. Impedovo,G. PirloOn-line Signature Verification by Stroke- Dependent Representation DomainsProc. 12 ICFHR,2010
+[40]B. Van,S. Garcia-Salicetti,B. DorizziOn Using the Viterbi Path Along with HMM Likelihood Information for Online Signature VerificationIEEE Trans. on Syst., Man and Cybernetics – Part B, vol. 37, no. 5, October 2007, pp. 1237-1247.2007
+[41]K. Wang,Y. Wang,Z. ZhangOn-line Signature Verification using Graph RepresentationProc. 6 Int. Conf. on Image and Graphics (ICIG), Hefei, Anhui,2011
+[42]M. PiekarczykHierarchical Random Graph Model for Off-line Handwritten Signature RecognitionProc. Int. Conf. on Complex, Intelligent and Software Intensive Systems,2010
+[43]H. Lv,X. Bai,W. Yin,J. DongOff-line Signature Verification Using Graph ModelProc. ICPR, Istanbul,2010
+[44]J.F. Vargas,M.A. Ferrer,C.M. Travieso,J.B. AlonsoOffline Signature Verification Based on Pseudo-Cepstral CoefficientsProc. of the 10 Int. Conference on Document Analysis and Recognition (ICDAR ’09),2009
+[45]S.N. Srihari,M.K.A. XuKalera, “Learning Strategies and Classification Methods for Off-line Signature Verification9th International Workshop on Frontiers in Handwriting Recognition (IWFHR-9),2004
+[46]C. Gruber,T. Gruber,S. Krinninger,B. SickOnline Signature Verification with Support Vector Machines Based on LCSS Kernel FunctionsIEEE SMC Part B: Cybernetics,2010
+[47]J. Fierrez-Aguilar,L. Nanni,J. Lopez-Penalba,J. Ortega-Garcia,D. MaltoniAn on-line signature verification system based on fusion of local and global informationAudio- and Video-based Biometric Person Authentication, New York, July 2005, AVBPA, Springer LNCS-3546, 2005, pp. 523-532.2005
+[48]A. Humm,J.Hennebert,R. IngoldCombined Handwriting and Speech Modalities for User AuthenticationIEEE T-SMC – Part A: Systems and Humans,2009
+[49]F.F. LiSound-based Multimodal Person Identification from Signature and VoiceProc. 5 Int. Conf. on Internet Monitoring and Protection,2010
+[50]T. FawcettAn introduction to ROC analysisPattern Recognition Letters,2006
+[51]M. Faundez-Zanuy,J. Fierrez-Aguilar,J. Ortega-Garcia,J. Gonzalez- RodriguezMultimodal biometric databases: An overviewIEEE Aerospace and Electronic Systems Magazine, vol. 21, no. 8, 2006, pp. 29-37.2006
+[52]J. Galbally,R. Plamondon,J. Fierrez,J. Ortega-GarciaSynthetic online signature generationPart I: Methodology and algorithms, Pattern Recognition,Vol.45,2012
+[53]J. Galbally,J. Fierrez,R.J. Ortega-GarciaPlamondon,.Synthetic online signaure generationPart II: Experimental validation, Pattern Recognition,Vol.45,2012
+[54]C. Rabasse,R.M. Guest,M.C. FairhurstA New Method for the Synthesis of Signature Data with Natural VariabilityIEEE T-SMC – Part B: Cybernetics,2008
+[55]D.-Y. Yeung,H. Chang,Y. Xiong,S. George,R. Kashi,T. Matsumoto,G. RigollSVC2004: First International Signature Verification CompetitionICBA 2004, LNCS 3072, Springer-Verlag Berlin Heidelberg, D. Zhang and A. K. Jain (Eds.), 2004, pp. 16-22.2004
+[56]N. Houmani,A. Mayoue,S. Garcia-Salicetti,B. Dorizzi,M.I. Khalil,M.N. Moustafa,H. Abbas,D. Muramatsu,B. Yanikoglu,A. Kholmatov,M. Martinez-Diaz,J. Fierrez,J. Ortega-Garcia,J. Roure Alcob_e,J. Fabregas,M. Faundez-Zanuy,J.M. Pascual-Gaspar,V. Cardenoso,Payo,C. Vivaracho-PascualBioSecure signature evaluation campaign (BSEC'2009): Evaluating online signature algorithms depending on the quality of signaturesPattern Recognition,2012
+[57]M. Liwicki,C.E. van den Heuvel,B. Found,M.I. MalikForensic signature verification competition 4nsigcomp2010 - detection of simulated and disguised signaturesin Proc. of ICFHR2010,2010
+[58]M. Blumenstein,M.A. Ferrer,J.F. VargasThe 4nsigcomp2010 online signature verification competition: ScenarioProc. of ICFHR2010,2010
+[59]M. Liwicki,M.I. Malik,C.E. van den Heuvel,X. Chen,C. Berger,R. Stoel,B.M. BlumensteinFound, "Signature verification competition for online and offline skilled forgeries (sigcomp2011)in: Proc. of ICDAR2011,2011
+[60]C. Vielhauer,T. Basu,J. Dittmann,P.K. DuttaFinding Metadata in Speech and Handwriting BiometricsProc. of SPIE-IS&T Electronic Imaging, San Jose, California, USA,2005
+[61]M. Abreu,M. FairhurstImproving Identity Prediction in Signature-based Unimodal Systems Using Soft Biometrics”, in Biometric ID Management and Multimodal CommunicationLNCS 2009,2009
+[62]J.L. Contreras-Vidal,H.L. Teulings,G.E. StelmachMicrographia in Parkinson's disease”, Neuroreport1995
+[63]A.W.A. Van Gemmert,C Adler,G. StelmachParkinson's disease patients undershoot target size in handwriting and similar tasksJ. Neurol Neurosurg Psychiatry2003
+[64]E. Maiorana,P. Campisi,J. Fierrez,J. Ortega-Garcia,A. NeriConcelable Templates for Sequence-Based Biometrics with Application to On-line Signature RecognitionIEEE T-SMC – Part A: Systems and Humans,2010
+[65]G.S. Eskander,R. Sabourin,E. GrangerSignature Based Fuzzy Vaults with Boosted Feature SelectionProc. of IEEE Workshop on Computational Intelligence in Biometrics and Identity Management (CIBIM), Paris,2011
+[66]R. Plamondon,S. ShriariOn-line and off-line handwriting recognitionIEEE Trans. On Pattern Analysis and Machine intelligence,2000

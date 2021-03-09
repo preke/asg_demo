@@ -1,0 +1,296 @@
+Feature Selection Based on Mutual Information: Criteria of Max-Dependency, Max-Relevance, and Min-Redundancy
+Hanchuan Peng,Chris Ding
+
+
+to the maximal statistical dependency criterion based on mutual information. Because of the difficulty in directly implementing the maximal dependency condition, we first derive an equivalent form, called minimal-redundancy-maximal-relevance criterion (mRMR), for first-order incremental feature selection. Then, we present a two-stage feature selection algorithm by combining mRMR and other more sophisticated feature selectors (e.g., wrappers). This allows us to select a compact set of superior features at very low cost. We perform extensive experimental comparison of our algorithm and other methods using three different classifiers (naive Bayes, support vector machine, and linear discriminate analysis) and four different data sets (handwritten digits, arrhythmia, NCI cancer cell lines, and lymphoma tissues). The results confirm that mRMR leads to promising improvement on feature selection and classification accuracy.
+Index Terms—Feature selection, mutual information, minimal redundancy, maximal relevance, maximal dependency, classification.
+
+1 INTRODUCTION
+IN many pattern recognition applications, identifying themost characterizing features (or attributes) of the observed data, i.e., feature selection (or variable selection, among many other names) [30], [14], [17], [18], [15], [12], [11], [19], [31], [32], [5], is critical to minimize the classification error. Given the input data D tabled as N samples and M features X ¼ fxi; i ¼ 1; . . . ;Mg, and the target classification variable c, the feature selection problem is to find from the M-dimensional observation space, RM , a subspace of m features, Rm, that “optimally” characterizes c.
+Given a condition defining the “optimal characterization,” a search algorithm is needed to find the best subspace. Because the total number of subspaces is 2M , and the number of subspaces with dimensions no larger than m is mi¼1 M i , it is hard to search the feature subspace exhaustively. Alternatively, many sequential-search-based approximation schemes have been proposed, including best individual features, sequential forward search, sequential forward floating search, etc., (see [30], [14], [13] for a detailed comparison.).
+The optimal characterization condition often means the minimal classification error. Inanunsupervisedsituationwhere theclassifiersarenotspecified,minimalerrorusuallyrequires themaximal statistical dependency of the target class c on the data distribution in the subspace Rm (and vice versa). This scheme ismaximal dependency (Max-Dependency).
+One of the most popular approaches to realize MaxDependency is maximal relevance (Max-Relevance) feature selection: selecting the features with the highest relevance to the target class c. Relevance is usually characterized in terms of correlation ormutual information, ofwhich the latter is one of the widely used measures to define dependency of variables. In this paper, we focus on the discussion of mutual-information-based feature selection.
+Given two random variables x and y, their mutual information is defined in terms of their probabilistic density functions pðxÞ, pðyÞ, and pðx; yÞ:
+Iðx; yÞ ¼ ZZ
+pðx; yÞ log pðx; yÞ pðxÞpðyÞ dxdy: ð1Þ
+In Max-Relevance, the selected features xi are required, individually, to have the largest mutual information Iðxi; cÞ with the target class c, reflecting the largest dependency on the target class. In terms of sequential search, the m best individual features, i.e., the top m features in the descent ordering of Iðxi; cÞ, are often selected as the m features.
+In feature selection, it has been recognized that the combinations of individually good features do not necessarily lead to good classification performance. In other words, “them best features are not the bestm features” [4], [3], [14], [30]. Some researchers have studied indirect or direct means to reduce the redundancy among features1 (e.g., [4], [14], [19], [15], [22], [12], [5]) and select features with the minimal redundancy (Min-Redundancy). For example, in the sequential forward floating search [25], the joint dependency of features on the target class ismaximized; as a by-product, the redundancy among featuresmight be reduced. In [12], Jaeger et al. presentedaprefilteringmethod togroupvariables, thus, redundant variables within each group can be removed. In
+. H. Peng and F. Long are with the Lawrence Berkeley National Laboratory, University of California at Berkeley, 1 Cyclotron Road, MS. 84-171, Berkeley, CA 94720. E-mail: {hpeng, flong}@lbl.gov. . C. Ding is with the Computational Research Division, Lawrence Berkeley National Laboratory, 1 Cyclotron Road, Berkeley, CA 94720. E-mail: CHQDing@lbl.gov.
+Manuscript received 6 Aug. 2003; revised 1 May 2004; accepted 3 Dec. 2004; published online 13 June 2005. Recommended for acceptance by A. Del Bimbo. For information on obtaining reprints of this article, please send e-mail to: tpami@computer.org, and reference IEEECS Log Number TPAMI-0215-0803. 1. Minimal redundancy has also been studied in feature extraction, which aims to find good features in a transformed domain. For instance, it has been well addressed in various techniques such as principal component analysis and independent component analysis [10], neural network feature extractors (e.g., [22]), etc.
+0162-8828/05/$20.00 2005 IEEE Published by the IEEE Computer Society
+[5], we proposed a heuristic minimal-redundancy-maximalrelevance (mRMR) framework to minimize redundancy, and used a series of intuitive measures of relevance and redundancy to select promising features for both continuous and discrete data sets.
+Our work in this paper focuses on three issues that have not been touched in earlier work. First, although both MaxRelevance and Min-Redundancy have been intuitively used for feature selection, no theoretical analysis is given on why they can benefit selecting optimal features for classification. Thus, the first goal of this paper is to present a theoretical analysis showing that mRMR is equivalent to Max-Dependency for first-order feature selection, but is more efficient.
+Second, we investigate how to combine mRMR with other feature selection methods (such as wrappers [18], [15]) into a two-stage selection algorithm. By doing this, we show that the space of candidate features selected by mRMR is more characterizing. This property of mRMR facilitates the integration of other feature selection schemes to find a compact subset of superior features at very low cost.
+Third, through comprehensive experiments we compare mRMR, Max-Relevance, Max-Dependency, and the twostage feature selection algorithm, using three different classifiers and four data sets. The results show that mRMR and our two-stage algorithm are very effective in a wide range of feature selection applications.
+This paper is organized as follows: Section 2 presents the theoretical analysis of the relationships of Max-Dependency, Max-Relevance, andMin-Redundancy. Section 3presents the two-stage feature selection algorithm, including schemes to integrate wrappers to select a squeezed subset of features. Section 4 discusses implementation issues of density estimation for mutual information and several different classifiers. Section 5 gives experimental results on four data sets, including handwritten characters, arrhythmia, NCI cancer cell lines, and lymphoma tissues. Sections 6 and 7 are discussions and conclusions, respectively.
+
+2 RELATIONSHIPS OF MAX-DEPENDENCY, MAX-RELEVANCE, AND MIN-REDUNDANCY
+2.1 Max-Dependency
+In terms of mutual information, the purpose of feature selection is to find a feature set Swithm features fxig, which jointly have the largest dependency on the target class c. This scheme, called Max-Dependency, has the following form:
+maxDðS; cÞ; D ¼ Iðfxi; i ¼ 1; . . . ;mg; cÞ: ð2Þ Obviously, when m equals 1, the solution is the feature that maximizes Iðxj; cÞð1 j MÞ. When m > 1, a simple incremental search scheme is to add one feature at one time: given the set with m 1 features, Sm 1, the mth feature can be determined as the one that contributes to the largest increase of IðS; cÞ, which takes the form of (3): IðSm; cÞ ¼ ZZ
+pðSm; cÞ log pðSm; cÞ pðSmÞpðcÞ dSmdc
+¼ ZZ
+pðSm 1; xm; cÞ log pðSm 1; xm; cÞ pðSm 1; xmÞpðcÞ dSm 1dxmdc
+¼ Z
+Z
+pðx1; ; xm; cÞ log pðx1; ; xm; cÞ pðx1; ; xmÞpðcÞ
+dx1 dxmdc: ð3Þ
+Despite the theoretical value of Max-Dependency, it is often hard to get an accurate estimation for multivariate density pðx1; . . . ; xmÞ and pðx1; . . . ; xm; cÞ, because of two difficulties in the high-dimensional space: 1) the number of samples is often insufficient and 2) the multivariate density estimation often involves computing the inverse of the high-dimensional covariance matrix, which is usually an illposed problem. Another drawback of Max-Dependency is the slow computational speed. These problems are most pronounced for continuous feature variables.
+Even for discrete (categorical) features, the practical problems in implementing Max-Dependency cannot be completely avoided. For example, suppose each feature has three categorical states and N samples. K features could have a maximum minð3K;NÞ joint states. When the number of joint states increases very quickly and gets comparable to the number of samples, N , the joint probability of these features, as well as the mutual information, cannot be estimated correctly. Hence, although Max-Dependency feature selection might be useful to select a very small number of features when N is large, it is not appropriate for applications where the aim is to achieve high classification accuracy with a reasonably compact set of features.
+
+2.2 Max-Relevance and Min-Redundancy
+As Max-Dependency criterion is hard to implement, an alternative is to select features based on maximal relevance criterion (Max-Relevance). Max-Relevance is to search features satisfying (4), which approximates DðS; cÞ in (2) with the mean value of all mutual information values between individual feature xi and class c:
+maxDðS; cÞ; D ¼ 1jSj X xi2S Iðxi; cÞ: ð4Þ
+It is likely that features selected according to MaxRelevance could have rich redundancy, i.e., the dependency among these features could be large. When two features highly depend on each other, the respective class-discriminative power would not change much if one of them were removed. Therefore, the following minimal redundancy (MinRedundancy) condition can be added to select mutually exclusive features [5]:
+minRðSÞ; R ¼ 1 jSj2 X xi;xj2S Iðxi; xjÞ: ð5Þ
+The criterion combining the above two constraints is called “minimal-redundancy-maximal-relevance” (mRMR) [5]. We define the operator ðD;RÞ to combineD and R and consider the following simplest form to optimize D and R simultaneously:
+max ðD;RÞ; ¼ D R: ð6Þ
+Inpractice, incremental searchmethods canbeused to find thenear-optimal featuresdefinedby ð:Þ.Supposewealready have Sm 1, the feature set with m 1 features. The task is to select themth feature fromthe setfX Sm 1g. This isdoneby selecting the feature that maximizes ð:Þ. The respective incremental algorithm optimizes the following condition:
+max xj2X Sm 1
+Iðxj; cÞ 1m 1 X
+xi2Sm 1 Iðxj;xiÞ
+" # : ð7Þ
+The computational complexity of this incremental search method is OðjSj MÞ.
+
+2.3 Optimal First-Order Incremental Selection
+We prove in the following that the combination of Max-
+Relevance and Min-Redundancy criteria, i.e., the mRMR
+criterion, is equivalent to the Max-Dependency criterion if
+one feature is selected (added) at one time. We call this type
+of selection the “first-order” incremental search. We have
+the following theorem:
+Theorem. For the first-order incremental search, mRMR is equivalent to Max-Dependency (2).
+Proof. By definition of the first-order search, we assume that Sm 1, i.e., the set of m 1 features, has already been obtained. The task is to select the optimal mth feature xm from set fX Sm 1g.
+The dependency D in (2) and (3) is represented by mutual information, i.e., D ¼ IðSm; cÞ, where Sm ¼ fSm 1; xmg can be treated as a multivariate variable. Thus, by the definition of mutual information, we have:
+IðSm; cÞ ¼ HðcÞ þHðSmÞ HðSm; cÞ ¼ HðcÞ þHðSm 1; xmÞ HðSm 1; xm; cÞ;
+ð8Þ
+where Hð:Þ is the entropy of the respective multivariate (or univariate) variables.
+Now, we define the following quantity JðSmÞ ¼ Jðx1; . . . ; xmÞ for scalar variables x1; . . . ; xm,
+Jðx1; x2; . . . ; xmÞ ¼Z Z pðx1; . . . ; xmÞ log
+pðx1; x2; . . . ; xmÞ pðx1Þ pðxmÞ dx1 dxm: ð9Þ
+Similarly, we define JðSm; cÞ ¼ Jðx1; . . . ; xm; cÞ as
+Jðx1; x2; . . . ; xm; cÞ ¼Z Z pðx1; . . . ; xm; cÞ log
+pðx1; x2; . . . ; xm; cÞ pðx1Þ pðxmÞpðcÞ dx1 dxmdc:
+ð10Þ
+We can easily derive (11) and (12) from (9) and (10), HðSm 1; xmÞ ¼ HðSmÞ ¼ Xm i¼1 HðxiÞ JðSmÞ; ð11Þ
+HðSm 1; xm; cÞ ¼ HðSm; cÞ ¼ HðcÞ þ Xm i¼1 HðxiÞ JðSm; cÞ:
+ð12Þ
+By substituting them to the corresponding terms in (8), we have
+IðSm; cÞ ¼ JðSm; cÞ JðSmÞ ¼ JðSm 1; xm; cÞ JðSm 1; xmÞ:
+ð13Þ
+Obviously, Max-Dependency is equivalent to simultaneously maximizing the first term and minimizing the second term.
+We can use the Jensen’s Inequality [16] to show the second term JðSm 1; xmÞ is lower-bounded by 0. A
+related and slightly simpler proof is to consider the inequality logðzÞ z 1 with the equality if and only if z ¼ 1. We see that
+Jðx1; x2; . . . ; xmÞ ¼ Z Z
+pðx1; . . . ; xmÞ log pðx1Þ pðxmÞ pðx1; . . . ; xmÞ dx1 dxm
+Z Z
+pðx1; . . . ; xmÞ pðx1Þ pðxmÞ pðx1; . . . ; xmÞ 1 dx1 dxm
+¼ Z Z pðx1Þ pðxmÞdx1 dxm
+Z Z
+pðx1; ; xmÞdx1 dxm
+¼1 1 ¼ 0: ð14Þ
+It is easy to verify that the minimum is attained when pðx1; . . . ; xmÞ ¼ pðx1Þ pðxmÞ, i.e., all the variables are independent of each other. As all the m 1 features have been selected, this pair-wise independence condition
+means that the mutual information between xm and any selected feature xiði ¼ 1; . . . ;m 1Þ is minimized. This is the Min-Redundancy criterion.
+We can also derive the upper bound of the first term in (13), JðSm 1; c; xmÞ. For simplicity, let us first show the upper bound of the general form Jðy1; . . . ; ynÞ, assuming there are n variables y1; . . . ; yn. This can be seen as follows:
+Jðy1; y2; . . . ; ynÞ ¼ Z Z
+pðy1; . . . ; ynÞ log pðy1; . . . ; ynÞ pðy1Þ pðynÞ dy1 dyn
+¼ Z Z pðy1; . . . ; ynÞ log pðy1 jy2 ;...;ynÞpðy2 jy3 ;...;ynÞ pðyn 1 jynÞpðynÞ
+pðy1Þ pðyn 1ÞpðynÞ dy1 dyn
+¼ Xn 1 i¼1 HðyiÞ Hðy1jy2; . . . ; ynÞ Hðy2jy3; . . . ; ynÞ Hðyn 1jynÞ
+Xn 1 i¼1 HðyiÞ:
+ð15Þ
+Equation (15) can be easily extended as
+Jðy1; y2; . . . ; ynÞ minXn i¼2 HðyiÞ; Xn i¼1;i 6¼2 HðyiÞ; ; Xn i¼1;i6¼n 1 HðyiÞ; Xn 1 i¼1 HðyiÞ ( ) :
+ð16Þ
+It is easy to verify the maximum of Jðy1; . . . ; ynÞ or, similarly, the first term in (13), JðSm 1; c; xmÞ, is attained when all variables are maximally dependent. When Sm 1 has been fixed, this indicates that xm and c should have the maximaldependency.This is theMax-Relevance criterion.
+Therefore, according to (13), as a combination of Max-
+Relevance and Min-Redundancy, mRMR is equivalent to Max-Dependency for first-order selection. tu Note that the quantity Jð:Þ in (9) and (10) has also been
+called“mutual information” formultiple scalarvariables [10].
+We have the following observations:
+1. Minimizing JðSmÞ only is equivalent to searching mutually exclusive (independent) features.2 This is insufficient for selecting highly discriminative features. 2. Maximizing JðSm; cÞ only leads to Max-Relevance. Clearly, the difference between mRMR and MaxRelevance is rooted in the different definitions of dependency (in terms of mutual information). Equation (10)doesnot consider the joint effect of featureson the target class.Onthecontrary,Max-Dependency ((2) and (3)) considers the dependency between the data distribution in subspaceRm and the target class c. This difference is critical in many circumstances. 3. The equivalence between Max-Dependency and mRMR indicates mRMR is an optimal first-order implementation scheme of Max-Dependency. 4. Compared to Max-Dependency, mRMR avoids the estimation of multivariate densities pðx1; . . . ; xmÞ and pðx1; . . . ; xm; cÞ. Instead, calculating the bivariate density pðxi; xjÞ and pðxi; cÞ could be much easier and more accurate. This also leads to a more efficient feature selection algorithm.
+
+3 FEATURE SELECTION ALGORITHMS
+Our goal is to design efficient algorithms to select a compact
+set of features. In Section 2, we propose a fast mRMR
+feature selection scheme (7). A remaining issue is how to
+determine the optimal number of features m. Since a
+mechanism to remove potentially redundant features from
+the already selected features has not been considered in the
+incremental selection, according to the idea of mRMR, we
+need to refine the results of incremental selection. We present a two-stage feature selection algorithm. In
+the first stage, we find a candidate feature set using the
+mRMR incremental selection method. In the second stage,
+we use other more sophisticated schemes to search a
+compact feature subset from the candidate feature set.
+
+3.1 Selecting the Candidate Feature Set
+To select the candidate feature set, we compute the cross-
+validation classification error for a large number of features
+and find a relatively stable range of small error. This range
+is called . The optimal number of features (denoted as n )
+of the candidate set is determined within . The whole
+process includes three steps:
+1. Use mRMR incremental selection (7) to select n (a preset large number) sequential features from the input X. This leads to n sequential feature sets S1 S2 . . . Sn 1 Sn. 2. Compare all the n sequential feature sets S1; . . . ; Sk; . . . ; Sn; ð1 k nÞ to find the range of k, called , within which the respective (cross-validation classification) error ek is consistently small (i.e., has both small mean and small variance). 3. Within , find the smallest classification error e ¼ min ek. The optimal size of the candidate feature set,n , ischosenasthesmallestk thatcorrespondstoe .
+
+3.2 Selecting Compact Feature Subsets
+Many sophisticated schemes can be used to search the compact feature subsets from the candidate set Sn . To illustrate that mRMR can produce better candidate features, which favors better combination with other methods, we use wrappers to search the compact feature subsets.
+A wrapper [15], [18] is a feature selector that convolves with a classifier (e.g., naive Bayes classifier), with the direct goal to minimize the classification error of the particular classifier. Usually, wrappers can yield high classification accuracy for a particular classifier at the cost of high computational complexity and less generalization of the selected features onother classifiers. This is different from the mRMR method introduced above, which does not optimize the classification error directly. The latter type of approach (e.g., mRMR and Max-Relevance), sometimes called “filter” [18], [15], often selects features by testing whether some preset conditions about the features and the target class are satisfied. In practice, the filter approach has much lower complexity than wrappers; the features thus selected often yield comparable classification errors for different classifiers, because such features often form intrinsic clusters in the respective subspace.
+By using mRMR feature selection in the first-stage, we intend to find a small set of candidate features, in which the wrappers can be applied at a much lower cost in the secondstage. We will continue our discussion on this point in Section 3.3.
+In this paper, we consider two selection schemes of wrapper, i.e., the backward and forward selections:
+1. The backward selection tries to exclude one redundant feature at a time from the current feature set Sk (initially, k is set ton obtained in Section 3.1), with the constraint that the resultant feature set Sk 1 leads to a classification error ek 1 no worse than ek. Because every feature inSk canbe considered in removal, there are k different configurations of Sk 1. For each possible configuration, the respective classification error ek 1 is calculated. If, for every configuration, the corresponding ek 1 is larger than ek, there is no gain in either classification accuracy or feature dimension reduction (i.e., every existing feature in Sk appears to be useful), thus, the backward selection terminates (accordingly, the sizeof the compact feature subset,m, is set to k). Otherwise, among the k configurations of Sk 1, the one that leads to the largest error reduction is chosen as the new feature set. If there are multiple configurations leading to the same error reduction, one of them is chosen randomly. This decremental selection procedure is repeated until the termination condition is satisfied. 2. The forward selection tries to select a subset of m features from Sn in an incremental manner. Initially, the classification error is set to the number of samples, i.e., N . The wrapper first searches for the feature subset with one feature, denoted as Z1, by selecting the feature x 1 that leads to the largest error reduction. Then, from the set fSn Z1g, the wrapper selects the feature x 2 so that the feature set Z2 ¼ fZ1; x 2g leads to the largest error reduction. This incremental selection repeats until the classification error begins to increase, i.e., ekþ1 > ek. Note that we
+2. In the field of feature extraction, minimizing JðSmÞ has led to an algorithm of independent component analysis [10].
+allow the incremental search to continue when ekþ1 equals ek, becausewewant to search a space as large as possible. Once the termination condition is satisfied, the selected number of features, m, is chosen as the dimension for which the lowest error is first reached. For example, suppose the sequence of classification errors of the first six features is [10, 8, 4, 4, 4, 7]. The forward selection will terminate at five features, but only return the first three features as the result; in this way we obtain a more compact set of features that minimizes the error.
+
+3.3 Characteristic Feature Space
+Given two feature sets S1n and S 2 n both containing n features, and a classifier , we say the feature space of S1n is more characteristic if the classification error (using classifier ) onS1n issmaller thanonS2n.Thisdefinitionofcharacteristicspacecan be extended recursively to the subsets (subspaces) of S1n and S2n. Supposewehave a feature selectionmethodF to generate a series of feature subsets in S1n : S 1 1 S12 . . . S1k . . . S1n 1 S1n, and, similarly, a series of subsets in S2n : S 2 1 . . . S2k . . . S2n. We say S1n is recursively more characteristic (RM-characteristic) than S2n on the range ¼ ½klower; kupper ð1 klower < kupper nÞ, if for every k 2 , the classificationerroronS1k is consistently smaller thanonS 2 k .
+To determine which one of the feature sets S1n and S 2 n is superior, it is often insufficient to compare the classification errors for a specific size of the feature sets. A better way is to observe which set is RM-characteristic for a reasonably large range . In the extreme case, we use ¼ ½1; n . Given two feature selection methods F 1 and F 2, if, the feature sets generated by F 1 are RM-characteristic than those generated by F 2, we believe the method F 1 is better than F 2.
+Let us consider the following example to compare mRMR and Max-Relevance based on the concept of RMcharacteristic feature space. As a comprehensive study, we consider both the sequential and nonsequential feature sets as follows (more details will be given in experiments):
+1. A direct comparison is to examine whether the mRMR sequential feature sets are RM-characteristic than Max-Relevance sequential feature sets. We use both methods to select n sequential feature sets S1 . . . Sk . . . Sn and compute the respective classification errors. If, for most k 2 ½1; n , we obtain smaller errors on mRMR feature sets, we can conclude that mRMR is better than Max-Relevance for the sequential (or incremental) feature selection. 2. We also use other feature selection methods (e.g., wrappers) in the second stage of our feature-selection algorithmtoprobewhethermRMRisbetter thanMaxRelevance fornonsequential feature sets. For example, for the mRMR and Max-Relevance candidate feature sets with n features, we use the backward-selectionwrapper to produce two series of feature sets with k ¼ n 1; n 2; . . . ;m features by removing some nonsequential features that arepotentially redundant. Then, the respective classification errors of these feature sets are computed. If, for most k, we find the mRMR nonsequential feature subset leads to lower error, we conclude themRMR candidate feature set is (approximately) RM-characteristic than the MaxRelevance candidate feature set.
+3. Both the forward and backward selections of wrapper are used. Different classifiers (as discussed later in Section 4.2) are also considered in wrappers. We use both mRMR and Max-Relevance methods to select the same number of candidate features and compare the classification errors of the feature subsets thereafter selected by wrappers. If all the observations agree that the mRMR candidate feature set is RM-characteristic, we have high confidence that mRMR is a superior feature selection method. 4. Given two feature sets, if S1n is RM-characteristic than S2n, then it is faithful to compare the lowest errors obtained for the subsets of S1n and S 2 n.
+Clearly, for feature spaces containing the same number of features, wrappers can be applied more effectively on the space that is RM-characteristic. This also indicates that wrappers can be applied at a lower cost, by improving the characterizing strength of features and reducing the number of pre-selected features.
+In real situations, it might not be possible to obtain e1k < e 2 k for every k in . Hence, we can define a confidence score 0 1 to indicate thepercentageofdifferentkvalues forwhich the e1k < e 2 k condition is satisfied. For example, when ¼ 0:90 (90 percent k-values correspond to the e1k < e 2 k condition), it is safe to claim thatS1n is approximatelyRM-characteristic thanS 2 n on . As can be seen in the experiments, usually this approximation is sufficient to compare two series of feature subsets.
+
+4 IMPLEMENTATION ISSUES
+Before presenting the experimental results in Section 5, we discuss two implementation issues regarding the experiments: 1) calculation of mutual information for both discrete and continuous data and 2) multiple types of classifiers used in our experiments.
+
+4.1 Mutual Information Estimation
+We consider mutual-information-based feature selection for both discrete and continuous data. For discrete (categorical) feature variables, the integral operation in (1) reduces to summation. In this case, computing mutual information is straightforward, because both joint and marginal probability tables can be estimated by tallying the samples of categorical variables in the data.
+However, when at least one of variables x and y is continuous, their mutual information Iðx; yÞ is hard to compute, because it is often difficult to compute the integral in thecontinuousspacebasedonalimitednumberofsamples. One solution is to incorporate data discretization as a preprocessing step. For some applications where it is unclear how toproperlydiscretize the continuousdata, an alternative solution is to use density estimation method (e.g., Parzen windows)toapproximateIðx; yÞ,assuggestedbyearlierwork in medical image registration [7] and feature selection [17].
+Given N samples of a variable x, the approximate density function p̂ðxÞ has the following form:
+p̂ðxÞ ¼ 1 N XN i¼1 ðx xðiÞ; hÞ; ð17Þ
+where ð:Þ is the Parzenwindow function as explainedbelow, xðiÞ is the ith sample, and h is the window width. Parzen has
+proven that, with the properly chosen ð:Þ and h, the estimation p̂ðxÞ can converge to the true density pðxÞ when N goes to infinity [21]. Usually, ð:Þ is chosen as the Gaussian window:
+ðz; hÞ ¼ exp z T 1z
+2h2
+ð2 Þd=2hdj j1=2 n o ; ð18Þ
+where z ¼ x xðiÞ; d is the dimension of the sample x and is the covariance of z. When d ¼ 1, (17) returns the estimated marginal density; when d ¼ 2, we can use (17) to estimate the density of bivariate variable ðx; yÞ; pðx; yÞ, which is actually the joint density of x and y. For the sake of robust estimation, ford 2, isoftenapproximatedbyitsdiagonalcomponents.
+
+4.2 Multiple Classifiers
+Our mRMR feature selection method does not convolve with specific classifiers. Therefore, we expect the features selected by this scheme have good performance on various types of classifiers. To test this, we consider three widely used classifiers, i.e., Naive Bayes (NB), Support Vector Machine (SVM), and Linear Discrimant Analysis (LDA).
+NB [20] is one of the oldest classifiers. It is based on the Bayes rule and assumes that feature variables are independent of each other given the target class. Given a sample s ¼ fx1; x2; . . . ; xmg for m features, the posterior probability that s belongs to class ck is
+pðckjsÞ / Ym i¼1 pðxijckÞ; ð19Þ
+where pðxijckÞ is the conditional probability table (or densities) learned from examples in the training process. The Parzen-window density-approximation in (17) and (18) can be used to estimate pðxijckÞ for continuous features. Despite the conditional independence assumption, NB has been shown to have good classification performance for many real data sets, on par with many more sophisticated classifiers [20].
+SVM [29], [2] is a more modern classifier that uses kernels to construct linear classification boundaries in higher dimensional spaces. We use the LIBSVM package [9], which supports both 2-class and multiclass classification.
+As one of the earliest classifiers, LDA [30] learns a linear classification boundary in the input feature space. It can be used for both 2-class and multiclass problems.
+
+5 EXPERIMENTS
+We tested our feature selection approach on two discrete and two continuous data sets. For these data sets, we used multiple ways to calculate the mutual information and tested the performance of the selected features based on three classifiers introduced above. In this way, we provided a comprehensive study on the performance of our feature selection approach under different conditions.
+This section is organized as follows: After a brief introduction of data sets in Section 5.1, we compare mRMR against Max-Dependency in terms of both feature selection complexity and feature classification accuracy in Section 5.2. These results demonstrate the practical advantages of our mRMR scheme and provide a direct verification of the theoretical analysis in Section 2. Then, in Sections 5.3 and 5.4, we show a detailed comparison ofmRMRandMax-Relevance, the latter
+ofwhichhasbeenwidelyused inpractice.Wedonot showthe comparison of mRMR with Min-Redundancy since MinRedundancy alone usually leads to poor classification (and is seldomused to select features in real applications). Due to the space limitation, in the following,wealwaysdemonstrate our comprehensive study with the most representative results. For simplicity, we use MaxDep to denote Max-Dependency andMaxRel todenoteMax-Relevance throughout the figures, tables, and texts in this section.
+
+5.1 Data Sets
+The four data sets we used are shown in Table 1. They have been extensively used in earlier studies [1], [13], [26], [27], [5]. The first two data sets, HDR-MultiFeature (HDR) and Arrhythmia (ARR), are also available on the UCI machine learning archive [28]. The latter two, NCI and Lymphoma (LYM), are available on the respective authors’ Web sites. All the raw data are continuous. Each feature variable in the raw data was preprocessed to have zero mean-value and unit variance (i.e., transformed to their z-scores). To test our approaches on both discrete and continuous data, we discretized the first two data sets, HDR and ARR. The other two data sets, NCI and LYM, were directly used for continuous feature selection.
+The data set HDR [6], [14], [13], [28] contains 649 features for 2,000 handwritten digits. The target class has 10 states, each ofwhich has 200 samples. Todiscretize the data set, each featurevariablewasbinarizedat themeanvalue, i.e., it takes 1 if it is larger than the mean value and -1 otherwise. We selected and evaluated features using 10-fold Cross-Validation (CV).
+The data setARR [28] contains 420 samples of 278 features. The target class has two states with 237 and 183 samples, respectively. Each feature variable was discretized into three states at the positions ( is the mean value and the standarddeviation): it takes -1 if it is less than , 1 if larger than þ , and 0 if otherwise.Weused 10-foldCV for feature selection and testing.
+The data set NCI [26], [27] contains 60 samples of 9,703 genes; each gene is regarded as a feature. The target class has nine states corresponding to different types of cancer; each type has two to nine samples. Since the sample number is small, we used the Leave-One-Out (LOO) CV method in testing.
+The data set LYM [1] has 96 samples of 4,026 gene features. The target class corresponds to nine subtypes of the lymphoma. Each subtype has two to 46 samples. The sample numbers for these subtypes are highly skewed, which makes it a hard classification problem.
+Note that the feature numbers of these data sets are large (e.g.,NCIhasnearly10,000features).Thesedatasetsrepresent some real applications where expensive feature selection methods (e.g., exhaustive search) cannot be used directly. They differ greatly in sample size, feature number, data type (discrete or continuous), data distribution, and target class type (multiclass or 2-class). In addition, we studied different mutual information calculation schemes for bothdiscrete and continuous data and provided results using different classifiers and different wrapper selection schemes. We believe these data andmethods provide a comprehensive testing suit for feature selection methods under different conditions.
+
+5.2 Comparison of mRMR and Max-Dependency
+The mRMR scheme is a first-order approximation of the Max-Dependency (or MaxDep) selection method. We compared their performances in terms of both feature selection complexity and feature classification accuracy. These comparisons indicate their applicability for real data.
+
+5.2.1 Feature Selection Complexity
+In practice, for categorical feature variables, we can introduce an intermediate “joint-feature” variable for MaxDep selection, so that the complexity would not increase much in selecting additional features (the comparison results against mRMR are omitted due to space limitation). Unfortunately, for continuous feature variables, it is hard to adopt a similar approach. For example, we
+compared the average computational time cost to select the top 50 mRMR and MaxDep features for both continuous data sets NCI and LYM, based on parallel experiments on a cluster of eight 3.06G Xeon CPUs running Redhat Linux 9, with the Matlab implementation.
+The results in Fig. 1 demonstrate that the time cost for MaxDep to select a single feature is a polynomial function of the number of features, whereas, for mRMR, it is almost constant. For example, for NCI data, MaxDep takes about 20 and 60 seconds to select the 20th and 40th features, respectively. In contrast,mRMRalways takesabout 2 seconds to select any features. For the LYMdata,MaxDep needsmore than 200 seconds to find the 50th feature, while mRMR uses only 5 seconds. We can conclude that mRMR is computationally much more efficient than MaxDep.
+
+5.2.2 Feature Classification Accuracy
+The selected features for the four data sets were tested using all the three classifiers introduced in Section 4.2.However, for both clarity and briefness, we only plot several representatives of the cross-validation classification error-rate curves in Fig. 2. Similar results were obtained in other cases.
+Fig. 2a shows that, for the HDR data, the overall performance of MaxDep andmRMR is similar. MaxDep gets slightly lower errors when the feature number is relatively small, within the range between 1 and 20. When the feature number is larger than 30, the MaxDep features lead to a significantly greater error rate than mRMR features, as indicated in the blow-up windows. For example, 50 mRMR features lead to 6 percent error, in contrast to the 11 percent error of 50 MaxDep features. Noticeably, the two error-rate curves have distinct tendency. For mRMR, the error rate constantlydecreasesandthenconvergesat somepoint.Onthe contrary, the error rate forMaxDepdeclines for small featurenumbers and then starts to increase for greater featurenumbers, indicating that more features lead to worse classification.
+Figs. 2b, 2c, and 2d show the respective comparison results for ARR, NCI, and LYM data sets. The different tendency of the mRMR and MaxDep error-rate curves can be seen more prominently for these three data sets. For example, in Fig. 2b, we see that only with the first three to five features, MaxDep has a slightly lower error rate thanmRMR, but the respective error rates are far away from optimum. For all the other feature numbers, mRMR features lead to consistently lower errors than MaxDep. For NCI data in Fig. 2c, MaxDep is better than mRMR only when less than seven features are
+used, but its overall classification accuracies are very poor. For a larger feature number, mRMR features lead to only half of the error rate of MaxDep features, indicating a greater discriminating strength. For LYM data in Fig. 2d, MaxDep features are never better than mRMR features.
+Why does mRMR tend to outperform MaxDep when the feature number is relatively large? This is because, in highdimensional space, the estimation of mutual information becomes much less reliable than in two-dimensional space, especially when the number of data samples is comparatively close to the number of joint states of features. This phenomenon is seen more clearly for continuous feature variables, i.e., the NCI and LYM data sets.
+This also explains why, for HDR data, the difference between mRMR and MaxDep is not as prominent as those of the three other data sets. Because the HDR data set has a much larger number of data samples than ARR, NCI, and LYM data sets, the accuracy of mutual information estimation for HDR data does not degrade as quickly as those for the other three data sets.
+Since the complexity of MaxDep in selecting features is higher and the classification accuracy usingMaxDep features is lower, it is much more appealing to make use of mRMR instead ofMaxDep in practical feature selection applications. In the following sections, wewill focus on comparingmRMR against the most widely used MaxRel selection method.
+
+5.3 Comparison of Candidate Features Selected by mRMR and MaxRel
+MaxRel and mRMR have similar computational complexity. The mRMR method is a little bit more expensive, but the
+difference is minor. Thus, we focus on comparing the feature classification accuracies.
+
+5.3.1 Discrete Data
+Figs. 3 and 4 show results of the incremental feature selection and classification for discrete data sets. The feature number ranges from 1 to 50.
+For HDR data set, Figs. 3a, 3b, and 3c show the classification error rates with classifiers NB, SVM, and LDA, respectively. Clearly, features selected by mRMR consistently attain significantly lower error rates than those selected by MaxRel. In other words, feature sets selected by mRMR are RM-characteristic than those selected by MaxRel. In this case, it is faithful to compare the lowest classification errors obtained for bothmethods. As illustrated in the zoominwindows, withNB, the lowest error rate ofmRMR is about 6percent,while that ofMaxRel is about 10percent;with SVM, the lowest error rate ofmRMR is about 3.5 percent, the lowest error rateofMaxRel is about5.5percent;withLDA, the lowest error rate ofmRMR features is around7percent,whereas that of MaxRel is around 11 percent.
+Figs. 4a, 4b, and4c showtheclassificationerror rates for the ARR data. Similar to those of the HDR data, features selected by mRMR significantly and consistently outperform those selected by MaxRel. When nearly 50 features are used, the performance of mRMR and MaxRel become close. Overall, theperformanceofmRMRismuchbetter than thatofMaxRel, since 15 mRMR features lead to better classification accuracy than 50 MaxRel features.
+Results in this section show that, for discrete data sets,
+the candidate features selected by mRMR are significantly
+better than those selected by MaxRel. These effects are
+independent of the concrete classifiers we used.
+
+5.3.2 Continuous Data
+Tables 2 and 3 show the results of the incremental feature
+selection and classification for continuous data sets. The
+feature number ranges from 1 to 50 (to save space, we only
+list results of 1; 5; 10; 15; . . . ; 50 features). Table 2 shows that, for NCI data, features selected by
+mRMR lead to lower error rates than those selected by
+MaxRel. The differences are consistent and significant. For
+example, with NB and more than 40 features (for simplicity,
+this combination is called ”NB+40features”), we obtained an
+error rate around20percent formRMRandaround33percent
+forMaxRel.With SVM+40features,we obtained the error rate
+23-26 percent formRMR, and 35-38 percent forMaxRel.With
+LDA+40features, the results are similar. Table 3 shows that, for LYMdata, mRMR features are also
+superior toMaxRel features (e.g., 3 percent versus 15 percent
+for LDA+50features). Results in this section show that, for continuous data,
+mRMR also outperforms MaxRel in selecting RM-character-
+istic sequential featuresets.Theyalso indicate that theParzen-
+window-based density-estimation for mutual information
+computation can be effectively used for feature selection.
+
+5.4 Comparison of Compact Feature Subsets Selected by mRMR and MaxRel
+The results of incrementally selected candidate features have indicated that, with the same number of sequential features, mRMR feature set has more characteristic strength than MaxRel feature set. Here, we investigate that, given the same number of candidate features, whether the mRMR feature space isRM-characteristic and contains amore characterizing nonsequential feature subspace than theMaxRel feature space. This canbeexaminedusing thewrappermethods inSection3.
+Since the first 50 features lead to reasonably stable and small error for every data set and classification method we tested (see Figs. 3 and 4 and Tables 2 and 3), we used the first 50 features selected by MaxRel and mRMR as the candidate features.
+Both forward and backward selection wrappers were used to search for the optimal subset of features. If the candidate feature space of mRMR is RM-characteristic than that of MaxRel, wrappers should be able to find combinations of mRMR features that correspond to better classification accuracy.
+As an example, Fig. 5 shows the classification error rates of optimal feature subsets selected by wrappers for HDR data set and NB classifier. Figs. 5a and 5b (the zoom-in
+view of Fig. 5a) clearly show that forward-selectionwrapper can consistently find a significantly better subset of features from the mRMR candidate feature set than from the MaxRel candidate feature set. This indicates that the mRMR candidate feature set is RM-characteristic for the forward-selection of wrapper. For MaxRel, wrapper obtains the lowest error 6.45 percent by selecting 18 features; more features will increase the error (thus, the wrapper selection is terminated). In contrast, by selecting 18 mRMR features, wrapper has ~ 4 percent classification error; it achieves even lower classification error with more mRMR features, e.g., 3.2 percent error for 26 features.
+Fig. 5c shows that the backward-selection-wrapper also finds superior subsets from the candidate features generated by mRMR. Such feature subset always lead to significantly lower error rate than the subset selected from MaxRel candidate features. This indicates the space of candidate features generated by mRMR does embed a subspace in which the data samples can be more easily classified.
+Table 4 summarizes the results obtained for all four data sets and three classifiers. Obviously, similar to theHDRdata, for almost all combinations of data sets, wrapper selection methods, and classifiers, lower error rates are attained from the mRMR candidate features, indicating that wrappers find
+TABLE 2 LOOCV Error Rate (%) of NCI Data Using mRMR and MaxRel Features
+TABLE 3 LOOCV Error Rate (%) of LYM Data Using mRMR and MaxRel Features
+Fig. 5. The wrapper selection/classification results (HDR + NB). (a) Forward selection. (b) Forward selection (zoom-in). (c) Backward selection.
+more characterizing feature subspaces from the mRMR features than from MaxRel features. We can conclude that mRMR candidate feature sets do cover a wider spectrum of the more characteristic features. (There are two exceptions in Table 4, for which the obtained feature subsets are comparable: 1) “NCI+LDA+Forward,” where five mRMR features lead to 20 errors (33.33 percent) and seven MaxRel features lead to 19 errors (31.67 ercent) and 2) “LYM+SVM+Backward,” the same error (3.13 percent) is obtained.)
+
+6 DISCUSSIONS
+In our approach, we have stressed that a well-designed filter method, such as mRMR, can be used to enhance the wrapper feature selection, in achieving both high accuracy and fast speed. Our method uses an optimal first-order incremental selection to generate a candidate list of features that cover a wider spectrum of characteristic features. These candidate features have similar generalization strength on different classifiers (as seen in Figs. 3 and 4 and Tables 2 and 3). They facilitate effective computation of wrappers to find compact feature subsets with superior classification accuracy (as shown in Fig. 5 and Table 4). Our algorithm is especially useful for large-scale feature/variable selection problems where there are at least thousands of features/variables, such asmedicalmorphometry [23], [8], gene selection [32], [31], [5], [12], etc.
+Ofnote, thepurposeof themRMRapproach studied in this paper is tomaximize the dependency. This typically involves the computation of multivariate joint probability, which is nonetheless difficult and inaccurate. Combining both MaxRelevance and Min-Redundancy criteria, the mRMR incremental selection scheme provides a better way to maximize the dependency. In this case, the difficult problem of multivariate joint probability estimation is reduced to estimation of multiple bivariate probabilities (densities), which is much easier. Our comparison in Section 5.2 demonstrates that mRMR is a very good approximation scheme to Max-Dependency. In most situations, mRMR reduces the feature selection time dramatically for continuous features and improves the classification accuracy significantly. For data sets with a large number of samples, e.g., the HDRdata set, the classification accuracy of mRMR is close to or better than that of Max-Dependency. We notice that the mRMR approach could also be applied to other domains where the similar heuristic algorithms are applicable to maximize the dependency of variables, such as
+searching (learning) the locally optimal structures of Bayesian networks [24].
+Our scheme of mRMR does not intend to select features that are independent of each other. Instead, at each step, it tries to select a feature that minimizes the redundancy and maximizes the relevance. For real data, the features selected in this way will have more or less correlation with each other. However, our analysis and experiments show that the joint effect of these features can lead to very good classification accuracy. A set of features that are completely independent of each other usually would be less optimal.
+All of the feature selection methods used in this paper, including incremental search, forward, or backward selection, etc., are heuristic search methods. None of them can guarantee theglobalmaximizationof a criterion function.The fundamental problem is the difficulty in searching the whole space, as pointed out at the beginning of this paper. Additionally, questing the global optimum strictly might lead to data overfitting. On the contrary,mRMRseems to be a practical way to achieve superior classification accuracy in relatively low computational complexity.
+Our experimental results show that, although, in general, more mRMR features will lead to a smaller classification error, the decrement of errormight not be significant for each additional feature, or occasionally there could be fluctuation of classification errors. For example, in Fig. 3, the fifthmRMR feature seemingly has not led to a major reduction of the classification error produced with the first four features. Many factors count for these fluctuations. One cause is that additional features might be noisy. Another possible cause is that themRMRscheme in (6) takes difference of the relevance term and the redundancy term. It is possible that one redundant feature also has relatively large relevance, so it could be selected as one of the top features. A greater penalty on the redundancy term would lessen this problem. A third possible cause is that the cross-validationmethodusedmight also introduce some fluctuations of the error curve. While a more detailed discussion on this fluctuation problem and other potential causes is beyond the scope of this paper, away to solve this problem is to use other feature selectors to directly minimize the classification error and remove those potentially unneeded features, as what we do in the second stage of our algorithm. For example, byusingwrappers in the second stage, the error curves thus obtained in Fig. 5 are much smoother than those obtained using the first-stage only in Fig. 3.
+Our results show that for continuous data, density estimation works well for both mutual information
+calculation and naive Bayes classifier. In earlier work, Kwak and Choi [17] used the density estimation approach to calculate the mutual information between an individual feature xi and the target class c. We used a different approach based on direct Parzen-window approximation similar to [7]. Our results indicate that the estimated density and mutual information among continuous feature variables can be utilized to reduce the redundancy and improve the classification accuracy.
+Finally, we notice that equation (6) is not the only possible mRMR scheme. Instead of combining relevance and redundancy terms using difference, we can consider quotient [5] or othermore sophisticated schemes. The quotient-combination imposes a greater penalty on the redundancy. Empirically, it often leads to better classification accuracy than the difference-combination for candidate features. However, the joint effect of these features is less robust when some of them are eliminated; as a result, in the second-stage of feature selection usingwrappers, the set of features induced fromthequotientcombination would have a bigger size than that from the difference-combination. The mRMR paradigm can be better viewed as a general framework to effectively select features and allow all possibilities for more sophisticated or more powerful implementation schemes.
+
+7 CONCLUSIONS
+We present a theoretical analysis of the minimal-redundancy-maximal-relevance (mRMR) condition and show that it is equivalent to the maximal dependency condition for first-order feature selection. Our mRMR incremental selection scheme avoids the difficult multivariate density estimation in maximizing dependency. We also show that mRMR can be effectively combined with other feature selectors such as wrappers to find a very compact subset from candidate features at lower expense. Our comprehensive experiments on both discrete and continuous data sets and multiple types of classifiers demonstrate that the classification accuracy can be significantly improved based on mRMR feature selection.
+
+ACKNOWLEDGMENTS
+The authors would like to thank Hao Chen for discussion on heuristic search schemes, Yu Wang for comments on a preliminary version of this paper, and the anonymous reviewers for their helpful comments. Both Hanchuan Peng and Fuhui Long contributed equally to this work.
+
+References
+[1]A.A. AlizadehDistinct Types of Diffuse Large B-Cell Lymphoma Identified by Gene Expression ProfilingNature, vol. 403, pp. 503-511, 2000.2000
+[2]C.J.C. BurgesA Tutorial on Support Vector Machines for Pattern RecognitionKnowledge Discovery and Data Mining, vol. 2, pp. 1- 43, 1998.1998
+[3]T.M. CoverThe Best Two Independent Measurements Are Not the Two BestIEEE Trans. Systems, Man, and Cybernetics, vol. 4, pp. 116-117, 1974.1974
+[4]C. Ding,H.C. PengMinimum Redundancy Feature Selection from Microarray Gene Expression DataProc. Second IEEE Computational Systems Bioinformatics Conf., pp. 523-528, Aug. 2003.2003
+[5]R.P.W. Duin,D.M.J. TaxExperiments with Classifier Combining RulesProc. First Int’l Workshop Multiple Classifier Systems MCS 2000, J. Kittler and F. Roli, eds., pp. 16-29, June 2000.2000
+[6]S.W. Hadley,C. Pelizzari,G.T.Y. ChenRegistration of Localization Images by Maximization of Mutual InformationProc. Ann. Meeting of the Am. Assoc. Physicists in Medicine, 1996.1996
+[7]E. Herskovits,H.C. Peng,C. DavatzikosA Bayesian Morphometry AlgorithmIEEE Trans. Medical Imaging, vol. 24, no. 6, pp. 723-737, 2004.2004
+[8]C.W. Hsu,C.J. LinA Comparison of Methods for Multi- Class Support Vector MachinesIEEE Trans. Neural Networks, vol. 13, pp. 415-425, 2002.2002
+[9]A. Hyvärinen,J. Karhunen,E. OjaIndependent Component Analysis2001
+[10]F.J. Iannarilli,P.A. RubinFeature Selection for Multiclass Discrimination via Mixed-Integer Linear ProgrammingIEEE Trans. Pattern Analysis and Machine Intelligence, vol. 25, no. 6, pp. 779-783, June 2003.2003
+[11]J. Jaeger,R. Sengupta,W.L. RuzzoImproved Gene Selection for Classification of MicroarraysProc. Pacific Symp. Biocomputing, pp. 53-64, 2003.2003
+[12]A.K. Jain,D. ZongkerFeature Selection: Evaluation, Application, and Small Sample PerformanceIEEE Trans. Pattern Analysis and Machine Intelligence, vol. 19, no. 2, pp. 153-158, Feb. 1997.1997
+[13]A.K. Jain,R.P.W. Duin,J. MaoStatistical Pattern Recognition: A ReviewIEEE Trans. Pattern Analysis and Machine Intelligence, vol. 22, no. 1, pp. 4-37, Jan. 2000.2000
+[14]R. Kohavi,G. JohnWrapper for Feature Subset SelectionArtificial Intelligence, vol. 97, nos. 1-2, pp. 273-324, 1997.1997
+[15]S.G. KrantzJensen’s InequalityHandbook of Complex Analysis, subsection 9.1.3, p. 118, Boston: Birkhäuser, 1999.1999
+[16]N. Kwak,C.H. ChoiInput Feature Selection by Mutual Information Based on Parzen WindowIEEE Trans. Pattern Analysis and Machine Intelligence, vol. 24, no. 12, pp. 1667-1671, Dec. 2002.2002
+[17]P. LangleySelection of Relevant Features in Machine LearningProc. AAAI Fall Symp. Relevance, 1994.1994
+[18]W. Li,Y. YangHow Many Genes Are Needed for a Discriminant Microarray Data Analysis?Proc. Critical Assessment of Techniques for Microarray Data Mining Workshop,2000
+[19]E. ParzenOn Estimation of a Probability Density Function and ModeAnnals of Math. Statistics, vol. 33, pp. 1065-1076, 1962.1962
+[20]H.C. Peng,Q. Gan,Y. WeiTwo Optimization Criterions for Neural Networks and Their Applications in Unconstrained Character RecognitionJ. Circuits and Systems, vol. 2, no. 3, pp. 1-6, 1997, (in Chinese).1997
+[21]H.C. Peng,E.H. Herskovits,C. DavatzikosBayesian Clustering Methods for Morphological Analysis of MR ImagesProc. Int’l Symp. Biomedical Imaging: from Nano to Macro, pp. 485- 488, 2002.2002
+[22]H.C. Peng,C. DingStructural Search and Stability Enhancement of Bayesian NetworksProc. Third IEEE Int’l Conf. Data Mining, pp. 621-624, Nov. 2003.2003
+[23]P. Pudil,J. Novovicova,J. KittlerFloating Search Methods in Feature SelectionPattern Recognition Letters, vol. 15, no. 11, pp. 1119-1125, 1994.1994
+[24]D.T. RossSystematic Variation in Gene Expression Patterns in Human Cancer Cell LinesNature Genetics, vol. 24, no. 3, pp. 227-234, 2000.2000
+[25]U. ScherfA cDNA Microarray Gene Expression Database for the Molecular Pharmacology of CancerNature Genetics, vol. 24, no. 3, pp. 236-244, 2000.2000
+[26]V. VapnikThe Nature of Statistical Learning TheoryNew York: Springer,1995
+[27]E.P. Xing,M.I. Jordan,R.M. KarpFeature Selection for High-Dimensional Genomic Microarray DataProc. 18th Int’l Conf. Machine Learning, 2001.2001

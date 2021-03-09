@@ -1,0 +1,102 @@
+An Active Under-sampling Approach for Imbalanced Data Classification
+Zeping Yang,Daqi Gao
+yangzeping@ecust.edu.cn,gaodaqi@ecust.edu.cn
+
+Keywords-under-sampling; imbalanced data; classification; machine learning; neural network
+I. INTRODUCTION Classification plays an essential role in a wide range of applications in several fields such as machine learning and data mining etc [1][2]. One of more important steps of classification is forming the training dataset to model for classifying the unknown samples. So it is useful to select the suitable training dataset for correct classification. The traditional classification algorithms often assume that the training dataset is even and balance, that is to say, the number of the training samples of different classes is same. Many experiments test the fact that classifiers perform well on the balance training dataset. However, the training datasets are not always balance, and imbalanced class distribution problem in real applications hinders the application of the traditional classifiers [3].
+Generally speaking, the imbalanced class distribution refers to that the majority class has much more samples than the other class in the training dataset. Especially, in the highly imbalanced dataset, the majority class has dominant percent of all the examples, while the minority class only has small part. In this case, traditional classifiers which are designed for higher overall prediction accuracy, tend to classify most of samples in the majority class and ignore the examples in the minority class completely.
+However, ignoring the minority class is a disastrous thing with the wide range of application such as identifying
+fraudulent credit card transactions, risk management and medical diagnosis etc [4]. For example, fraud detection is a binary classification problem. The number of the fraud samples is only two percent of all the examples. If the classifier predicts that all the samples are non-fraud, it will have a quite high accuracy 98%. For this type of problems, the fraud samples are not classified correctly, and accuracy is not an appropriate measure because the cost associated with the minority class is very high. So the performance on the classification of the minority class is very important. An active under-sampling approach is presented in this paper to change the data distribution of training dataset, and improve the classification accuracy of minority classes while maintaining the overall classification performance.
+The rest of this paper is organized as follows. In Section II, the related work about methods for imbalanced data classification problem especially under-sampling methods are reviewed. Section III gives the active under-sampling approach in details. In Section IV, the performance of this method is test on various machine learning test benches and the major advantages are discussed, compared with the other under-sampling methods. Finally, we conclude in Section V.
+II. RELATED WORK In recent years regarding real world domains, a large number of approaches have been proposed to solve the class imbalance problem. These methods include sampling methods such as over-sampling and under-sampling, adjusting misclassification costs and improving the standard learning algorithms. Sampling methods aim to modify the original training dataset to provide a balanced distribution [5]. For several base classifiers, studies have shown that a balanced training dataset provides high prediction accuracy and good generalization capability compared to an imbalanced dataset [6] [7]. The essence of over-sampling is to reduce the degree of imbalanced distribution by increasing the number of minority class samples. Random oversampling method replicates the randomly selected minority examples and adds them into the final training dataset. In this way, the number of the minority class is increased and the data distribution of the whole dataset is adjusted accordingly. One of the famous over-sampling methods is the synthetic minority over-sampling technique (SMOTE) [8]. The SMOTE algorithm generates artificial synthetic minority class samples by selecting K-nearest neighbors for each example in minority class, and creates new samples along
+978-0-7695-4811-1/12 $26.00 © 2012 IEEE DOI 10.1109/ISCID.2012.219
+2710
+the lines between the examples in minority class and their Knearest neighbors. However, the drawbacks of over-sampling approaches are enlarging the size of the original training dataset, and leading to overfitting[7][9].
+While over-sampling methods add data to the original data set, under-sampling methods are designed to reduce the samples in the majority class [10]. Random under-sampling approach is one simple method of under-sampling, and removes the examples in the majority class randomly. Consequently, Random under-sampling approach gives a simple method to get a balanced data set. But some important majority class samples may be removed. Several researches are put forward to select more representative samples in majority class by removing redundant examples. Four different methods of choosing examples in majority class are proposed to by J. Zhang and I. Mani[11]. The first method (NearMiss-1) selects the samples in majority class whose average distances to three closest examples in minority class are the smallest. The second method (NearMiss-2) selects those majority class examples whose average distances to three farthest minority class samples are the smallest. In the third method (NearMiss-3), a given number of the closet majority class samples for each minority class sample are chosen. Finally, the fourth method (most distant) selects the majority class samples whose average distances to the three closest minority class examples are the farthest. The final experimental results showed that the NearMiss-2 method can provide competitive results [4].
+Traditionally, metrics which are used by the most standard algorithm are accuracy and error rate [7][12][13][14]. Considering a basic two-class classification problem, the measures of classification performance are built from a confusion matrix (shown in Table I) which records correctly and incorrectly recognized samples for each class. The minority class is regarded as the positive class and the majority class as the negative class in this paper. So the common performance metric for classification algorithms is the whole accuracy (WA) which is defined as follows:
+FNFPTNTP TNTPWA +++ += (1)
+FNTP TPMIArecallTPRRatePositiveTrue + ===)( (2)
+FPTN TNMAA + = (3)
+Where, MIA means the accuracy of minority class and MAA means the accuracy of majority class, respectively. Based on Table I, the evaluation metrics used to measure the performance of classification over imbalanced data sets are defined as:
+FPTN TN FNTP TPMIAMAAmeanG + × + =×=− (4)
+FPTP TPprecision + = (5)
+Where β is a coefficient to adjust the relative importance of precision versus recall (usually β =1).
+III. ACTIVE UNDER-SAMPLING ALGORITHM Give a simple example to illustrate how the imbalance in the number of samples affects the performance of neural network classification. Let Ω be a training data set in a given one-dimensional feature space, where each element x in Ω is associated with a class label cl, cl Class Labels = {cl1,cl2}. Let in denote the number of data examples in class icl , i=1,2, and 1,12 >= μμnn . All of examples in cl
+1 are situated at point 0.0 while the whole examples in cl2 at point 1.0. We take a single neuron with the SAF
+1))exp(1()( −−+= ϕϕf to divide the two classes. The target output for class cl1 is 0 while class cl2 is 1. When the decision equation is 0=−θx , the mean square error(MSE) is
+−+
+−+
+++
+=
+−+
+−+
++ − + =
+22
+2
+1
+2
+1 1
+)0.1exp(1 11 )exp(1 1 )1(2 1
+)0.1exp(1 11 )exp(1 10 )1(2 1
+θ μ θμ
+θ μ θμ nn n E
+(8)
+Fig.1 shows, according to the number proportion of the two classes μ and different θ values, the MSE values changes. Obviously, when μ =1, the MSE get the minimum value exactly corresponds to θ =0.5. When μ gradually increases, the θ value corresponds to the minimum MSE value gradually shift to the left of 0.5, that is to say, the decision boundary will move to the smaller number of samples. The greater the difference between the numbers of samples in various classes, the larger the real error values is. So the imbalance data sets seriously affecting the performance of neural network classifiers.
+In Section II, Several under-sampling methods are introduced in details. The key of under-sampling method is to select the representative majority class samples. Many experiments show that majority class examples can be classified into two categories: useful and useless, just like
+The main idea of our approach is to get rid of the abundant majority class examples based on the density data distribution. The calculation of density is the same as in [9]. Considering the two-class classification problem, the active under-sampling algorithm is described as follows.
+Assume that the number of examples in the original training data is N, which includes the samples in majority class and the examples in minority class. The number of the majority class examples is represented as MAN and MIN is the number of the minority class samples. In the imbalanced dataset, MAN is far larger than MIN . For each example lx in minority class, the ratio lρ is defined as:
+MIll NlKM ,,1,/ ==ρ (9) Where K is the number of nearest neighbors of lx based
+on the Euclidean distance in n dimensional space, and lM is the number of examples in the K nearest neighbors of lx that belong to the majority class, therefore ]1,0[∈lρ . Then the density distribution 'lρ is defined as:
+MIN
+l l
+l l Nl MI ,,1,
+1
+' ==
+=
+ρ
+ρρ (10)
+Obviously, 1' = lρ . Let maxθ be a preset threshold for the maximum tolerated degree of class imbalance ratio ( MIN / MAN ), and the number of selected majority class
+samples (represented as lN ) which is near lx is shown in (11):
+max ' 0, θθ θ ρ ≤< ×= MIll
+NN (11)
+After the number of majority class samples which is near lx is determined, the selected majority class examples are
+included in new dataset lS and the remains are out of new dataset. Merging all the selected majority class samples
+(represented as MIN
+l lS 1= ), we combine all of the minority class
+examples with the selected majority class samples to construct a new training data set. The steps for our approach are shown in Table II.
+IV. EXPERIMENTAL RESULTS The back-propagation algorithm (BP) is used as the base learning model in our experiments. In order to improve the learning speeds of networks, the activation functions of the hidden and the output neurons are set to be
+1))3/exp(1(3)( −−+= ϕϕf [15]. The proposed method is tested on several real-world datasets which are obtained from UCI repository of machine learning databases [16]. Table III gives the description for the used data sets and Ratio is the number of majority class divided by that of minority class. Considering two-class imbalanced problems, we construct the new training datasets by modifying the original datasets. The balance dataset includes 625 samples, 3 classes and contains 4 attributes. “Balanced” is chosen as the minority class and the rest of the samples as the majority class. The ionosphere dataset is only consist of two classes, and has 351 samples. Each example is represented by 34 attributes all of which are numerical. Instances labeled as “bad radar” form the minority class and instances labeled as “good radar” constitute the majority class, respectively. In the vehicle dataset, we choose “van” as the minority class and the remainder of the whole dataset is regarded as the majority class. The dataset Wisconsin Prognostic Breast Cancer is denoted as wpbc for short in Table III. We choose the “recur” as the minority class and the majority class has 151 samples in the wpbc dataset.
+According to the assessment metrics presented in Section II, Table IV shows the performance of the proposed algorithm compared to the random under-sampling and NearMiss-2 that are introduced in Section II. The method NS
+Useful samples
+Useless samples
+Decision boundary
+Figure 2. Two classes samples distribution
+Figure1. The mean square error E with respect to θ and μ
+1=μ
+2=μ 10=μ
+5=μ
+E
+θ
+uses the original imbalanced data sets without any data sampling. In Table IV, the methods random under-sampling, NearMiss-2 and our algorithm are denoted as RUS, NM2 and AUS for short, respectively. All the performances listed in Table IV are generated through a 10-fold cross validation process.
+The experiments were performed on the Pentium (R) Dual-Core 2.30GHz computer, with 2GB of RAM. The best performance is denoted by bold and italic in each category for each method. For the balance dataset, classifier without sampling almost ignores the minority class as we discussed earlier. Based on these experimental results, our algorithm can achieve competitive results on these four test benches. Compared with other methods, our algorithm provides better performance in terms of F-measure and G-mean values for these datasets. So our method can improve the classification accuracy of the minority classes while maintaining the overall classification performance.
+
+Dataset Attribute Size #min #maj Ratio
+V. CONCLUSION Learning from imbalanced dataset is a challenging problem, because traditional classifiers are designed on the assumption that training examples are evenly distributed among different classes. Sampling methods can change data distribution by adding or deleting samples from the original training dataset. An active under-sampling approach has been presented on imbalanced data in this paper. Instead of getting rid of majority class samples randomly, our algorithm
+actively selected the samples of majority class near the decision boundary, and, at the same time, maintained the original density distribution. The experimental results show that the proposed algorithm can achieve better performance compared to other methods on imbalanced datasets. For the future, the proposed method and suitable data cleaning technique were combined to handle highly imbalanced and overlapping datasets.
+
+References
+[1]Z.H. Chen,L.P. Huang,YiL. MurpheyIncremental Learning for Text Document ClassificationIJCNN, pp.2592-2597, 2007.2007
+[2]I.S. Oh,C.Y. SuenA class-modular feedforward neural network for handwriting recognitionPattern Recognition, vo.35, no.1, pp. 229- 244, 2002.2002
+[3]G.E.A.P.A. Batista,R.C. Prati,M.C. MonardA Study of the Behavior of Several Methods for Balancing Machine Learning Training DataACM SIGKDD Explorations Newsletter, vo.6, no. 1, pp.20-29, 2004.2004
+[4]Show-Jane. Yen,Yue-Shi. LeeUnder-Sampling Approaches for Improving Prediction of the Minority Class in an Imbalanced DatasetProc, of the Intelligent Control and Automation, Lecture Notes in Control and Information Sciences (LNCIS ), pp. 731-740, 2006.2006
+[5]A. Estabrooks,T. Jo,N. JapkowiczA Multiple Resampling Method for Learning from Imbalanced Data SetsComputational Intelligence, pp. 18-36, 2004.2004
+[6]YiL. Murphey,H. Guo,L.A. FeldkampNeural learning from unbalanced dataAppl. Intell. Neural Networks App, vo.21, no.2, pp. 117-128, 2004.2004
+[7]H. He,E.A. GarciaLearning from Imbalanced DataIEEE TRANSACTIONS ON KNOWLEDGE AND DATA ENGINEERING, pp.1263-1282, 2009.2009
+[8]N.V.Chawla,K.W. Bowyer,L.O.Hall,W.P.KegelmeyerSMOTE: Synthetic Minority Over-Sampling TechniqueArtificial Intelligence Research, pp. 321-357, 2002.2002
+[9]H. He,Y. Bai,E.A. Garcia,S. LiADASYN: Adaptive Synthetic Sampling Approach for Imbalanced LearningProc. Int’l J. Conf. Neural Networks, pp. 1322-1328, 2008.2008
+[10]X.Y. Liu,J.Wu,Z.H. ZhouExploratory Under-Sampling for Class Imbalance LearningProc. Int’l Conf. Data Mining, pp. 965- 969, 2006.2006
+[11]J. Zhang,I. ManikNN approach to unbalanced data distributions: A case study involving information extractionProc, of the ICML- 2003 Workshop: Learning with Imbalanced Data Sets II, pp. 42- 48,2003.2003
+[12]Thai-Nghe Ngu yen,Z. Gantner,L. Schmidt-ThiemeA New evaluation measure for learning from imbalanced data,”IJCNN2011
+[13]D.J. HandMeasuring classifier performance: A coherent alternative to the area under the ROC curveMachine Learning, vo.77,no.1, pp103-123, 2009.2009
+[14]T. FawcettAn Introduction to ROC AnalysisPattern Recognition Letters, vo. 27, no. 8, pp. 861-874, 2006.2006
+[15]Y.G. DaqiGenxing, Influences of variable scales and activation functions on the performances of multilayer feedforward neural networksPattern Recognition2003

@@ -1,0 +1,394 @@
+A New Algorithm and System for the Characterization of Handwriting Strokes with Delta-Lognormal Parameters
+Moussa Djioua
+
+
+Abstract
+In this paper, we present a new analytical method for estimating the parameters of Delta-Lognormal functions and characterizing handwriting strokes. According to the Kinematic Theory of rapid human movements, these parameters contain information on both the motor commands and the timing properties of a neuromuscular system. The new algorithm, called XZERO, exploits relationships between the zero crossings of the first and second time derivatives of a lognormal function and its four basic parameters. The methodology is described and then evaluated under various testing conditions. The new tool allows a greater variety of stroke patterns to be processed automatically. Furthermore, for the first time, the extraction accuracy is quantified empirically, taking advantage of the exponential relationships that link the dispersion of the extraction errors with its signal-to-noise ratio. A new extraction system which combines this algorithm with two other previously published methods is also described and evaluated. This system provides researchers involved in various domains of pattern analysis and artificial intelligence with new tools for the basic study of single strokes as primitives for understanding rapid human movements.
+
+1 INTRODUCTION
+HANDWRITING strokes constitute a specific class of rapidhuman movements. They have been intensively used and studied in many fields of research. For example, various online handwriting pattern analysis and recognition methods represent a complex pattern, like a graph, a letter, a word, a signature, etc., as made up of simple handwriting strokes superimposed [1], [2], [3], [4]. In motor control, these strokes are considered as primitives from which complex movements are assumed to be planned and executed [5], [6], [7], [8], [9]. In the forensic sciences, a detailed study of individual stroke patterns, focusing on tiny variations, often constitutes the grounds for a decision about the authenticity of a signature or a document [10], [11]. In education, various interactive teaching methods have been developed to reproduce letters and words from the concatenation of neat strokes [12], [13]. Similarly, strokes are analyzed to study handwriting deficits in children [40], [41], as well as for training patients with writer’s cramp [44]. In the neurosciences, strokes are investigated to characterize neurodegenerative processes like Parkinson’s disease, Alzheimer’s disease [14], [15], and multiple sclerosis [43], and in the diagnosis of dyspraxia [42], as well as to assess recovery in the rehabilitation of patients having suffered cerebrovascular accidents [16] or to assess the severity of their loss of visuospatial capacity [52]. Strokes are also investigated in studies dealing with drug treatments [45], [46], as well as nicotine [47] or caffeine [48] effects and alcohol intoxication [49]. In anthropomorphic robotics, the superimposition of handwriting strokes is exploited to explore the biomechanical principles employed by humans to produce movements, and later to apply them in the control of a robot arm [17], [50]. Recently, synthetic strokes have been proposed for cybersecurity applications [51].
+Many of these examples emphasize the need to study the basic properties of single strokes for a realistic analysis and understanding of how the motor control system performs complex movements. The cornerstone of this whole methodology is then to understand the genesis of strokes, since this reflects some of the fundamental properties of a writer’s neuromuscular system, as well as some of the basic features of the motor control strategies employed to produce these simple movements. Among these basic features, the most remarkable is the invariance of the velocity profile of the end-effector of a subject performing a rapid stroke over a wide range of movement size and speed [18], [19], [20], [21], [53], [54]. Its asymmetric bell shape is considered a fundamental property reflecting the synergetic activity of a large number of neuromotor networks [55], [56], [57].
+Many studies have been conducted from this perspective to model the various processes involved in the production of single strokes. These models can be classified in various categories. Neural network models [58], [59], [72], [73] have been developed to study the emergence of invariants in arm movements, velocity invariance being considered as the product of an intrinsic property of the differential equation network describing the dynamics of the system. Other approaches, like dynamic models, focus on the mass-spring characteristics of muscles [60], [74] or on the changes in equilibrium points [61] to understand trajectory formation. Generalized motor program models [62], [63] rely on different representations of the action plan [65] or on various stochastic properties of strokes [64]. Finally, principle-oriented models track the velocity invariance problem with various minimization criteria: minimum time [66], minimum acceleration [71], minimum jerk [67], minimum snap [68], and minimum torque changes [69]. These models generally provide, directly or indirectly, an analytical expression describing the velocity profile. However, not all these models can be integrated into the design of practical applications like those mentioned above. For example, neural networks are preferable for simulating learning mechanisms, and analytical models for studying basic skills. Some models require too many parameters and are not of practical use, although they might be essential, from a neuroscience perspective, for developing theories of human motor behavior.
+Among these various computational models and approaches, the Kinematic Theory [22] has been found to be successful in reproducing the various invariants observed in rapid strokes [23]. So far, few applications based on this theory, or inspired by it, have been developed [23], [24], [25], [31]. This is mainly due to the lack of a robust and efficient software tool (a parameter extraction system) which can accurately fit any stroke velocity profile with a minimum reconstruction error.
+In this paper, we propose a new analytical algorithm to improve the performances of the existing extraction system, and to enlarge the range of velocity profiles that can be processed automatically. Furthermore, this study introduces a methodology to quantify the accuracy of the extraction results under noise constraints by constructing a confidence interval for each extracted parameter value. Indeed, to apply such models particularly in forensics, educational, and biomedical applications dealing with real data, parameter estimation should be conducted accurately and produce confidence intervals, which can be used, for example, in the classification of genuine signatures and forgeries or in the detection of incapacities in normal and compromised students or in diseased individuals.
+The remainder of the paper is organized as follows: In Section 2, a brief overview of the Kinematic Theory and its Delta-Lognormal model is presented, while the current status of the extraction problem is reported in Section 3. The new XZERO algorithm is described in detail in Section 4. The performance results obtained under ideal and noisy conditions are presented and discussed in Section 5. In Section 6, a complete extraction system is proposed and the methodology used to quantify its accuracy is set out. Typical examples involving real data are reported in Section 7 to highlight the power of the upgraded DeltaLognormal extraction system.
+
+2 OVERVIEW OF THE DELTA-LOGNORMAL MODEL
+The Kinematic Theory relies on the Delta-Lognormal model. This theory was initially proposed in the handwriting context [22], [36] and later extended to process other
+biosignals [2], [35]. It describes a stroke velocity profile as the output of a system made up of two neuromuscular systems, one agonist (acting in the direction of the movement) and the other antagonist (acting in the opposite direction). Each of these systems, excited by a Dirac Impulse U0 t t0ð Þ, is depicted by a lognormal impulse response t; t0; ;
+2ð Þ, and the velocity profile of the end-effector (a pen tip, for example) can thus be described by a DeltaLognormal equation with seven parameters:
+v tð Þ ¼ D1 t; t0; 1; 21
+D2 t; t0; 2; 22 ; ð1Þ
+where
+t; t0; ; 2
+¼
+1 ffiffiffiffiffi 2 p t t0ð Þ exp 1 2 2 ln t t0ð Þ ½ 2 ; for t0 < t; 0; elsewhere;
+8< :
+ð2Þ
+and with: D1; D2: The amplitudes of the input commands, their effects corresponding to the distances covered by the individual agonist (1) and antagonist (2) components. t0: The time occurrence of the input commands, a timeshift parameter. 1; 2: The log-time delays, the time delays of the neuromuscular systems expressed on a logarithmic time scale, e explicitly representing the median of a lognormal impulse response. 1; 2: The log-response times, which are the response times of the neuromuscular systems expressed on a logarithmic time scale.
+The main features of the model are illustrated in Fig. 1. According to this representation, a rapid movement, produced by an end-effector, is the result of the synchronous activation of an agonist and an antagonist neuromuscular system. Their impulse responses i t; t0; ;
+2ð Þ, once convolved with their corresponding input commands DiU0ðt t0Þ, represent the agonist v1ðt t0Þ and the antagonist v2ðt t0Þ lognormal components of the velocity profile vðt t0Þ, respectively, and can be described synthetically by the seven parameters t0; D1; 1; 1; D2; 2; 2ð Þ of the Delta-Lognormal pattern.
+
+3 CURRENT STATUS OF THE EXTRACTION PROBLEM
+A few methods have been proposed over the years to extract the seven parameters of the single-stroke velocity
+profile as described with a Delta-Lognormal pattern. They were first used to show that a Delta-Lognormal function is the most powerful of 26 analytical expressions in its ability to reconstruct the velocity profile of handwritten strokes with a minimum of reconstruction errors [32], [33], [34]. The current extraction methods can be grouped into three main categories: statistical, deterministic, and evolutionary. Statistical methods rely on generic parameter estimation algorithms, which deal with random variable lognormal densities [26], [27]. Deterministic methods are more specific, in that they focus on particular points on the velocity curve, first to estimate the parameters and then to use optimization algorithms to converge on optimal solutions [28], [29]. Evolutionary methods use, for example, breeder genetic algorithms to explore the parameter space [30]. Previous comparative studies have shown that the deterministic methods are more efficient than the statistical [24] or evolutionary ones [30]. So far, two deterministic approaches developed in our group have led to successful applications dealing with the analysis-by-synthesis method of handwriting and signature verification [23], [24], [25], [28], and the knowledge derived from the model has been used by other researchers in a few offline applications [31], [70].
+The functioning of the current determinist DeltaLognormal extractors, hereafter called the INFLEX [28] and INITRI [29] algorithms, is schematized in Fig. 2. Given a typical velocity profile v tð Þ, the algorithm first estimates the agonist lognormal parameters by considering v tð Þ as a single lognormal profile. Then, the antagonist lognormal profile is deduced by subtracting the agonist lognormal profile from the velocity. The second step consists of estimating the antagonist lognormal parameters. Then, the estimated values of the seven parameters serve as a starting solution for an optimizing algorithm. Indeed, these initial estimated values may represent only a coarse solution, depending on the experimental conditions under which handwriting data were collected. Starting from these coarse solutions, the extractor seeks optimized values using the mean square nonlinear regression technique developed by Levenberg and Marquardt [38]. This step minimizes the distance between experimental data and the predicted Delta-Lognormal model using a weighted gradient descent which combines the Newton and Gauss methods. At the end of the process, both the optimal values of the seven
+parameters and the mean square reconstruction error
+(MSE) between the original and the reconstructed velocity profiles (in cm2=s2) are obtained. This error can also be
+expressed in decibels by computing the signal-to-noise
+ratio (SNR) that characterizes the reconstruction error with
+respect to the original curve. The critical path of the previous architecture starts with
+the initial estimation process: the better the starting solu-
+tions, the better the optimization results. The INFLEX
+algorithm [28] uses conversion tables and a graphical
+method initially proposed by Wise [75] to exploit the
+characteristics of the tangent lines at the inflexion points of
+a single lognormal. The INITRI algorithm [29] uses
+analytical relationships established between the parameters
+and the time occurrence of the maximum velocity, in
+addition to two other arbitrary points located prior to the
+maximum, specifically in the rising phase of the velocity
+curve. Some internal studies have shown that the current
+deterministic algorithms fail, especially when the antagonist
+component is preponderant before the agonist component in
+the velocity profile becomes involved, and when significant
+noise is present in the signal [29], [35]. Moreover, many
+applications, particularly those in the biomedical fields,
+require an estimation of the confidence levels associated
+with the extraction results, a problem which has not been
+addressed so far. These drawbacks have limited the
+exploitation of the Kinematic Theory over the last 10 years.
+
+4 THE XZERO ALGORITHM
+Our new algorithm proposes an original solution to the
+estimation process, exploiting the analytical relationships
+that exist between three specific time indices of a lognormal profile tð Þ (a maximum and two inflexion points) and its four parameters. The time occurrence of the maximum corresponds to the solution of d tð Þ=dt ¼ 0, and the time occurrences of the inflexion points correspond to the solutions of d2 tð Þ=dt2 ¼ 0. For this reason, the new algorithm has been named XZERO, referring to these zero
+crossings.
+
+4.1 Estimation of Lognormal Parameters
+The estimation of single lognormal parameters consists of
+linking the experimental values of these zero crossings to
+their corresponding analytical expressions. Let us consider v t; t0; ;
+2ð Þ to be a lognormal function weighted by D and shifted by t0:
+v t t0ð Þ ¼ D t; t0; ; 2
+¼ D t t0ð Þ ffiffiffiffiffi 2 p e ln t t0ð Þ ½ 2 2 2 ; t0 < t;
+0; elsewere:
+8>< >:
+ð3Þ
+The zero crossings tm of v 0 t t0ð Þ, tinf 1, and tinf 2 of v00ðt t0Þ are, respectively, given by (see Appendix A for further details):
+tm ¼ t0 þ e 2 ; ð4Þ
+tinf 1 ¼ t0 þ exp 3 þ
+ffiffiffiffiffiffiffiffiffiffiffiffiffi 2 þ 4 p
+2
+!( ) ; ð5Þ
+tinf 2 ¼ t0 þ exp 3
+ffiffiffiffiffiffiffiffiffiffiffiffiffi 2 þ 4 p
+2
+!( ) : ð6Þ
+In practice, these three time indices are calculated from sampled velocity profiles by considering the time occurrences of the maximum velocity to estimate tm and the time occurrences of the maximum and minimum of the acceleration to estimate tinf 1 and tinf 2 respectively.
+Thus, by using (4), (5), and (6), t0, D, , and can be expressed as a function of tm, tinf 1 and tinf 2.
+
+4.1.1 Estimation of
+The parameter is estimated by solving a nonlinear equation as follows: Let us consider the interval I, which covers 99.97 percent of the surface under a lognormal curve:
+I ¼ ½e 3 ; e þ3 ¼ ½tmin; tmax ; ð7Þ
+where tmin and tmax are the extreme bounds of the interval, as estimated from the lognormal profile using empirical thresholds (e.g., the times when the velocity reaches 1 percent of its maximum). Then, can be evaluated without difficulty by solving the following nonlinear relationship:
+F ð Þ ¼ tmax tmin 2 sinh 3 ð Þ ½e 2 e 3 ðtm tminÞ ¼ 0: ð8Þ
+
+4.1.2 Estimation of the Other Parameters
+Using the estimated value ̂ of , the estimated value ̂ of can be computed by
+̂ ¼ ̂2 þ ln tinf 2 tinf 1 2 1 ; ð9Þ
+with
+a1 ¼ þ
+ffiffiffiffiffiffiffiffiffiffiffiffiffi 2 þ 4 p
+2
+( ) > 0! 1 ¼ e a1 < 1; ð10:aÞ
+a2 ¼
+ffiffiffiffiffiffiffiffiffiffiffiffiffi 2 þ 4 p
+2
+( ) < 0! 2 ¼ e a2 > 1: ð10:bÞ
+Then, we can estimate t0,
+t̂0 ¼ tm ê ̂ 2 ; ð11Þ
+and D, using
+v tmð Þ ¼ vm ¼ D ̂ tm t̂0 ffiffiffiffiffi 2 p e 1 2̂2 ln tm t̂0ð Þ ̂ð Þ2 ; ð12Þ
+D̂ ¼ vm̂ ffiffiffiffiffi 2 p ê ̂2 2 ; ð13Þ
+where vm is the maximum velocity.
+
+4.2 Estimation of the Delta-Lognormal Parameters
+The estimation of the agonist lognormal parameters is performed by exploiting the above method directly since a Delta-Lognormal profile is given by
+v t t0ð Þ ¼ v1 t t0ð Þ v2 t t0ð Þ; ð14Þ
+where v1 t t0ð Þ and v2 t t0ð Þ are the agonist and antagonist components, respectively. Using (8) to (13), the four agonist parameters t0; D1; 1; 1ð Þ are estimated by considering the main peak of the velocity profile as a single lognormal function (v t t0ð Þ v1 t t0ð Þ; tinf 1 < t < tinf 2).
+The antagonist parameters are then evaluated after subtracting the agonist component v1 t t0ð Þ from the total velocity profile v t t0ð Þ. The time indices of the resulting lognormal function v2 t t0ð Þ are given by
+tm2 ¼ t0 þ e 2 2 2 ; ð15:aÞ
+tinf 12 ¼ t0 þ e 2 2 2e a1 ; ð15:bÞ
+tinf 22 ¼ t0 þ e 2 2 2e a2 : ð15:cÞ
+The following expression is used to estimate ̂2 of 2 (see Appendix A for more details):
+̂2 ¼ ffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffi B2 þ 4 p 2 q ; ð16Þ
+with
+B ¼ ln tinf 22 t0 tinf 12 t0
+and the other estimated values of 2 and D2 are then calculated by reusing (9) and (13), respectively.
+As schematized in Fig. 2, this process for the estimation of the Delta-Lognormal parameters provides a rough initial solution from which the Levenberg-Marquardt optimization algorithm is boosted, and the solution is then iteratively refined by minimizing the mean square of the reconstruction error between the original and the reconstructed velocity profiles. This optimization process at least leads to the optimum solution, according to the mean square error criteria.
+
+5 TESTING uNDER IDEAL CONDITIONS
+After implementing XZERO on a software benchmark, a testing phase under ideal conditions is performed. This consists of building an ideal database of Delta-Lognormal functions, and comparing the performances of our new algorithm with the two previously developed deterministic algorithms, INFLEX [28] and INITRI [29].
+
+5.1 Construction of the Database
+Theoretically, an infinite number of velocity profiles can be generated from the superimposition of the agonist and antagonist lognormal components. Construction of our database is aimed at grouping this large number of profiles together into a few classes. To reach this goal, two main features were considered to classify the ideal profiles into seven classes: 1) the number of zero crossings appearing in the velocity profile and 2) the position of the antagonist component with respect to the agonist one [35]. Fig. 3 depicts typical examples for each class Cuw, where the subscript u indicates where the dominance of the antagonist component occurs with respect to the antagonist one
+(b: before, a: after, or s: simultaneously) and the subscript w represents the number of zero crossings 0, 1, or 2. The label i (imaginary) is used when there is no real root to the zero crossing equation [29], [36].
+As can be seen in these plots, the different timings of the antagonist versus the agonist curves can generate a large variety of primitive patterns, and as previously stated, some of these patterns, like classes Cb1, Cbi, and Cs2, often cause problems. To obtain a wide variability of patterns, the Delta-Lognormal parameter values were randomly selected within specific intervals. To generate realistic velocity profiles, these intervals were fixed according to typical features of rapid movements made by normal subjects. In the database we have used here, it was assumed that the movement time was typically between 100 and 500 ms, and the minimum time occurrence of the maximum velocity was about 100 ms after t0. The lower bound of this latter parameter was fixed, based on the fact that a human being does not respond without anticipation to a stimulus faster than 50 ms. The upper bound was arbitrarily fixed at 1 second. The parameters D1 and D2 were empirically deduced by taking into account both the dimensions of the digitizer used to acquire real data (31 cm 23 cm) and on the assumption that the distance covered by the antagonist movement is generally smaller than that covered by the agonist.
+The corresponding ratio was fixed toD2 max ¼ 0:1D1 max to emulate worst-case testing conditions since movements with small antagonist component are generally more difficult to process [30]. Table 1 summarizes these constraints.
+
+5.2 Performance Evaluation
+To test our algorithm, each ideal Delta-Lognormal curve was sampled at 200 Hz to simulate the data collected with a
+digitizer. The seven parameter values extracted by the XZERO, INFLEX, and INITRI algorithms were compared with the original ones (Truth Table). The results are summarized in Table 2 [29], [35]. In this test, the extracted parameters were considered as matching the original ones if the SNR between the original and the reconstructed curve was greater than 100 dB (equivalent to an MSE of less than 10 9cm2:s 2).
+As can be seen in Table 2, for the Ca classes (antagonist dominance after the agonist peak activity), XZERO performs better than INFLEX and INITRI, both of which also have serious problems with the Cb classes, where the antagonist activity is dominant prior to the agonist activity. If we remove the results from these two classes, we can see that, in the penultimate column, there are differences of 6 and 12 percent between XZERO and the other two algorithms, respectively. These differences grow to 30 and 32 percent, respectively (last column) when all of the specimens are taken into account.
+However, a vertical comparison of the results in Table 2 emphasizes the complementarities of the three algorithms. This is mainly because INFLEX encounters some difficulties when the main peak of the velocity profile is almost symmetrical, while INITRI has some difficulty with profiles that are profoundly asymmetrical. Moreover, XZERO has a stable performance, with a minimum of 92 percent of perfect reconstruction for ideal Delta-Lognormal curves.
+In an attempt to improve overall capabilities, we have designed a combined system, called INFLEX+INITRI+ XZERO or (IIX), which integrates the three algorithms in parallel. For each test curve, the solution, chosen among the solutions given by the three algorithms, corresponds to that which leads to a minimum MSE. As can be seen in Table 2, the IIX system is better than XZERO, INFLEX, and INITRI considered individually. The IIX system can recover 100 percent of the original parameters for the Ca classes, and 99.3 percent when all the database profiles are analyzed. Considering the improvements resulting from the parallel use of the three algorithms, we have adopted this architecture as an upgrade of our extractor system and used it in the following study.
+
+6 PERFORMANCES uNDER NOISY CONDITIONS
+The first test confirmed the capacity of the system to recover the exact parameters in the ideal case of simulated Delta-Lognormals. In real situations, the strokes acquired
+from a digitizer usually contain noise and distortion. Therefore, the extracted data are corrupted by error sources, and the resulting extraction errors must be circumscribed to quantify the accuracy of the extractor under noise constraints. To do so, another database has been constructed by adding to the ideal data sets an artificial noise with zero mean and various SNR levels using a Gaussian random noise generator [29], [35]. Fig. 4 shows a pair of such noisy profiles (with SNR ¼ 20 dB), as constructed from two of the profiles presented in Fig. 3.
+An initial performance evaluation based on the percentages of successful extractions, using corrupted profiles with SNR of 20 dB, was run. In this experiment, a solution was accepted if the SNR of the reconstructed profile over the original was greater than an arbitrary threshold of 10 dB. As can be seen in Table 3, XZERO performed better than either INFLEX or INITRI under these noisy conditions, and the combined system IIX converged in more than 98 percent of the cases.
+Since we knew the original parameter values of each noisy curve in this simulation, we could evaluate the performance of the extractor according to its ability to recover, under various SNRs, the real parameter values within specific confidence intervals. For example, Fig. 5 depicts the extracted values of the parameter 1 versus the original ones, for SNRs of 20, 30, 40, and 50 dB, respectively. Each plot represents the best extraction result obtained by the IIX system.
+For ideal curves, all dots in a plot would be located on the 45 degree oblique line and, in noisy conditions, the
+extraction errors would result in a dispersion of the values around this oblique line. As observed from these plots, there is a relationship between the dispersion error and the SNR.
+Indeed, Fig. 6a depicts the extraction error of the parameter for an SNR of 20 dB. These fluctuations look like a random signal. The histogram of the error (Fig. 6b) shows that it roughly follows a Gaussian process. According to the Kolmogorov-Smirnov test, this histogram can be considered as a normal distribution ðh ¼ 0; p ¼ 0:03Þ, and we can thus evaluate, for each parameter, the dispersion of the corresponding extraction error through its confidence interval.
+This result suggests that a part of the synthetic Gaussian noise added to the ideal velocity profile is transformed into an extraction error which keeps the same distribution. In other words, the IIX extractor can be considered as a system which does not generate any additional distortion or noise
+over the Delta-Lognormal parameters, but which translates
+the noise existing in the original data into extraction errors.
+In these conditions, confidence intervals can be estimated
+for the optimal extracted values of the seven parameters.
+
+6.1 Evaluation of the Extraction Accuracy
+Moreover, in real-life applications, there is no prior information about the original values of the seven parameters. An estimate of the confidence levels associated with the parameter values is essential in some of these applications, particularly those dealing with biomedical and neuromotor engineering. The second performance
+evaluation has led to the circumscription and quantification
+of extractor accuracy by constructing these confidence
+intervals (CIs) for each parameter. They have been computed using the optimal parameter
+values, the MSE and the SNR. To do so, the extracted value
+of a parameter was considered as the center of a confidence
+interval with extremities calculated from the standard
+deviation (STD) of the corresponding extraction error. For
+example, the CI of the parameter 1 was evaluated by
+CI 1 ¼ ½ 1 k STD 1 ; 1 þ k STD 1 ; ð17Þ
+where 1 is the extracted value, STD 1 the standard deviation of the extraction error, and k the dispersion range (k ¼ 1; 2; 3). Let us recall that, for k ¼ 2, the original value is inside the CI with a confidence level of 95 percent.
+Since the dispersion STD decreases when the SNR increases (see Fig. 5), we can construct empirical relationships between these quantities and build the CIs from the SNR values.
+These empirical relationships were calculated as follows: for each Delta-Lognormal parameter, a dispersion parameter STDp of the extraction error was calculated (assuming that the mean value of the error was nearly zero) by considering the 7,000 curves of the seven classes for a given SNR value. The STDp versus SNR curve was then plotted as, for example, in Fig. 7. An exponential relationship emerges from these plots, which can be expressed as
+STDp ¼ e SNR; ð18Þ
+where STDp is the standard deviation of the extraction error for a given parameter p, and and are the regression coefficients, as summarized in Table 4 for the seven parameters.
+According to the definition of the SNR (SNR ¼ 10 log10 Ps=Pn½ , where Ps is the power of the signal and Pn ¼ STD2n is the power of the Gaussian noise), (18) can be rewritten as follows:
+STDp ¼ Ps STDn: ð19Þ
+Equation (19) clearly reflects the fact that the power of the extraction error (its standard deviation) corresponds to a proportion of the noise added to the velocity profiles.
+As previously anticipated, this also suggests that the IIX extractor does not add any supplementary noise, but “transforms” the existing fluctuations into extraction errors with different proportions. This characterization process permits the quantification of the extractor accuracy and the
+determination of confidence intervals for each extracted parameter value.
+
+7 TESTING wITH REAL DATA
+Working with simulated data was essential to calibrating the IIX extraction system, but our ultimate goal was to evaluate its performance in real applications.
+To do so, we conducted a third experiment using real handwritten strokes. These experiments were performed on 10 right-handed subjects of both genders, between 22 and 45 years of age and in good health.
+They were asked to produce rapid strokes with their dominant right hand on a digitizer tablet (Wacom Intuos II , 22 cm 32 cm, resolution of 100 points per millimeter) between a departure point located in the bottom left-hand corner and a target zone located in the upper right-hand corner.
+Fig. 8a depicts the typical x-y trajectory of a stroke produced by a subject. The corresponding velocity profile,
+Lognormal profiles.
+as illustrated in Fig. 8b, was computed using numerical filters (a Chebychev II low-pass filter with order n ¼ 10, cutoff frequency Fc ¼ 16 Hz, sampling frequency Fs ¼ 200 Hz, and Attenuation Att ¼ 81 dB; and an FIR derivative filter with n ¼ 10, Fc ¼ 50 Hz, and Fs ¼ 200 Hz) applied to the two position components x(t) and y(t) for
+each stroke. Representative results of the analysis-by-
+synthesis process are presented in Figs. 9a, 9b, 9c, 9d. For
+each trial, the velocity profile, as reconstructed from the
+seven extracted parameters, is very close to the original
+profile, with an SNR greater than 20 dB. Details of the
+corresponding parameters with their confidence intervals
+are summarized in Table 5. As can be deduced from this table, the agonist
+parameters were extracted with greater accuracy (extrac-
+tion uncertainty less than 9 percent) than the antagonist
+ones. This is probably because of the architecture of the
+extractor and the fact that the antagonist parameter values
+were small. Indeed, since the antagonist component is isolated after
+subtracting the estimated agonist component, more distor-
+tions are created in the antagonist profile, leading to a
+poorer estimation of its parameters. Moreover, since the
+magnitude of D2 is generally smaller than that of D1 and often becomes comparable to the magnitude of the noise, it
+is difficult to obtain an acceptable precision in some cases.
+For example, in the velocity profiles depicted in Fig. 9a, the
+uncertainty grows to 32 percent when D2 is small, even if the SNR is about 31 dB. However, as depicted in Figs. 9b
+and 9d, when the antagonist component is more significant,
+the corresponding uncertainty of its parameters decreases,
+to less than 20 percent in these specific results.
+
+8 CONCLUSION
+In this paper, we have focused on the analysis-by-synthesis
+of individual strokes, i.e., the study of motor control
+primitives. Using the Kinematic Theory, which describes
+the velocity profile of rapid movement with seven Delta-
+Lognormal parameters, we have developed an efficient
+parameter extractor system which relies on a new algorithm
+(XZERO). This algorithm exploits the properties of the first
+and the second-order time derivatives of a lognormal function. We have highlighted the performance improvements that are observed by this new estimation method in comparison with two existing ones (INFLEX and INITRI). For ideal curves, XZERO finds the true values of DeltaLognormal parameters in 98 percent of cases, for a database of 7,000 curves representing a huge variety of patterns. Moreover, the complementarities that exist between the three algorithms (INFLEX, INITRI, and XZERO) have led us to combine them in a new architecture, the IIX system, to improve global performances.
+We have also circumscribed and quantified the confidence intervals of the extracted values, exploiting the empirical exponential regressions that link the standard deviation (STD) of the extraction error with the SNR. Thus, the optimal values of the parameters used to reconstruct the velocity profiles of rapid movements by a Delta-Lognormal equation are, for the first time, accompanied with precision estimates, which quantify their relative validity.
+Although more work will be necessary to apply this methodology to the automatic study of complex movements like handwriting, our tool is potentially widely applicable in various applications. It already offers the possibility of analyzing the behavior of neuromuscular and motor control systems under various experimental and psychophysical conditions dealing with single-stroke production. With our robust extractor, the Kinematic Theory could be used in education, psychophysics, neuroscience, and robotics, and in any basic studies requiring a better characterization of the neuromuscular system. For example, experiments are under way in our laboratory, where our algorithms are being applied to analyzing the intrinsic properties of strokes produced by different groups of participants (young and old subjects, male and female, either healthy or at risk of cerebrovascular accident, etc.) [39]. Another investigation is aimed at providing a better understanding of single strokes as movement primitives, and their use as building blocks for the automatic processing of handwriting in various
+fields of computer science [2]. Moreover, in its present form, the IIX system is not limited to human movement applications. It could be employed to analyze any lognormal process [27]. However, to deal with more complex gestures, more work will be needed. Preliminary studies in which the XZERO algorithm is used as a cornerstone are currently under way [76].
+
+APPENDIX A
+Let consider v t t0ð Þ to be a lognormal function weighted by D and shifted by t0 (see (3)):
+vðt t0Þ ¼ D ðt t0Þ ffiffiffiffiffi 2 p e k 2 2 ; ðA-1Þ
+where
+k ¼ lnðt t0Þ
+! dk dt ¼ 1 ðt t0Þ :
+The first-order derivative is given by
+dvðt t0Þ dt ¼ v0ðt t0Þ ¼ d dt
+D ðt t0Þ ffiffiffiffiffi 2 p e k 2 2
+" #
+¼ vðt t0Þ ðt t0Þ
+ð þ kÞ; ðA-2Þ
+where v0 and v00 are the first and the second time derivatives of a function v t t0ð Þ, respectively.
+The nontrivial zeros of this function occur when þ k ¼ 0, e.g.,
+þ k ¼ 0! k ¼ lnðt t0Þ
+¼ ! tm ¼ t0 þ e 2 :
+The time occurrence of the maximum that corresponds to this zero crossing is then given by
+tm ¼ t0 þ e 2 : ðA-3Þ
+Similarly, the second time derivative of the shifted and
+weighted lognormal function is
+d2 dt2 ðvðt t0ÞÞ ¼ v00ðt t0Þ
+¼ d dt vðt t0Þ þ k ðt t0Þ ¼ vðt t0Þ 2ðt t0Þ2 ðk2 þ 3k þ 2 2 1Þ:
+ðA-4Þ
+The zeros of this function are calculated by solving the
+following equation:
+k2 þ 3 kþ 2 2 1 ¼ 0: ðA-5Þ
+Let k1;2 ¼ 3 ffiffiffiffiffiffiffiffi 2þ4 p
+2 be the two solutions. Then, the roots are given by
+tinf 1 ¼ t0 þ exp 3 þ
+ffiffiffiffiffiffiffiffiffiffiffiffiffi 2 þ 4 p
+2
+!( ) ¼ t0 þ 1e 2 ;
+ðA-6:aÞ
+tinf 2 ¼ t0 þ exp 3
+ffiffiffiffiffiffiffiffiffiffiffiffiffi 2 þ 4 p
+2
+!( ) ¼ t0 þ 2e 2 ;
+ðA-6:bÞ
+with
+a1 ¼ þ
+ffiffiffiffiffiffiffiffiffiffiffiffiffi 2 þ 4 p
+2
+( ) > 0! 1 ¼ e a1 < 1; ðA-7:aÞ
+a2 ¼
+ffiffiffiffiffiffiffiffiffiffiffiffiffi 2 þ 4 p
+2
+( ) < 0! 2 ¼ e a2 > 1; ðA-7:bÞ
+and then
+tinf 1 < tm < tinf 2: ðA-8Þ
+A.1 Estimation of the Parameter of a Lognormal Function
+The parameter is estimated by solving a nonlinear
+equation. Indeed, let us consider the interval I, which
+covers 99.97 percent of the surface under a lognormal curve:
+I ¼ e 3 ; e þ3 ¼ tmin; tmax½ ; ðA-9Þ
+where tmin and tmax are the extreme bounds of the interval, as estimated from the lognormal profile using empirical
+thresholds (e.g., the times when the velocity reaches
+1 percent of its maximum). Then,
+e þ3 e 3 ¼ e ðe3 e 3 Þ ¼ tmax tmin; ðA-10Þ
+e ¼ tmax tmin 2 sinh 3 ð Þ ; ðA-11Þ
+tm tmin ¼ e ½e 2 e 3 ; ðA-12Þ
+and, finally, is evaluated by solving the following
+nonlinear relationship:
+F ð Þ ¼ tmax tmin 2 sinh 3 ð Þ e
+2 e 3 h i tm tminð Þ ¼ 0: ðA-13Þ
+A.2 Estimation of the Parameter 2 of a Delta-Lognormal Function
+Let tm2, tinf 12, and tinf 22 be the time indices of the maximum and inflexion points of the antagonist lognormal curve,
+respectively, where the parameter t0 is already estimated:
+tm2 ¼ t0 þ e 2 2 2 ; ðA-14:aÞ
+tinf 12 ¼ t0 þ e 2 2 2e a1 ; ðA-14:bÞ
+tinf 22 ¼ t0 þ e 2 2 2e a2 : ðA-14:cÞ
+The following expressions are then used to estimate 2:
+tinf 22 t0 tinf 12 t0
+¼ e 2 22e a2
+e 2 2 2e a1
+¼ ea1 a2 : ðA-15Þ
+Considering that B ¼ a1 a2 ¼ lnðtinf 22 t0tinf 12 t0Þ, a positive constant:
+tinf 12 < tinf 22 ! 1 < tinf 22 t0 tinf 12 t0 ! 0 < B ¼ ln tinf 22 t0 tinf 12 t0 ;
+ðA-16Þ
+a1 a2 B ¼ 2 2
+2 þ ffiffiffiffiffiffiffiffiffiffiffiffiffi 22 þ 4 q
+2 2
+2 ffiffiffiffiffiffiffiffiffiffiffiffiffi 22 þ 4 q B ¼ 0:
+ðA-17Þ
+Then, after transformation of (A-17),
+22 2 2 þ 4 ¼ B2: ðA-18Þ
+Using l ¼ 22, (A-18) becomes a second-order polynomial:
+l2 þ 4l B2 ¼ 0: ðA-19Þ
+The parameter 2 is then calculated from the positive
+solution of (A-19):
+̂2 ¼ ffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffi B2 þ 4 p 2 q : ðA-20Þ
+
+ACKNOWLEDGMENTS
+This research was supported by grant RGPIN-915 from the
+NSERC to Réjean Plamondon.
+
+References
+[1]M. Djioua,R. PlamondonAnalysis and Synthesis of Handwriting Variability Using the Sigma-Lognormal Model,Proc. 13th Conf. Int’l Graphonomics Soc.,2007
+[2]R. Plamondon,M. DjiouaA Multi-Level Representation Paradigm for Handwriting Stroke Generation,Human Movement Science,2006
+[3]R. Plamondon,S. SrihariOn-Line and Off-Line Handwriting Recognition: A Comprehensive Survey,IEEE Trans. Pattern Analysis and Machine Intelligence,2000
+[4]R. Plamondon,D. Lopresti,L.R.B. Schomakerand SSrihari, “On- Line Handwriting Recognition,” Encyclopedia of Electrical and Electronics Engineering, J.G. Webster, ed., vol. 15, pp. 123-146, John Wiley & Sons1999
+[5]A. Woch,R. PlamondonUsing the Framework of the Kinematic Theory for the Definition of a Movement Primitive,Motor Control,2004
+[6]S.F. Giszter,F.A. Mussa-Ivaldiand EBizzi, “Convergent Force Field Organized in the Frog’s Spinal Cord,” J. Neuroscience, vol. 13, pp. 467-4911993
+[7]F.A. Mussa-Ivaldi,S.F. Giszterand EBizzi, “Linear Combinations of Primitives in Vertebrate Motor Control,” Proc. Nat’l Academy of Sciences USA, vol. 91, no. 16, pp. 7534-75381994
+[8]R.W. Paine,J. TaniMotor Primitive and Sequence Self- Organization in a Hierarchical Recurrent Neural Network,Neural Network,2004
+[9]K.A. Thoroughman,R. ShadmehrLearning of Action through Adaptive Combination of Motor Primitives,Nature, vol2000
+[10]O. HiltonScientific Examination of Questioned Documents,CRC Series in Forensic and Police Science, revised ed., CRC Press,1993
+[11]P.L.M.L. SimnerGirouard eds., “Advance in Forensic Document Examination,J. Forensic Document Examination,2000
+[12]J. Wann,A.M. Wing,N. SøvikDevelopment of Graphic Skills: ResearchPerspectives and Education Implications. Academic Press1991
+[13]A. Schröter,R. Mergl,K. Bürger,H. Hampel,H.-J. Möller,U. HegerlKinematic Analysis of Handwriting Movements in Patients with Alzheimer’s DiseaseMild Cognitive Impairment, Depression and Healthy Subjects,” Dementia and Geriatric Cognitive Disorders, vol. 15, pp. 132-1422003
+[14]H.L.T. Teuling,G.E. StelmachControl of Stroke SizePeak Acceleration and Stroke Duration in Parkinsonian Handwriting,” Human Movement Science, vol. 10, pp. 315-3331991
+[15]B. Rohrer,S. Fasoli,H.I. Krebs,R. HughesBVolpe, and W.R. Frontera, “Movement Smoothness Changes during Stroke Recovery,” J. Neuroscience, vol. 22, pp. 8297-83042002
+[16]V. PotkonjakRobotic Handwriting,Int’l J. Humanoid Robotics,2005
+[17]F. Lacquaniti,C. Terzuoloand PViviani, “The Law Relating the Kinematic and Figural Aspects of Drawing Movements,” Acta Psychologica, vol. 54, pp. 115-1301983
+[18]P. MorassoSpatial Control of Arm Movements,Experimental Brain Research,1981
+[19]J. Soechting,F. LacquanitiInvariant Characteristics of a Pointing Movement in Man,J. Neuroscience,1981
+[20]C.P. VivianiTerzuelo, “Space-Time Invariance in Learned Motor Skills,Tutorials in Motor Behavior, G.E. Stelmach and J. Requin,1980
+[21]R. PlamondonA Kinematic Theory of Rapid Human Movements Part IMovement Representation and Generation,” Biological Cybernetics, vol. 72, pp. 295-3071995
+[22]R. Plamondon,W. GuerfaliThe Generation of Handwriting with Delta-Lognormal Synergies,Biological Cybernetics,1998
+[23]W. GuerfaliModèle Delta-Lognormal Vectoriel pour l’Analyse du Mouvement et la Génération de lEcriture Manuscrite,” PhD dissertation, Dept. of Electrical Eng., Ecole Polytechnique de Montréal,1996
+[24]F. LeclercModèle de Génération de Mouvements Rapides en Représentation de Signatures Manuscrites,PhD dissertation, Dept. of Electrical Eng., Ecole Polytechnique de Montréal,1996
+[25]A.C. Cohen,B.J. WhittenEstimation in the Three-Parameter Lognormal Distribution,J. Am. Statistical Assoc.,1980
+[26]W. Guerfali,R. PlamondonSignal Processing for the Parameter Extraction of the Delta Lognormal Model,Research in Computer and Robot Vision,1995
+[27]R. Plamondon,X. Liand MDjioua, “Extraction of Delta- Lognormal Parameters from Handwriting Strokes,” J. Frontiers of Computer Science in China, vol. 1, no. 1, pp. 106-1132007
+[28]M. Djioua,R. Plamondon,A.D. Cioppaand AMarcelli, “Deterministic and Evolutionary Extraction of Delta-Lognormal Parameters: Performance Comparison,” Int’l J. Pattern Recognition and Artificial Intelligence, vol. 21, no. 1, pp. 21-412007
+[29]T. Varga,D. Kilchhoferand HBunke, “Template-Based Synthetic Handwriting Generation for the Training of Recognition Systems,” Proc. 12th Conf. Int’l Graphonomics Soc., vol. 12, pp. 206-2112005
+[30]R. Plamondon,A.M. Alimi,P. Yergeauand FLeclerc, “Modelling Velocity Profiles of Rapid Movements: A Comparative Study,” Biological Cybernetics, vol. 69, no. 2, pp. 119-1281993
+[31]A. Alimi,R. PlamondonA Comparative Study of Speed/Accuracy Tradeoff Formulations: The Case of Spatially Constrained Movements where Both Distance and Spatial Precision Are Specified,Handwriting and Drawing Research: Basic and Applied Issues,1996
+[32]C. Feng,A. Wochand RPlamondon, “A Comparative Study of Two Velocity Profile Models for Rapid Stroke Analysis,” Proc. 16th Int’l Conf. Pattern Recognition, vol. 4, pp. 52-552002
+[33]M. DjiouaContributions à la Généralisationà la Compréhension et à l’Utilisation de la Théorie Cinématique dans l’Analyse et la Synthèse du Mouvement Humain,” PhD dissertation, Dept. of Electrical Eng., Ecole Polytechnique de Montréal2007
+[34]R. PlamondonA Kinematic Theory of Rapid Human MovementsPart II. Movement Time and Control,” Biological Cybernetics, vol. 72, pp. 309-3201995
+[35]R. Plamondon,C. Feng,A. WochA Kinematic Theory of Rapid Human MovementPart IV: A Formal Mathematical Proof and New Insights,” Biological Cybernetics, vol. 89, pp. 126-1382003
+[36]D.W. MarquardtAn Algorithm for Least-Squares Estimation of Non-Linear Parameters,J. SIAM,1963
+[37]A. Woch,R. PlamondonAnalysis of Movement Primitives with the DL Model: Insights on the Age Effect,Proc. 13th Biennial Conf. Int’l Graphonomics Soc.,2007
+[38]M.S. RosenblumLivneh-Zirinski, “Handwriting Process and Product Characteristics of Children Diagnosed with Developmental Coordination Disorder,Human Movement Science,2008
+[39]S.H. Chang,N.Y. YuEvaluation and Classification of Types of Chinese Handwriting Deficits in Elementary Schoolchildren,Perceptual and Motor Skills,2005
+[40]S. Glenat,L. Heutte,T. Paquetand DMellier, “Computer-Based Diagnosis of Dyspraxia: The MEDDRW Project,” Proc. 12th Biennial Conf. Int’l Graphonomics Soc., vol. 12, pp. 49-532005
+[41]M.G. Longstaff,R.A. HeathSpiral Drawing as an Indicator of Fine Motor Function in Patients with Multiple Sclerosis,Proc. 12th Biennial Conf. Int’l Graphonomics Soc.,2005
+[42]T. Schenk,B. Baur,B. Steidleand CMarquardt, “Does Training Improve Writer’s Cramp?—An Evaluation of a Behavioral Treatment Approach Using Kinematic Analysis,” J. Hand Therapy, vol. 17, pp. 349-3632004
+[43]K.W. Lange,L. Mecklinger,M. Schecklmannand OTucha, “Handwriting Fluency after Acute Phenylalanine-Tyrosine Depletion,” Proc. 12th Biennial Conf. Int’l Graphonomics Soc., vol. 12, pp. 276-2802005
+[44]A. Gerken,H. Wetzel,O. BenkertExtrapyramidal Symptoms and Their Relationship to Clinical Efficacy under Perphenazine TreatmentA Controlled Prospective Handwriting-Test Study in 22 Acutely Ill Schizophrenic Patients,” Pharmacopsychology, vol. 24, pp. 132-1371991
+[45]O. Tucha,K.W. LangeEffects of Nicotine Chewing Gum on a Real-Life Motor Task: A Kinematic Analysis of Handwriting Movements in Smokers and Non-Smokers,Psychopharmacology,2004
+[46]O. Tucha,D. Stasik,L. MecklingerIKarl, and K.W. Lange, “The Effect of Caffeine on Handwriting Movements in Skilled Writers,” Proc. 12th Biennial Conf. Int’l Graphonomics Soc., vol. 12, pp. 237- 2412005
+[47]J.G. PhillipsFMuller, and R.P. Ogeil, “Alcohol Intoxication and Handwriting; A Kinematic Analysis,” Proc. 13th Biennial Conf. Int’l Graphonomics Soc., vol. 13, pp. 83-872007
+[48]A. De Santis,V. Caggiano,B. Siciliano,L. Villaniand GBoccignone, “Anthropic Inverse Kinematics of Robot Manipulators in Handwriting Tasks,” Proc. 12th Biennial Conf. Int’l Graphonomics Soc., vol. 12, pp. 168-1722005
+[49]A. Rusu,U. Midicand VGovindaraju, “Synthetic Handwriting Generator for Cybersecurity,” Proc. 13th Biennial Conf. Int’l Graphonomics Soc., vol. 13, pp. 14-182007
+[50]R.M. Guest,M.C. Fairhurst,J.M. PotterDiagnosis of Visuo- Spatial Neglect Using Dynamic Sequence Features from a Cancellation Task,Pattern Analysis and Applications,2002
+[51]C.C.A.M. GielenKOosten, and F.P. Gunne, “Relation between EMG Activation Patterns and Kinematic Properties of Aimed Arm Movements,” J. Motor Behavior, vol. 17, pp. 421-4421985
+[52]D.M. Corcos,G.C. Agarwal,B.P. Flaherty,G.L. GottliebOrganizing Principles for Single-Joint Movements IVImplications for Isometric Contraction,” J. Neurophysiology, vol. 64, pp. 1033-10421990
+[53]A.P. Georgopoulos,J.F. Kalaska,J.T. MasseySpatial Trajectories and Reaction Time of Aimed Movements: Effects of PracticeUncertainty, and Change in Target Location,” J. Neurophysiology, vol. 46, pp. 725-7431981
+[54]P. MorassoSpatial Control of Arm Movements,Experimental Brain Research,1981
+[55]H. NagasakiAsymmetric Velocity and Acceleration Profiles of Human Arm Movements,Experimental Brain Research,1989
+[56]D. Bullock,S. Grossbergand CMannes, “A Neural Network Model for Cursive Script Production,” Biological Cybernetics, vol. 70, pp. 15-231990
+[57]F. Guenther,D. BullockA Review of Neural Networks for Control,Neural Networks,1992
+[58]E. BizziCentral and Peripheral Mechanisms in Motor Control,Tutorials in Motor Control, G.E. Stelmach and J. Requin,1980
+[59]A.G. FeldmanOnce More on the Equilibrium-Point Hypothesis (Lambda Model) for Motor Control,J. Motor Behavior,1986
+[60]Y. NiheiLimit of Duration of a Generalized Motor Program for Handwriting,Tokohu Psychologica Folia,1985
+[61]M.C. Carter,D.C. ShapiroControl of Sequential Movements: Evidences for Generalized Motor Programs,J. Neurophysiology,1984
+[62]C.M. Harris,D.M. WolpertSignal-Dependent Noise DeterminesMotor Planning,” Nature,1998
+[63]D.E. Meyer,J.E.K. Smith,C.E. WrightModels for the Speed and Accuracy of Aimed Movements,Psychological Rev.,1982
+[64]J.D. Enderle,J.W. WolfeTime-Optimal Control of Saccadic Eye Movements,IEEE Trans. Biomedical Eng.,1987
+[65]T. Flash,N. HoganThe Coordination of Arm Movements: An Experimentally ConfirmedMathematical Model,” J. Neuroscience,1985
+[66]S. Edelman,T. FlashA Model of Handwriting,Biological Cybernetics,1987
+[67]Y. Uno,R. Suzukiand MKawato, “Formation and Control of Optimal Trajectories in Human Multijoint Arm Movements,” Biological Cybernetics, vol. 61, pp. 89-1011989
+[68]L. Likforman-Sulem,A. VinciarelliHMM-Based Offline Recognition of Handwritten Words Crossed Out with Different Kind of Strokes,Proc. 11th Int’l Conf. Frontiers in Handwriting Recognition,2008
+[69]P.D. NeilsonThe Problem of Redundancy in Movement Control: The Adaptive Model Theory Approach,Psychological Research,1993
+[70]L.R.B. SchomakerSimulation and Recognition of Handwriting Movements: A Vertical Approach to Modeling Human Motor Behavior,PhD thesis, Nijmegen Univ.,1991
+[71]G. Gangadhar,D. JosephAn Oscillatory Neuromotor Model of Handwriting Generation,Int’l J. Document Analysis and Recognition,2007
+[72]J.M. HollerbachAn Oscillation Theory of Handwriting,Biological Cybernetics,1981
+[73]M.E. WiseThe Geometry of Lognormal and Related Distributions and an Application to Tracer-Dilution Curves,Statistica Neerlandica,1966

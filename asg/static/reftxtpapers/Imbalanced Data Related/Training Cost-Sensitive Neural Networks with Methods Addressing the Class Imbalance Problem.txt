@@ -1,0 +1,348 @@
+Training Cost-Sensitive Neural Networks with Methods Addressing the Class Imbalance Problem
+Zhi-Hua Zhou,Xu-Ying Liu
+
+
+oversampling and undersampling are considered. These techniques modify the distribution of the training data such that the costs of the examples are conveyed explicitly by the appearances of the examples. Threshold-moving tries to move the output threshold toward inexpensive classes such that examples with higher costs become harder to be misclassified. Moreover, hard-ensemble and softensemble, i.e., the combination of above techniques via hard or soft voting schemes, are also tested. Twenty-one UCI data sets with three types of cost matrices and a real-world cost-sensitive data set are used in the empirical study. The results suggest that costsensitive learning with multiclass tasks is more difficult than with two-class tasks, and a higher degree of class imbalance may increase the difficulty. It also reveals that almost all the techniques are effective on two-class tasks, while most are ineffective and even may cause negative effect on multiclass tasks. Overall, threshold-moving and soft-ensemble are relatively good choices in training costsensitive neural networks. The empirical study also suggests that some methods that have been believed to be effective in addressing the class imbalance problem may, in fact, only be effective on learning with imbalanced two-class data sets.
+Index Terms—Machine learning, data mining, neural networks, cost-sensitive learning, class imbalance learning, sampling, thresholdmoving, ensemble learning.
+
+1 INTRODUCTION
+IN classical machine learning or data mining settings, theclassifiers usually try to minimize the number of errors they will make in dealing with new data. Such a setting is valid only when the costs of different errors are equal. Unfortunately, in many real-world applications, the costs of different errors are often unequal. For example, in medical diagnosis, the cost of erroneously diagnosing a patient to be healthy may be much bigger than that of mistakenly diagnosing a healthy person as being sick, because the former kind of error may result in the loss of a life.
+In fact, cost-sensitive learning has already attracted
+much attention from the machine learning and data mining
+communities. As it has been stated in the Technological
+Roadmap of the MLnetII project (European Network of
+Excellence in Machine Learning, [29]), the inclusion of costs
+into learning has been regarded as one of the most relevant
+topics of future machine learning research. During the past
+years, many cost-sensitive learning methods have been
+developed [6], [11], [14], [23], [31]. However, although there
+are many research efforts devoted to making decision trees
+cost-sensitive [5], [17], [24], [33], [35], [37], only a few
+studies discuss cost-sensitive neural networks [19], [21], while usually it is not feasible to apply cost-sensitive decision tree learning methods to neural networks directly. For example, the instance-weighting method [33] requires the learning algorithm to accept weighted-examples, which is not a problem for C4.5 decision trees but is difficult for common feedforward neural networks.
+Recently, the class imbalance problem has been recognized as a crucial problem in machine learning and data mining because such a problem is encountered in a large number of domains and, in certain cases, it causes seriously negative effects on the performance of learning methods that assume a balanced distribution of classes [15], [25]. Much work has been done in addressing the class imbalance problem [38]. In particular, it has been indicated that learning from imbalanced data sets and learning when costs are unequal and unknown can be handled in a similar manner [22], and cost-sensitive learning is a good solution to the class imbalance problem [38].
+This paper studies methods that have been shown to be effective in addressing the class imbalance problem applied to cost-sensitive neural networks. On one hand, such a study could help identify methods that are effective in training cost-sensitive neural networks; on the other hand, it may give an answer to the question: Considering that cost-sensitive learning methods are useful in learning with imbalanced data sets, are learning methods for the class imbalance problem also helpful in cost-sensitive learning?
+In particular, this paper studies empirically the effect of oversampling, undersampling, and threshold-moving in training cost-sensitive neural networks. Hard-ensemble and soft-en-
+semble, i.e., the combination of oversampling, undersampling, and threshold-moving via hard or soft voting schemes
+. Z.-H. Zhou is with the National Laboratory for Novel Software Technology, Nanjing University, Nanjing 210093, China, and the Shanghai Key Laboratory of Intelligent Information Processing, Fudan University, Shanghai 200433, China. E-mail: zhouzh@lamda.nju.edu.cn. . X.-Y. Liu is with the National Laboratory for Novel Software Technology, Nanjing University, Nanjing 210093, China. E-mail: liuxy@lamda.nju.edu.cn.
+Manuscript received 1 Apr. 2005; accepted 22 July 2005; published online 18 Nov. 2005. For information on obtaining reprints of this article, please send e-mail to: tkde@computer.org, and reference IEEECS Log Number TKDE-0122-0305.
+1041-4347/06/$20.00 2006 IEEE Published by the IEEE Computer Society
+are also tested. It is noteworthy that none of these techniques
+need modify the architecture or training algorithms of the
+neural networks, therefore, they are very easy to use.
+Twenty-one UCI data sets with three types of cost matrices
+and a real-world cost-sensitive data set were used in the
+empirical study. The results suggest that the difficulties of
+different cost matrices are usually different; cost-sensitive
+learning with multiclass tasks is more difficult than with two-
+class tasks and a higher degree of class imbalance may
+increase the difficulty. The empirical study also reveals that
+almost all the techniques are effective on two-class tasks,
+while most are ineffective on multiclass tasks. Concretely,
+sampling methods are only helpful on two-class tasks, while
+often causing a negative effect on data sets with a big number
+of classes; threshold-moving is excellent on two-class tasks,
+which is capable of performing cost-sensitive learning even
+on seriously imbalanced two-class data sets and effective on
+some multiclass tasks; soft-ensemble is effective on both two-
+class and multiclass tasks given that the data set is not
+seriously imbalanced, which is much better than hard-
+ensemble. Overall, the findings of the empirical study
+suggest that threshold-moving and soft-ensemble are rela-
+tively good choices in training cost-sensitive neural net-
+works. Moreover, the empirical study suggests that cost-
+sensitive learning and learning with imbalanced data sets
+might have different characteristics, or some methods such as
+sampling, which have been believed to be effective in
+addressing the class imbalance problem, may in fact only
+be effective on learning with imbalanced two-class data sets. The rest of this paper is organized as follows: Section 2 presents the learning methods studied in this paper. Section 3 reports on the empirical study. Section 4 discusses some observations. Section 5 concludes.
+
+2 LEARNING METHODS
+Suppose there areC classes and the ith class hasNi number of training examples. LetCost½i; c ði; c 2 f1::CgÞdenote the cost of misclassifying an example of the ith class to the cth class (Cost½i; i ¼ 0) and Cost½i ði 2 f1::CgÞ denote the cost of the ith class. Moreover, suppose the classes are ordered such that, for the ith class and the jth class, if i < j, then ðCost½i < Cost½j Þor ðCost½i ¼ Cost½j and Ni NjÞ.Cost½i is usually derived from Cost½i; c . There are many possible rules for the derivation, among which a popular one is Cost½i ¼PC
+c¼1 Cost½i; c [7], [33].
+
+2.1 Oversampling
+Oversampling changes the training data distribution such
+that the costs of the examples are conveyed by the appearance
+of the examples. In other words, this method duplicates
+higher-cost training examples until the appearance of
+different training examples are proportional to their costs. Concretely, the kth class will have N k training examples after resampling, which is computed according to (1):
+N k ¼ Cost½k Cost½ N : ð1Þ
+Here, the -class has the smallest number of training examples to be duplicated, which is identified according to (2):
+¼ arg min j
+Cost½j min c Cost½c Narg min c Cost½c
+Nj : ð2Þ
+If N k > Nk, then ðN k NkÞ number of training examples of the kth class should be resampled, which is accomplished here by random sampling with replacement. The presented oversampling algorithm is summarized in Table 1.
+Note that oversampling is a popular method in addressing the class imbalance problem, which resamples the small class until it contains as many examples as the other class. Although some studies have shown that oversampling is effective in learning with imbalanced data sets [15], [16], [22], it should be noted that oversampling usually increases the training time and may lead to overfitting since it involves making exact copies of examples [8], [13]. Moreover, there are also some studies that have suggested that oversampling is ineffective on the class imbalance problem [13].
+Besides the algorithm shown in Table 1, this paper also studies a recent variant of oversampling, i.e., SMOTE [8]. This algorithm resamples the small class through taking each small class example and introducing synthetic examples along the line segments joining its small class nearest neighbors. For example, assume the amount of oversampling needed is 200 percent, then, for each small class example, two nearest neighbors belonging to the same class are identified and one synthetic example is generated in the direction of each. The synthetic example is generated in the following way: Take the difference between the attribute vector (example) under consideration and its nearest neighbor; multiply this difference by a random number between 0 and 1 and add it to the attribute vector under consideration. Default parameter settings of SMOTE are used in the empirical study. The detailed description of the algorithm can be found in [8].
+
+2.2 Undersampling
+Like oversampling, undersampling also changes the training data distribution such that the costs of the examples are
+explicitly conveyed by the appearances of examples. However, the working style of undersampling opposites that of oversampling in the way that the former tries to decrease the number of inexpensive examples while the latter tries to increase the number of expensive examples.
+Concretely, the kth class will have N k training examples after resampling, which is computed according to (1). Here, the -class has the smallest number of training examples to be eliminated, which is identified according to (3):
+¼ arg max j
+Cost½j max c Cost½c Narg max c Cost½c
+Nj : ð3Þ
+If N k < Nk, then ðNk N k Þ number of training examples of the kth class should be eliminated. Here, a routine similar to that used in [18] is employed, which removes redundant examples at first and then removes borderline examples and examples suffering from the class label noise.
+Redundant examples are the training examples whose part can be taken over by other training examples. Here, they are identified by the 1-NN rule [9]. In detail, some training examples are put into S at first. Then, for a class to be shrank, all its examples outside of S are classified according to 1-NN in S . If the classification is correct, then the example is regarded as being redundant.
+Borderline examples are the examples close to the boundaries between different classes. They are unreliable because even a small amount of attribute noise can send the example to the wrong side of the boundary. The borderline examples and examples suffering from the class label noise can be detected using the concept of Tomek links [34]. The idea could be put as follows: Take two examples, i.e., x and y, such that each belongs to a different class. Let Distðx;yÞ denote the distance between them. Then, the pair ðx;yÞ is called a Tomek link if no example z exists such that Distðx; zÞ < Distðx;yÞ or Distðy; zÞ < Distðy;xÞ. Here, the distance between two examples are computed according to (4), where d is the number of attributes among which the first j attributes are binary or nominal:
+Dist x1;x2ð Þ ¼ ffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiffiXj l¼1 VDM x1l;x2lð Þ þ Xd l¼jþ1 x1l x2lj j2 vuut : ð4Þ
+Let Na;u denote the number of training examples holding value u on attribute a and Na;u;c denote the number of training examples belonging to class c and holding value u on a. Then, VDM [30] is defined according to (5), which is employed in (4) to deal with binary or nominal attributes:
+VDM u; vð Þ ¼ XC c¼1 Na;u;c Na;u Na;v;c Na;v 2 : ð5Þ
+The presented undersampling algorithm is summarized in Table 2.
+Note that undersampling is also a popular method in addressing the class imbalance problem, which eliminates training examples of the oversized class until it matches the size of the other class. Since it discards potentially useful training examples, the performance of the resulting classifier may be degraded. Nevertheless, some studies have
+shown that undersampling is effective in learning with
+imbalanced data sets [15], [16], [22], sometimes even
+stronger than oversampling, especially on large data sets
+[13], [15]. Drummond and Holte [13] suggested under-
+sampling to be a reasonable baseline for algorithmic
+comparison, but they also indicated that undersampling
+introduces nondeterminism into what is otherwise a
+deterministic learning process. With a deterministic learn-
+ing process, any variance in the expected performance is
+largely due to testing on a limited sample, but, for
+undersampling, there is also variance due to the nonde-
+terminism of the undersampling process. Since the choice
+between two classifiers might also depend on the variance,
+using undersampling might be less desirable. However, as
+Elkan indicated [14], sampling can be done either randomly
+or deterministically. While deterministic sampling risks
+introducing bias, it can reduce variance. Thus, under-
+sampling via deterministic strategies, such as the one
+shown in Table 2, can be a baseline for comparison.
+
+2.3 Threshold-Moving
+Threshold-moving moves the output threshold toward
+inexpensive classes such that examples with higher costs
+become harder to be misclassified. This method uses the
+original training set to train a neural network, and the costsensitivity is introduced in the test phase.
+Concretely, let Oi (i 2 f1::Cg) denote the real-value output of different output units of the neural network,PC
+i¼1 Oi ¼ 1 and 0 Oi 1. In standard neural classifiers, the class returned is arg max
+i Oi, while, in threshold-moving,
+the class returned is arg max i O i . O i is computed according to (6), where is a normalization term such that PC
+i¼1 O i ¼
+
+1 and 0 O i 1:
+O i ¼ XC c¼1 OiCost½i; c : ð6Þ
+The presented threshold-moving algorithm is summarized in Table 3, which is similar to the cost-sensitive classification method [19] and the method for modifying the internal classifiers of MetaCost [32].1 It is obvious that threshold-moving is very different from sampling because the latter relies on the manipulation of the training data while the former relies on manipulating the outputs of the classifier.
+Note that threshold-moving has been overlooked for a long time such that it is not as popular as sampling methods in addressing the class imbalance problem. Fortunately, it has recently been recognized that “the bottom line is that when studying problems with imbalanced data, using the classifiers produced by standard machine learning algorithms without adjusting the output threshold may well be a critical mistake” [25]. It has also been declared that trying other methods, such as sampling, without trying simply setting the threshold may be misleading [25]. A recent study has shown that threshold-moving is as effective as sampling methods in addressing the class imbalance problem [22].
+
+2.4 Hard-Ensemble and Soft-Ensemble
+Ensemble learning paradigms train multiple component learners and then combine their predictions. Ensemble techniques can significantly improve the generalization ability of single learners, therefore, ensemble learning has been a hot topic during the past years [10]. Since different
+cost-sensitive learners can be trained with the oversampling, undersampling, and threshold-moving algorithms, it is feasible to combine these learners into an ensemble.
+Two popular strategies are often used in combining component classifiers, that is, combining the crisp classification decisions or the normalized real-value outputs. Previous research on ensemble learning [2] shows that these two strategies can result in different performance, therefore, here, both of them are tried.
+Concretely, in both hard-ensemble and soft-ensemble, every component learner votes for a class and then the class receiving the biggest number of votes is returned. If a tie appears, that is, there are multiple classes receiving the biggest number of votes, then the class with the biggest cost is returned. The only difference between hard-ensemble and soft-ensemble lies in the fact that the former uses binary votes while the latter uses real-value votes. In other words, the crisp classification decisions of the component learners are used in hard-ensemble while the normalized real-value outputs of the component learners are used in softensemble.
+Note that, here, the component learners are generated through applying the oversampling, undersampling and threshold-moving algorithms directly to the training set. But it is evident that other variations such as applying these algorithms to bootstrap samples of the training set can also be used, which may be helpful in building ensembles comprising more component learners. The hard-ensemble and soft-ensemble algorithms are summarized in Table 4.
+
+3 EMPIRICAL STUDY
+3.1 Configuration
+Backpropagation (BP) neural network [28] is used in the empirical study, which is a popular cost blind neural network easy to couple with the methods presented in Section 2. Each network has one hidden layer containing ten units and is trained to 200 epoches. Note that, since the relative instead of absolute performance of the investigated methods are concerned, the architecture and training process of the neural networks have not been finely tuned.
+Twenty-one data sets from the UCI Machine Learning Repository [4] are used in the empirical study, where missing values on continuous attributes are set to the average value while those on binary or nominal attributes are set to the majority value. Information on these data sets is tabulated in Table 5.
+Three types of cost matrices are used along with these UCI data sets. They are defined as follows [33]:
+(a) 1:0 < Cost½i; j 10:0 only for a single value of j ¼ c andCost½i; j 6¼ c ¼ 1:0 for all j 6¼ i;Cost½i ¼ Cost½i; c for j 6¼ c and Cost½c ¼ 1:0. (b) 1:0 Cost½i; j ¼Hi 10:0 for each j 6¼ i;Cost½i ¼Hi: At least one Hi ¼ 1:0. (c) 1:0 Cost½i; j 10:0 for all j 6¼ i;
+Cost½i ¼ XC c¼1 Cost½i; c :
+At least one Cost½i; j ¼ 1:0.
+TABLE 3 The Threshold-Moving Algorithm
+1. It is worth noting that the original MetaCost method [11] does not explicitly manipulate the outputs of the classifier. In fact, the original MetaCost can be regarded as a mixed method which computes the probability estimates on the training data and then manipulates the training data to construct a cost-sensitive classifier.
+Recall that, as explained in Section 2, there are C classes, Cost½i; c ði; c 2 f1::CgÞ denotes the cost of misclassifying an example of the ith class to the cth class (Cost½i; i ¼ 0), and Cost½i ði 2 f1::CgÞ denotes the cost of the ith class. Examples of these cost matrices are shown in Table 6. Note that the unit cost is the minimum misclassification cost and all the costs are integers. Moreover, on two-class data sets, these three types of cost matrices have no difference since all of them become type (c) cost matrices. Therefore, the experimental results on two-class tasks and multiclass tasks will be reported in separate sections.
+Under each type of cost matrix, 10 times 10-fold cross validation are performed on each data set except on waveform, where a randomly generated training data size of 300 and test data size of 5,000 are used in 100 trials, which is the way this data set has been used in some other costsensitive learning studies [33]. In detail, except on waveform, each data set is partitioned into 10 subsets with similar sizes and distributions. Then, the union of nine subsets is used as the training set while the remaining subset is used as the test set. The experiment is repeated 10 times such that every subset is used once as a test set. The average test result is the result of the 10-fold cross validation. The whole process described above is then repeated 10 times with randomly generated cost matrices belonging to the same cost type, and the average results are recorded as the final results, where statistical significance are examined.
+Besides these UCI data sets, a data set with real-world cost information, i.e., the KDD-99 data set [3], is also used in the empirical study. This is a really large data set, which is utilized in the same way as that of Abe et al. [1]. Concretely, the so-called 10 percent training set is used, which consists roughly of 500,000 examples, and is further sampled down by random sampling 40 percent of them to get the data set of size 197,605 which is used in this study. Information on this data set is shown in Table 7. In each experiment, two thirds of the examples in this data set are randomly selected for training while the remaining one third is selected for testing. The experiment is repeated 10 times with different training-test partition and the average result is recorded. Since this is a multiclass data set, the experimental results will be reported in the section devoted to multiclass tasks.
+
+3.2 Two-Class Tasks
+As shown in Table 5, there are twelve two-class data sets. The detailed 10 times 10-fold cross validation results on them are shown in Table 8.
+To compare the robustness of these methods, that is, how well the particular method performs in different situations, a criterion is defined similar to the one used in [36]. In detail, the relative performance of algorithm on a particular data set is expressed by dividing its average cost cost by the biggest average cost among all the compared methods, as shown in (7):
+r ¼ cost
+max i costi
+: ð7Þ
+The worst algorithm on that data set has r ¼ 1 and all the other methods have r 1. The smaller the value of r , the better the performance of the method. Thus, the sum of r over all data sets provides a good indication of the robustness of the method . The smaller the value of the sum, the better the robustness of the method. The distribution of r of each compared method over the experimental data sets is shown in Fig. 1. For each method, the 12 values of r are stacked for the ease of comparison.
+Table 8 reveals that, on two-class tasks, all the investigated methods are effective in cost-sensitive learning because the misclassification costs of all of them are apparently less than that of sole BP. This is also confirmed by Fig. 1 where the robustness of BP is the biggest, that is,
+TABLE 4 The Hard-Ensemble and Soft-Ensemble Algorithms
+the worst. Table 8 and Fig. 1 also disclose that the performance of SMOTE is better than that of undersampling but worse than that of oversampling. Moreover, the performance of oversampling, undersampling, and SMOTE are worse than that of threshold-moving and ensemble methods, while the performance of threshold-moving is comparable to that of the ensemble methods. It is noteworthy that, on two seriously imbalanced data sets, i.e., enthyroid and hypothyroid, only threshold-moving is effective, while all the other methods except soft-ensemble on enthyroid cause a negative effect.
+When dealing with two-class tasks, some powerful tools
+such as ROC curve [26] or cost curve [12] can be used to
+measure the learning performance. Note that ROC and cost
+curves are dual representations that can be easily converted
+into each other [12]. Here, cost curve is used since it
+explicitly shows the misclassification costs. The x-axis of a
+cost curve is the probability-cost function for positive examples, defined as (8), where pðþÞ is the probability of a given example belonging to the positive class, Cost½þ; is the cost incurred if a positive example is misclassified to a negative class, and pð Þ and Cost½ ;þ are defined similarly. The y-axis is the expected cost normalized with
+respect to the cost incurred when every example is
+incorrectly classified. Thus, the area under a cost curve is
+the expected cost, assuming a uniform distribution on the
+probability-cost. The difference in area under two curves
+gives the expected advantage of using one classifier over
+another. In other words, the lower the cost curve, the better
+the corresponding classifier.
+PCF ðþÞ ¼ pðþÞCost½þ; pðþÞCost½þ; þ pð ÞCost½ ;þ : ð8Þ
+The cost curves on the two-class data sets are shown in
+Fig. 2. On each figure, the curves corresponding to BP,
+oversampling, undersampling, threshold-moving, hard-en-
+semble, soft-ensemble, and SMOTE are depicted. Moreover, the triangular region defined by the points ð0; 0Þ, ð0:5; 0:5Þ, and ð1; 0Þ, i.e., the effective range, is outlined, inside of which useful nontrivial classifiers can be identified [12]. Note that,
+in order to obtain these curves, experiments with different
+cost-ratios have been performed besides these reported in
+Table 8.
+TABLE 5 UCI Data Sets Used in the Empirical Study
+(B: Binary, N: Nominal, C: Continuous)
+Fig. 2 exhibits that, on echocardiogram, undersampling is slightly worse than the other methods in the effective range, while SMOTE is very poor when PCF ðþÞ is smaller than 0.3. On hepatitis, the ensemble methods are significantly better than the other methods in the effective range, undersampling is very bad when PCF ðþÞ is smaller than 0.4, and oversampling, threshold-moving, and ensemble methods are poor when PCF ðþÞ is bigger than 0.85. On euthyroid, threshold-moving is the best, undersampling is the worst in the effective range, and the ensemble methods become poor when PCF ðþÞ is bigger than 0.8. On the remaining nine data sets, all the methods work well. On heart_s, the ensemble methods are slightly better than others. On heart, the ensemble methods are apparently better than oversampling, undersampling, and thresholdmoving. On horse, threshold-moving and the ensemble methods are better than the other methods. On credit, undersampling and SMOTE are apparently worse than others. On breast-w, undersampling is slightly worse than the other methods. On diabetes, threshold-moving is the best while undersampling is the worst. On german, the ensemble methods are better than others. On hypothyroid, thresholdmoving and oversampling are better than the other methods while undersampling is the worst. On coding, the ensemble methods are slightly better, while SMOTE is slightly worse than others. Totally, Fig. 2 reveals that all the cost-sensitive learning methods are effective on two-class tasks because, on all the data sets, the cost curves have a large portion or even almost fully appear in the effective range. Moreover, it discloses that the ensemble methods and threshold-moving are often better, while undersampling is often worse than the other methods.
+In summary, the observations reported in this section
+suggest that, on two-class tasks:
+1. Cost-sensitive learning is relatively easy because all methods are effective. 2. A higher degree of class imbalance may increase the difficulty of cost-sensitive learning. 3. Although the sampling methods and SMOTE are effective, they are not so good as threshold-moving and ensemble methods. 4. Threshold-moving is a good choice which is effective on all the data sets and can perform cost-sensitive learning even with seriously imbalanced data sets. 5. Soft-ensemble is also a good choice which is effective on most data sets and rarely cause negative effect.
+
+3.3 Multiclass Tasks
+As shown in Table 5, there are nine multiclass UCI data sets. The detailed 10 times 10-fold cross validation results on them with types (a) to (c) cost matrices are shown in Tables 9, 10, and 11, respectively. The comparison on the robustness of different methods are shown in Figs. 3, 4, and 5, respectively.
+Table 9 shows that on multiclass UCI data sets with a type (a) cost matrix, the performance of oversampling, threshold-moving, and ensemble methods are apparently better than that of sole BP, while the performance of undersampling and SMOTE are worse than that of sole BP. Fig. 3 shows that soft-ensemble plays the best, while the robustness of undersampling is apparently worse than that of sole BP. Table 9 and Fig. 3 also show that thresholdmoving and soft-ensemble are effective on all data sets and hard-ensemble causes negative effect on soybean, which is with the biggest number of classes and suffering from serious class imbalance. It is noteworthy that the sampling methods and SMOTE cause a negative effect on several data sets suffering from class imbalance, that is, glass, soybean, and annealing.
+Table 10 shows that, on multiclass UCI data sets with type (b) cost matrix, the performance of threshold-moving and ensemble methods are apparently better than that of sole BP, while the performance of sampling methods and SMOTE are worse than that of sole BP. Fig. 4 shows that soft-ensemble plays the best, while the robustness of undersampling is apparently worse than that of sole BP. Table 10 and Fig. 4 also show that threshold-moving is always effective and softensemble only causes negative effect on the most seriously imbalanced data set annealing. SMOTE and hard-ensemble cause a negative effect on soybean and annealing. It is noteworthy that the sampling methods cause a negative effect on almost all data sets suffering from class imbalance, that is, lymphography, glass, soybean, and annealing. It can be found from comparing Tables 9 and 10 that all the methods degrade when a type (a) cost matrix is replaced with a type (b) cost matrix, which suggests that the type (b) cost matrix is more difficult to learn than the type (a) cost matrix.
+Table 11 shows that, on multiclass UCI data sets with a type (c) cost matrix, the performance of threshold-moving and soft-ensemble are better than that of sole BP, while the performance of the remaining methods are worse than that of sole BP. In particular, the average misclassification costs of undersampling and SMOTE are even about 2.4 and 1.9 times of that of sole BP, respectively. Fig. 5 confirms that soft-ensemble plays the best, while the sampling methods
+and SMOTE are worse than sole BP. Table 11 and Fig. 5 also
+show that soft-ensemble only causes a negative effect on
+glass and the most seriously imbalanced data set annealing,
+while hard-ensemble causes a negative effect on one more
+data set, i.e., soybean. Threshold-moving does not cause a
+negative effect on glass, but it causes a negative effect on
+lymphography and vowel. The sampling methods and SMOTE
+cause a negative effect on more than half of the data sets. It
+is noteworthy that neither method is effective on the most
+seriously imbalanced data set annealing. Comparing
+Tables 9, 10, and 11, it can be found that the performance
+of all the methods degrade much more when a type (b) cost
+matrix is taken over by a type (c) matrix than when a
+type (a) cost matrix is taken over by a type (b) cost matrix,
+which suggests that the type (c) cost matrix may be more
+difficult to learn than the type (b) cost matrix, and the gap
+between the type (b) and (c) cost matrices may be bigger
+than that between the type (a) and (b) cost matrices.
+TABLE 8 Experimental Results on Two-Class Data Sets
+The table entries present the real results of BP or the ratio of other methods against that of BP. The values following “ ” are standard deviations.
+Table 12 presents the experimental results on the KDD-99 data set. It can be found that the performance of threshold-moving is better than that of sole BP, while the performance of the ensemble methods and oversampling are worse than that of sole BP. However, pairwise twotailed t-tests with .05 significance level indicate that these differences are without statistical significance. On the other hand, the performance of undersampling and SMOTE are apparently worse than that of sole BP. In other words, none of the studied cost-sensitive learning methods is effective on this data set, but oversampling, threshold-moving, and the ensemble methods do not cause a negative effect, while undersampling and SMOTE cause negative effect. The poor performance of undersampling is not difficult to be expected because on the KDD-99 data set, the classes are seriously imbalanced,
+therefore, undersampling has removed so many big class examples that the learning process has been seriously weakened. Maybe SMOTE causes a negative effect because the serious imbalanced class distribution has hampered the generation of synthetic examples. In other words, some synthetic examples generated on the line segments connecting the small class examples may be misleading since the small class examples are surrounded by a large number of big class examples. The poor performance of undersampling may also causes the ineffectiveness of the ensemble methods. Nevertheless, it is noteworthy that threshold-moving and the ensemble methods have not caused a negative effect on this seriously imbalanced data set.
+In summary, the observations reported in this section suggest that, on multiclass tasks:
+1. Cost-sensitive learning is relatively more difficult than on two-class tasks.
+2. A higher degree of class imbalance may increase the
+difficulty of cost-sensitive learning. 3. The sampling methods and SMOTE are usually
+ineffective and often cause negative effect, especially
+on data sets with a big number of classes. 4. Threshold-moving is a good choice which causes
+relatively fewer negative effects and may be effective
+on some data sets. 5. Soft-ensemble is also a good choice, which is almost
+always effective but may cause a negative effect on some seriously imbalanced data sets.
+
+4 DISCUSSION
+The empirical study presented in Section 3 reveals that cost-
+sensitive learning is relatively easy on two-class tasks while
+hard on multiclass tasks. This is not difficult to understand
+because an example can be misclassified in more ways in
+TABLE 9 Experimental Results on Multiclass UCI Data Sets with a Type (a) Cost Matrix
+The table entries present the real results of BP or the ratio of other methods against that of BP. The values following “ ” are standard deviations.
+multiclass tasks than it might be in two-class tasks, which
+means the multiclass cost function structure can be more
+complex to be incorporated in any learning algorithms.
+Unfortunately, previous research on cost-sensitive learning
+rarely pays attention to the differences between multiclass
+and two-class tasks.
+Almost at the same time as this paper was written, Abe
+et al. [1] proposed an algorithm for solving multiclass cost-
+sensitive learning problems. This algorithm seems inspired
+by an earlier work of Zadrozny and Elkan [39], where every
+example is associated with an estimated cost. Since, in
+multiclass tasks, such a cost is not directly available, the
+iterative weighting and data space expansion mechanisms are
+employed to estimate, for each possible example, an optimal
+cost (or weight). These mechanisms are then unified in the
+GBSE (Gradient Boosting with Stochastic Ensembles) frame-
+work to use. Note that both the GBSE and our soft-ensemble
+method exploit ensemble learning, but the purpose of the
+former is to make the iterative weighting process feasible
+while the latter is to combine the goodness of different
+learning methods. GBSE and soft-ensemble have achieved
+some success, nevertheless, investigating the nature of
+multiclass cost-sensitive learning and designing powerful
+learning methods remain important open problems.
+Note that multiclass problems can be converted into a
+series of binary classification problems, and methods
+effective in two-class cost-sensitive learning can be used
+after the conversion. However, this approach might be
+troublesome when there are many classes and a user
+usually favors a more direct solution. This is just like that
+although multiclass classification can be addressed by
+traditional support vector machines via pairwise coupling,
+researchers still attempt to design multiclass support vector
+machines. Nevertheless, it will be an interesting future issue
+TABLE 10 Experimental Results on Multiclass Data Sets with a Type (b) Cost Matrix
+The table entries present the real results of BP or the ratio of other methods against that of BP. The values following “ ” are standard deviations.
+to compare the effect of doing multiclass cost-sensitive
+learning directly and the effect of decoupling multiclass
+problems and then doing two-class cost-sensitive learning.
+We found that, although oversampling, undersampling,
+and SMOTE are known to be effective in addressing the class
+imbalance problem, they are helpless in cost-sensitive
+TABLE 11 Experimental Results on Multiclass UCI Data Sets with a Type (c) Cost Matrix
+The table entries present the real results of BP or the ratio of other methods against that of BP. The values following “ ” are standard deviations.
+learning on multiclass tasks. This may suggest that cost-
+sensitive learning and learning with imbalanced data sets
+might have different characteristics. But it should be noted
+that, although many researchers believed that their conclu-
+sions drawn on imbalanced two-class data sets could be
+applied to multiclass problems [15], in fact, little work has
+been devoted to the study of imbalanced multiclass data
+sets. So, there is a big chance that some methods which have
+been believed to be effective in addressing the class
+imbalance problem may indeed be only effective on two-
+class tasks, if the claim “learning from imbalanced data sets and
+learning when costs are unequal and unknown can be handled in a
+similar manner” [22] is correct. Whatever the truth is,
+investigating the class imbalance problem on multiclass
+tasks is an urgently important issue for future work, which
+may set the groundwork for developing effective methods
+in addressing the class imbalance problem and costsensitive learning simultaneously.
+It is interesting that, although sampling methods are ineffective in multiclass cost-sensitive learning, ensemble methods utilizing sampling can be effective, sometimes even more effective than threshold-moving. It is wellknown that the component learners constituting a good ensemble should be with high diversity as well as high accuracy. In order to explore whether the learners generated by oversampling, undersampling, and thresholdmoving are diverse or not, the Qav statistic recommended by Kuncheva and Whitaker [20] is exploited. The formal definition of Qav is shown in (9), where L is the number of component learners, Qi;k is defined as (10), and N
+ab is the number of examples that have been classified to class a by the ith component learner while classified to class b by the kth component learner. The smaller the value of Qav, the bigger the diversity.
+Qav ¼ 2 L L 1ð Þ XL 1 i¼1 XL k¼iþ1 Qi;k ð9Þ
+Qi;k ¼ N11N00 N01N10 N11N00 þN01N10 : ð10Þ
+Table 13 shows the average Qav values of the learners generated by oversampling, undersampling, and thresholdmoving, while the performance of these learners have been presented in Tables 8, 9, 10, 11, and 12.
+Table 13 shows that the Qav values on multiclass tasks are apparently smaller than these on two-class tasks, which
+TABLE 12 Experimental Results on KDD-99
+The table entries present the real results of BP and the studied cost-sensitive learning methods. The values following “ ” are standard deviations.
+implies that the learners generated by oversampling, undersampling, and threshold-moving on multiclass tasks are more diverse than these generated on two-class tasks. Therefore, the merits of the component learners can be exerted better on multiclass tasks than on two-class tasks by the ensemble methods. Note that, on KDD-99, the Qav value is quite small, but, as it has been reported in Table 12, the performance of the ensemble methods are not very good. This is because, although the learners generated by oversampling, undersampling, and threshold-moving are diverse, the individual performance, especially undersampling, is quite poor. It is obvious that, in order to obtain bigger profit from the ensemble methods, effective mechanisms for encouraging the diversity among the component cost-sensitive learners as well as preserving good individual performance should be designed, which is an interesting issue for future work.
+
+5 CONCLUSION
+In this paper, the effect of oversampling, undersampling, threshold-moving, hard-ensemble, soft-ensemble, and SMOTE in training cost-sensitive neural networks are studied empirically on 21 UCI data sets with three types of cost matrices and a real-world cost-sensitive data set. The results suggest that cost-sensitive learning is relatively easy on two-class tasks while it is difficult on multiclass tasks, a higher degree of class imbalance usually results in higher difficulty in cost-sensitive learning, and different types of cost matrices are usually with different difficulties. Both threshold-moving and soft-ensemble are found to be relatively good choices in training cost-sensitive neural networks. The former is a conservative method which rarely causes negative effect, while the latter is an aggressive method which might cause negative effect on seriously imbalanced data sets but its absolute performance is usually better than that of threshold-moving when it is effective. Note that threshold-moving is easier to use than softensemble because the latter requires more computational cost and involves the employment of sampling methods.
+The ensembles studied in this paper contain only three component learners. This setting is sufficient for exploring whether or not the combination of sampling and threshold-moving can work, but more benefits should be anticipated from ensemble learning. Specifically, although previous research has shown that using three learners to make an ensemble is already beneficial [27], it is expected that the performance can be improved if more learners are included. A possible extension of current work is to employ each of oversampling, undersampling, and thresholdmoving to train multiple neural networks, such as applying these algorithms on different bootstrap samples of the training set, while another possible extension is to exploit more methods, each producing one cost-sensitive neural network. Both are interesting to try in future work.
+Section 4 has raised several future issues. Additionally, in most studies on cost-sensitive learning, the cost matrices are usually fixed, while, in some real tasks, the costs might change due to many reasons. Designing effective methods for cost-sensitive learning with variable cost matrices is an interesting issue to be explored in the future.
+
+ACKNOWLEDGMENTS
+The authors wish to thank the anonymous reviewers and the associate editor for their constructive comments and suggestions. This work was supported by the National Science Fund for Distinguished Young Scholars of China under Grant No. 60325207, the Jiangsu Science Foundation Key Project under Grant No. BK2004001, and the National 973 Fundamental Research Program of China under Grant No. 2002CB312002.
+
+References
+[1]N. Abe,B. Zadrozny,J. LangfordAn Iterative Method for Multiclass Cost-Sensitive LearningProc. 10th ACM SIGKDD Int’l Conf. Knowledge Discovery and Data Mining, pp. 3-11, 2004.2004
+[2]E. Bauer,R. KohaviAn Empirical Comparison of Voting Classification Algorithms: Bagging, Boosting, and VariantsMachine Learning, vol. 36, nos. 1-2, pp. 102-139, 1999.1999
+[3]S.D. BayUCI KDD ArchiveDept. of Information and Computer Science, Univ. of California, Irvine, 2000, http://kdd.ics.uci.edu/.2000
+[4]C. Blake,E. Keogh,C.J. MerzUCI Repository of Machine Learning DatabasesDept. of Information and Computer Science, Univ. of California, Irvine, 1998, http://www.ics.uci.edu/ ~mlearn/MLRepository.html.1998
+[5]J.P. Bradford,C. Kuntz,R. Kohavi,C. Brunk,C.E. BrodleyPruning Decision Trees with Misclassification CostsProc. 10th European Conf. Machine Learning, pp. 131-136, 1998.1998
+[6]U. Brefeld,P. Geibel,F. WysotzkiSupport Vector Machines with Example Dependent CostsProc. 14th European Conf. Machine Learning, pp. 23-34, 2003.2003
+[7]N.V. Chawla,K.W. Bowyer,L.O. Hall,W.P. KegelmeyerSMOTE: Synthetic Minority Over-Sampling TechniqueJ. Artificial Intelligence Research, vol. 16, pp. 321-357, 2002.2002
+[8]B.V. DasarathyNearest Neighbor Norms: NN Pattern Classification TechniquesLos Alamitos, Calif.: IEEE CS Press,1991
+[9]T.G. DietterichEnsemble LearningThe Handbook of Brain Theory and Neural Networks, second ed., M.A. Arbib, ed., Cambridge, Mass.: MIT Press, 2002.2002
+[10]P. DomingosMetaCost: A General Method for Making Classifiers Cost-SensitiveProc. Fifth ACM SIGKDD Int’l Conf. Knowledge Discovery and Data Mining, pp. 155-164, 1999.1999
+[11]C. Drummond,R.C. HolteExplicitly Representing Expected Cost: An Alternative to ROC RepresentationProc. ACM SIGKDD Int’l Conf. Knowledge Discovery and Data Mining, pp. 198-207, 2000.2000
+[12]C. Drummond,R.C. HolteC4.5, Class Imbalance, and Cost Sensitivity: Why Under-Sampling Beats Over-SamplingWorking Notes of the ICML’03 Workshop Learning from Imbalanced Data Sets, 2003.2003
+[13]C. ElkanThe Foundations of Cost-Sensitive LearningProc. 17th Int’l Joint Conf. Artificial Intelligence, pp. 973-978, 2001.2001
+[14]N. JapkowiczLearning from Imbalanced Data Sets: A Comparison of Various StrategiesWorking Notes of the AAAI’00 Workshop Learning from Imbalanced Data Sets, pp. 10-15, 2000.2000
+[15]N. Japkowicz,S. StephenThe Class Imbalance Problem: A Systematic StudyIntelligent Data Analysis, vol. 6, no. 5, pp. 429- 450, 2002.2002
+[16]U. Knoll,G. Nakhaeizadeh,B. TausendCost-Sensitive Pruning of Decision TreesProc. Eighth European Conf. Machine Learning, pp. 383-386, 1994.1994
+[17]M. Kubat,S. MatwinAddressing the Curse of Imbalanced Training Sets: One-Sided SelectionProc. 14th Int’l Conf. Machine Learning, pp. 179-186, 1997.1997
+[18]M. Kukar,I. KononenkoCost-Sensitive Learning with Neural NetworksProc. 13th European Conf. Artificial Intelligence, pp. 445-449, 1998.1998
+[19]L.I. Kuncheva,C.J. WhitakerMeasures of Diversity in Classifier EnsemblesMachine Learning, vol. 51, no. 2, pp. 181-207, 2003.2003
+[20]S. Lawrence,I. Burns,A. Back,A.C. Tsoi,C.L. GilesNeural Network Classification and Prior Class ProbabilitiesLecture Notes in Computer Science 1524, G.B. Orr and K.-R. Müller, eds., pp. 299-313, Berlin: Springer, 1998. 76 IEEE TRANSACTIONS ON KNOWLEDGE AND DATA ENGINEERING, VOL. 18, NO. 1, JANUARY 20061998
+[21]M.A. MaloofLearning When Data Sets are Imbalanced and When Costs Are Unequal and UnknownProc. Working Notes ICML’03 Workshop Learning from Imbalanced Data Sets, 2003.2003
+[22]D.D. Margineantu,T.G. DietterichBootstrap Methods for the Cost-Sensitive Evaluation of ClassifiersProc. 17th Int’l Conf. Machine Learning, pp. 583-590, 2000.2000
+[23]M. Pazzani,C. Merz,P. Murphy,K. Ali,T. Hume,C. BrunkReducing Misclassification CostsProc. 11th Int’l Conf. Machine Learning, pp. 217-225, 1994.1994
+[24]F. ProvostMachine Learning from Imbalanced Data Sets 101Working Notes AAAI’00 Workshop Learning from Imbalanced Data Sets, pp. 1-3, 2000.2000
+[25]F. Provost,T. FawcettAnalysis and Visualization of Classifier Performance: Comparison Under Imprecise Class and Cost DistributionsProc. Third ACM SIGKDD Int’l Conf. Knowledge Discovery and Data Mining, pp. 43-48, 1997.1997
+[26]J.R. QuinlanMiniBoosting Decision Treeshttp://www.cse. unsw.edu.au/~quinlan/miniboost.ps, 1998.1998
+[27]D.E. Rumelhart,G.E. Hinton,R.J. WilliamsLearning Internal Representations by Error PropagationParallel Distributed Processing: Explorations in The Microstructure of Cognition, D.E. Rumelhart and J.L. McClelland, eds., vol. 1, pp. 318-362, Cambridge, Mass.: MIT Press, 1986.1986
+[28]C. Stanfill,D. WaltzToward Memory-Based ReasoningComm. ACM, vol. 29, no. 12, pp. 1213-1228, 1986.1986
+[29]K.M. TingA Comparative Study of Cost-Sensitive Boosting AlgorithmsProc. 17th Int’l Conf. Machine Learning, pp. 983-990, 2000.2000
+[30]K.M. TingAn Empirical Study of MetaCost Using Boosting AlgorithmProc. 11th European Conf. Machine Learning, pp. 413- 425, 2000.2000
+[31]K.M. TingAn Instance-Weighting Method to Induce Cost- Sensitive TreesIEEE Trans. Knowledge and Data Eng., vol. 14, no. 3, pp. 659-665, Apr./May 2002.2002
+[32]I. TomekTwo Modifications of CNNIEEE Trans. Systems, Man, and Cybernetics, vol. 6, no. 6, pp. 769-772, 1976.1976
+[33]P.D. TurneyCost-Sensitive Classification: Empirical Evaluation of a Hybrid Genetic Decision Tree Induction AlgorithmJ. Artificial Intelligence Research, vol. 2, pp. 369-409, 1995.1995
+[34]M. Vlachos,C. Domeniconi,D. Gunopulos,G. Kollios,N. KoudasNon-Linear Dimensionality Reduction Techniques for Classification and VisualizationProc. Eighth ACM SIGKDD Int’l Conf. Knowledge Discovery and Data Mining, pp. 645-651, 2002.2002
+[35]G.I. WebbCost-Sensitive SpecializationProc. Fourth Pacific Rim Int’l Conf. Artificial Intelligence, pp. 23-34, 1996.1996
+[36]G.M. WeissMining with Rarity—Problems and Solutions: A Unifying FrameworkSIGKDD Explorations, vol. 6, no. 1, pp. 7-19, 2004.2004

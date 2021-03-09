@@ -1,0 +1,88 @@
+Glove-Based Approach to Online Signature Verification
+Nidal S. Kamel
+
+
+Abstract
+Utilizing the multiple degrees of freedom offered by the data glove for each finger and the hand, a novel online signature verification system using the Singular Value Decomposition (SVD) numerical tool for signature classification and verification is presented. The proposed technique is based on the Singular Value Decomposition in finding r singular vectors sensing the maximal energy of glove data matrixA, called principal subspace, so the effective dimensionality ofA can be reduced. Having modeled the data glove signature through its r-principal subspace, signature authentication is performed by finding the angles between the different subspaces. A demonstration of the data glove is presented as an effective highbandwidth data entry device for signature verification. This SVD-based signature verification technique is tested and its performance is shown to be able to produce Equal Error Rate (EER) of less than 2.37 percent.
+
+1 INTRODUCTION
+SIGNATURE verification can be split into two categories: Static or offline: In this mode, users write their signature on paper, digitize it through an optical scanner or comer, and a biometric system recognizes the signature by analyzing its shape. Dynamic or online: In this mode, users write their signature on a digitizing tablet, smart pen, or pen tablet. Considering the highest security levels required by the online systems (dynamic), most of the efforts of the researchers in this field address this group.
+The design of a dynamic signature verification system initially involves the following four aspects:
+1. data acquisition and preprocessing (input device), 2. feature extraction, 3. matching (classification), and 4. decision making.
+Fig. 1 shows the general online signature verification process. Although successful in resisting attempts by imposters, the Dynamic Signature Verification (DSV) system still faces serious challenges for various reasons. The large variation in the execution speed of various phases of a signature is one such reason. Another reason is the quality and positions of the physical properties describing the signature themselves. Other factors affecting the difficulty of DSV are the emotional state of the signing person and the accuracy of the input device used. For successful implementation,
+This paper is organized as follows: Section 2 describes the details of the proposed SVD-based signature verification technique. Section 3 shows experimental results including the selection of the system parameters and a comparison with other online techniques. Section 4 concludes the paper.
+For clarity, an attempt has been made to adhere to a standard notational convention. Lower case boldface characters will generally refer to vectors. Upper case BOLDFACE characters will generally refer to matrices. Vector or matrix transposition will be denoted using ð:ÞT. Rn denotes the real vector space ofndimensions.
+
+2 THE SVD-BASED DATA GLOVE SIGNATURE VERIFICATION SYSTEM
+Data glove [1] is a new dimension in the field of virtual reality environments, initially designed to satisfy the stringent requirements of modern motion capture and animation professionals. It offers comfort, ease of use, a small form factor, and multiple application drivers. The high data quality, low cross-correlation, and high data rate make it ideal for online signature verification systems. The dynamic features of the data glove provide information on:
+1. Patterns distinctive to an individuals’ signature and hand size. 2. Time elapsed during the signature process. 3. Hand trajectory dependent rolling.
+Thus, while most input devices offer few degrees of freedom, the data glove is unique in offering multiple degrees of freedom in that it provides data on both the dynamics of the pen motion during the signature and the individual’s hand shape. Fig. 2 shows the 5DT Data Glove 14 Ultra with the location of the sensors [1].
+In the next section, we describe the proposed approach for the data glove input device. The approach is based on the singular value decomposition (SVD) in reducing the dimensionality of the data glove output matrix, and extracting a number of unique features (Modeling) for signature classification (matching).
+2.1 The r-principal Subspace for Features Extraction
+In signature verification and other signal processing applications, vector sequences are measured or computed. Such a situation arises whenever multivariable signals are measured in time and at fixed locations. For the analysis of such data sequences, a wide variety of multivariate analysis tools are available. The underlying theme of much multivariate analysis is simplification and explanation of the observed phenomena.
+Consider a data glove with m sensors each of which generates n samples per signature, producing an output data matrix, Aðm nÞ. Usually n m, wherem denotes the number of measured channels while n denotes the number of measurements. It has been found in many signal processing applications and control systems that the singular value decomposition of matrix formed from observed data can be used to improve methods of signal parameter estimation and system identification. In this section, we extend the implementation of SVD and the principal components of data matrix A towards signature verification systems.
+Principal component analysis, originating in work by Karl Pearson around the turn of the last century and further developed in 1930s by Harold Hoteling, consist of finding an orthogonal transformation of the original-stochastic-variables to a new set of uncorrelated variables, which are derived in nonincreasing order of importance. These so-called principal components are linear
+. N.S. Kamel and G.A. Ellis are with the Electrical and Electronics Engineering Department, Technical University of Petronas, Bandar Seri Iskandar, 31750, Tronoh, Perak, Malaysia. E-mail: {nidalkamel, grant_ellis}@petronas.com.my. . S. Sayeed is with the Faculty of Information Science and Technology, Multimedia University, Jalan Ayer Keroh Lama, 75450 Melaka, Malaysia. E-mail: shohel.sayeed@mmu.edu.my.
+Manuscript received 10 Oct. 2007; accepted 9 Jan. 2008; published online 30 Jan. 2008. Recommended for acceptance by L. O’Gorman. For information on obtaining reprints of this article, please send e-mail to: tpami@computer.org, and reference IEEECS Log Number TPAMI-2007-10-0693. Digital Object Identifier no. 10.1109/TPAMI.2008.32.
+0162-8828/08/$25.00 2008 IEEE Published by the IEEE Computer Society
+combination of the original variables such that its first few components will account for most of the variation in the original data so the effective dimensionality of the data can be reduced [2]. Since, the concept of oriented energy is closely related to principal components analysis, we start our work using this definition.
+
+2.1.1 Oriented Energy
+The column vectors of an m n matrix A are considered to form an indexed set of m vectors, denoted by fakg, k ¼ 1; 2; . . . ; n. An mdimensional vector q and the direction it represents in a vector space are used as synonyms.
+Definition 1. Energy of a vector sequence.
+Consider a sequence of m-vectors fakg, k ¼ 1; 2; . . . ; n and associated real m n matrix A. Its total energy E½A is defined via Frobenius norm of the m n matrix A
+E½A ¼ Ak k2F¼ Xm
+i¼1
+Xn j¼1 a2ij: ð1Þ
+Definition 2. Oriented energy.
+Let A be a m n matrix and denote its n column vectors as ak, k ¼ 1; 2; . . . ; n. For the indexed vector set fakg of m-vectors fakg 2 Rm and for any unit vector q 2 Rm the energy Eq measured in direction q , is defined as
+Eq ½A ¼ Xn
+k¼1 qT ak 2 : ð2Þ
+More generally, the energy EQ measured in a subspace Q Rm, is defined as
+EQ½A ¼ Xn
+k¼1 PQðakÞ 2; ð3Þ
+where PQðakÞ denotes the orthogonal projection of fakg into the subspace Q and k:k denotes the euclidean norm. In other words, the oriented energy of a vector sequence fakg, measured in the direction q (subspace Q) is the energy of the signal, projected orthogonally on to the vector q (subspace Q).
+
+2.1.2 The Oriented Energy Concept and the SVD
+In Section 2.1.1, attention was given to the basic concepts of the oriented energy distribution. In this section, the tools which allow numerical characterization of the oriented energy concept will be studied.
+The singular value decomposition (SVD). The SVD for real matrices is based upon the following theorem [2], [3], [4]:
+Theorem 1. For any realm nmatrixA, there exists a real factorization
+A ¼ U m m S m n V T n n ð4Þ
+in which the matrices U and V are real orthonormal, and matrix S is real pseudodiagonal with nonnegative diagonal elements.
+The diagonal entries i of S are called the singular values of the matrixA. It is assumed that they are sorted in nonincreasing order of magnitude. The set of singular values f ig is called the singular spectrum of matrix A. The columns ui and vi of U and V are called, respectively, the left and right singular vectors of matrix A. The
+space SrU ¼ span ½u1; u2; . . . ; ur is called the rth left principal subspace. In a similar way, the rth right singular subspace is defined.
+Proofs of the above classical existence and uniqueness theorems are found in [2].
+Lemma 1. The number of non zero singular values, equals the algebraic rank of the matrix A.
+Lemma 2. Via the SVD, any matrix A can be written as the sum of r ¼ rankðAÞ rank-one matrices
+A ¼ Xr
+i¼1 ui i vTi ; ð5Þ
+where ðui; i;; viÞ is the ith singular triplet of matrix A. Lemma 3. Frobenius norm of m n matrix A of rank r
+Ak k2F¼ Xm
+i¼1
+Xn j¼1 a2ij ¼ Xr k¼1 2k; ð6Þ
+where k are the singular values of A. The total energy in a vector sequence fakg associated with matrix A as defined in Definition 1, is equal to the energy in the singular spectrum.
+The smallest nonzero singular value corresponds to the distance in Frobenius norm, of the matrix to the closest matrix of lower rank. This property makes SVD attractive for approximation and data reduction purposes.
+Conceptual relations between SVD and oriented energy. We are now in the position to establish the link between the singular value decomposition and the concept of oriented energy distribution.
+Define the unit ball UB in Rm as UB ¼ q 2 RM qk k2¼ 1 .
+Theorem 2. Consider a sequence of m-vectors fakg, k ¼ 1; 2; . . . ; n and the associated m n matrix A with SVD as defined in (4) with n m. Then,
+Eui ½A ¼ 2i ð7Þ
+8q 2 UB: if q ¼ Pm
+i¼1 i ui, then
+Eq ½A ¼ Xm
+i¼1 2i 2i : ð8Þ
+Proof. Trivial from Theorem 1. tu The oriented energy measured in the direction of the ith left singular vector of the matrix A, is equal to the ith singular value squared. The energy in an arbitrary direction q is the linear combination of “orthogonal” oriented energies associated with the left singular vectors. If the matrix A is rank deficient, then there exist directions in Rm that contain no energy at all.
+With the aid of Theorem 2, one can easily obtain, using the SVD, the directions and spaces of extremal energy, as follows:
+Corollary 1. Under the assumptions of Theorem 2:
+1: maxq2UB Eq ½A ¼ Eu1 ½A ¼ 21; ð9Þ 2: minq2UB Eq ½A ¼ Eum ½A ¼ 2m; ð10Þ
+3: maxQr Rm EQr ½A ¼ ESr U ½A ¼
+Xr i¼1 2i ; ð11Þ
+4: minQr Rm EQr ½A ¼ E Sm r Uð Þ
+? ½A ¼ Xm
+i¼m rþ1 2i ; ð12Þ
+where “max” and “min” denote operators, maximizing or minimizing overall r-dimensional subspaces Qr of the space Rm. SrU is the r-dimensional principal subspace of matrix A while Sm rU ? denotes the r-dimensional orthogonal complement of Sm rU .
+Proof. Property (9), (10), (11), and (12) follow immediately from the SVD Theorem 1 and from Theorem 2. tu In other words, (9) and (10) relate the SVD to the minima and maxima of the oriented energy distribution. In fact, it can be shown that extrema occur at each left singular direction.
+The rth principal subspace SrU is, among all r-dimensional subspaces of Rm, the one that senses a maximal oriented energy (11). Properties (11) and (12) show that the orthogonal decomposition of the energy via the singular value decomposition is canonical in the sense that it allows subspaces of dimension r to be found where the sequence has minimal and maximal energy. This decomposition of the ambient space, as direct sum of a space of maximal and minimal energy for a given vector sequence, leads to very interesting rank consideration.
+By establishing this link between the oriented energy and SVD, we proved that the first r left singular vectors sensing the maximal energy of glove data matrix A and, thus, account for most of the variation in the original data. This means that with an m n data matrix that is usually overdetermined with much more samples (columns) than channels (rows), n m, the singular value decomposition allows most of signature characteristics to be compressed into r vectors.
+
+2.2 Reference Signature
+[During the enrollment stage, 10 sample signatures from each writer to be enrolled are collected and pairwise angles between their principal subspaces are computed. Based on these angles, a reference signature is selected as the one that presents minimal overall angle to the others. The simulation results in Section 3 will show that the value of at least ten samples per reference signature result in the best performance for the proposed technique in term of its receiver operating characteristic (ROC).

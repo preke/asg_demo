@@ -1,0 +1,128 @@
+Active Learning from Positive and Unlabeled Data
+Alireza Ghasemi,Hamid R. Rabiee,Mohsen Fadaee,Mohammad T. Manzuri,Mohammad H. Rohban
+ghasemi@ce.sharif.edu,,rabiee@sharif.edu,,fadaee@ce.sharif.edu,,manzuri@sharif.edu,,rahban@ce.sharif.edu
+
+Such problems arise in many real-world situations and are known as the problem of learning from positive and unlabeled data. In this paper we propose an active learning algorithm that can work when only samples of one class as well as a set of unlabeled data are available. Our method works by separately estimating probability density of positive and unlabeled points and then computing expected value of informativeness to get rid of a hyper-parameter and have a better measure of informativeness. Experiments and empirical analysis show promising results compared to other similar methods.
+Keywords-active learning; one-class learning; learning from positive and unlabeled data; semi-supervised learning;uncertainty sampling
+I. INTRODUCTION
+There has been an explosive growth in the amount of available digital content during recent years. This is mostly because of the technological development and evolution of web which causes vast amount of digital media to be created. Managing and organizing such a large amount of data is a tedious task which has to be automated as much as possible. To facilitate this task, machine learning algorithms have been utilized for automatic classification of digital objects. However, achieving acceptable classification accuracy by machine learning algorithms requires large amount of labelled data to be used for training the algorithms. Labeling data has to be done manually and therefore it is a time consuming and expensive task by itself. Because of this, methods which try to exploit unlabeled data to improve accuracy of classification have been of prime interest in recent years. One of such methods is active learning which tries to improve classification accuracy by posing a limited number of queries to a user who can predict label of
+unlabeled data. Active learning works by selecting among unlabeled data, the most informative data sample. The informativeness of a sample is the amount of accuracy gain achieved after adding it to the training set. Many paradigms have been proposed to asses informativeness of data samples for active learning. One of the popular approaches is selecting the most uncertain data sample, i.e the data sample in which current classifier is least confident. Some other approaches are selecting the sample which yields a model with minimum risk or the data sample which yields fastest convergence in gradient based methods [14].
+Although many active learning algorithms have been proposed in the literature so far, most of them require that the training set contain labeled data of all classes, or at least two of them. In other words, most active learning algorithms work with binary or multi-class classification problems and therefore can not be applied to problem in which only samples from one class and a set of unlabeled data are available. Such problems arise in many real-world situations like information retrieval, document classification and ranking and are known as the problem of learning from positive and unlabeled data. Although a wide range methods have been proposed for learning from positive and unlabeled data [17], few efforts have been made to propose active learning methods consistent with this settings.
+In this paper, we propose an uncertainty-based active learning algorithm which requires only samples of one class and a set of unlabeled data in order to operate. The principal contribution of our work is twofold: First, we use Bayes’ rule and density estimation to avoid the need to have a model of all classes for computing the uncertainty measure. This allows us to use popular uncertainty measures of active learning while utilizing only positive and unlabeled samples, rather than using both positive and negative data. Our second contribution is that we define the prior probability of positive class as a random variable and compute expected value of the uncertainty measure by integrating over all possible parameter values. This technique reduces the number of input parameters of the problem.
+At the rest of this paper, we first review recent related works in the fields of active learning and active one-class learning (section II). Then, we propose the two approaches
+978-0-7695-4409-0/11 $26.00 © 2011 IEEE DOI 10.1109/ICDMW.2011.20
+244
+to measure uncertainty, utilizing only positive and unlabeled data (section III). After that, we explain our testing framework, analyze experimental results of the proposed methods, and compare them with other methods of this field (section IV). Finally, we conclude the paper and present ideas for future improvements of the methods.
+
+II. RELATED WORKS
+Many active learning algorithms have been proposed in the literature so far. [14] is a comprehensive survey of recent works in this field. Among the earliest and most popular active learning paradigms is the uncertainty sampling approach which is based on selecting the least confident sample for querying. The definition of confidence depends on the base classifier in use. For example, [16] proposes an active learning approach for SVM which selects for querying the sample which is closest to the separating hyperplane. selecting the sample with minimum margin [3] and the data sample with maximum entropy [11] are other approaches which have been applied to active learning problems.
+For classifiers that are unable to define a similarity measure over their predictions, committee-based active learning methods have been proposed. these methods form an ensemble or committee of diverse classifiers and measure uncertainty by the amount of disagreement between committee members’ votes for a data sample [14].
+In problems where samples of only one class are available, traditional uncertainty assessment methods can not work since they require information about at least two of the classes or their separating hyperplane . Therefore, specific active learning methods are required for one-class problems. One of the earlier works is [1] which uses active learning for outlier detection. This methods works in two stages: First, a number of unlabeled samples are selected as negative samples by means of statical methods. Then a traditional committee based active learning algorithm is used to perform active learning on the rest of samples. The main advantage of this approach is that it’s flexible and can utilize a wide range of traditional active learning algorithms. However, [1] approaches the problem of one-class learning by a traditional binary classification method. This causes degradation in accuracy of the resulting classifier since the two classes have very different characteristics and should not be treated equally. moreover, because of using two learning algorithms, the runtime complexity of this approach is much higher than other similar methods.
+Another method for active learning from positive and unlabeled data has been proposed by [10]. This paper suggests that the best choice for active learning is selecting the most relevant data sample. the justification behind this claim comes from the nature of relevance feedback in image retrieval applications. In other words, the most informative data will be chosen by the following rule:
+x∗ = argmaxx∈U f(x), (1)
+in which f(.) is the scoring function of one-class learning which is used to rank data samples by their likelihood to the target (positive) class. The main advantages of this method lie in its simplicity and speed. However, since this method does not consider uncertainty in choosing samples, the selected data point may lack informativeness.
+A more recent approach has been proposed in [9], which tries to apply active learning to the well-known SVDD method. [9] considers likelihood as well as local density of data point to assess their uncertainty. First, the algorithm constructs a neighborhood graph over all data samples. Then, the most informative sample is selected using the following rule:
+x∗ =
+argminxi∈U σ ||d(xi,C)−R|| c + 1−σ 2k Σxj∈L∪U (yj + 1)aij
+(2)
+In (2), parameters c and σ are used to manipulate the significance of any of two factors in the final decision measure, d(xi, C) is the distance between xi and center of sphere formed by the SVDD approach. R is radius of that sphere. y is 0 for unlabeled data, +1 for positive and −1 for negative samples. a is the adjacency matrix of the data neighborhood graph. aij = 1 if there is an edge between xi and xj , and 0 otherwise.
+The main advantage of [9] is that it considers both selection based on uncertainty of data, and exploring unknown regions of the feature space. This fact can be easily inferred from the two terms of equation 2. However, this methods is biased toward exploring regions containing negative data in the feature space. This causes algorithm to be biased toward selecting data which are more likely negative samples. Due to the nature of one-class learning, positive data are much more valuable than negative data samples and therefore selecting negative samples may not be much helpful in improving classification accuracy. Moreover, constructing the neighborhood graph is a time consuming task and makes the algorithm infeasible for real-time applications.
+
+III. THE PROPOSED APPROACH
+In this section we present the two proposed approaches for learning from positive and unlabeled data.
+
+A. Expected Margin Sampling
+Margin sampling is among the well-known approaches used for uncertainty-based active learning in different application domains [14]. Margin in this context is defined as the difference between posterior probability of the most likely and the second most likely class. The data sample
+with smaller margin is intuitively more uncertain and hence more informative for learning the positive class.
+The margin sampling strategy for active learning is selecting the data sample from the unlabeled sample pool which has the smallest margin, i.e. the data sample for which two of the classes are as equally likely as possible. In a binary classification problem, the selection rule for margin sampling is:
+xinf = argminx∈U |p(+|x)− p(−|x)|, (3)
+in which p(+|x) and p(+|x) are posterior probabilities of the two classes respectively. Applying Bayes’ rule to 3 yields:
+xinf = argminx∈U ∣∣∣p(x|+)p(+)p(x) − p(x|−)p(−)p(x) ∣∣∣ = ∣∣∣p(x|+)p(+)−p(x|−)[1−p(+)]p(x) ∣∣∣ .
+(4)
+For one-class problems in which there is access to samples of one-class only, p(x|+) can be computed easily from the positive (available) class samples. However, since samples from the other classes (which we call collectively the negative class) are not available for training, p(x|−) can not be estimated directly. Moreover, the p(+) estimate should be computed from other sources of information or according to a priori knowledge about the problem. It may be given as input to the algorithm.
+The term p(x) is not usually computed directly in Bayes’ rule applications. Since it has a normalizing role in Bayes’ formula, it can be set easily such that p(.|x) becomes a probability distribution, i.e.
+p(x) = p(x|+)p(+) + p(x|−)[1− p(+)]. (5)
+However, when large amount of unlabeled data are available, p(x) can be estimated directly using a parametric or nonparametric [4] density estimation approach. Noting the fact that p(x|+) can be estimated from positive samples in the same way that p(x) is estimated from unlabeled data, and the p(x|−) is un-known in one-class settings, the equation can be reorganized to compute an estimate for p(x|−) [7]:
+p(x|−) = p(x)−p(x|+)p(+)1−p(+) . (6)
+In (6), p(+) is the prior probability of positive class which we assume a priori known. Substituting 6 into 4 yields the following equation for the margin sampling strategy of active learning:
+xinf = argminx∈U ∣∣∣∣ p(x|+)p(+)− p(x)−p(x|+)p(+) 1−p(+) [1−p(+)] p(x) ∣∣∣∣ = ∣∣∣p(x|+)p(+)−p(x)+p(x|+)p(+)p(x) ∣∣∣ .
+(7)
+After mathematical simplifications of 7 and setting ax = p(x|+) p(x) and P = p(+) to make expressions shorter, we reach the following:
+xinf = argminx∈U |1− 2axP | . (8) In (8), P is assumed a priori known. To relax this assumption and count for uncertainty in P , we average over different values of it.
+Considering P a random variable, we compute expected value of margin for a data sample, rather than selecting a single value for P , i.e.
+x∗ = argminx∈U EP {|1− 2axP |}. (9) Since P is a probability value and there is no other prior knowledge available about it, we can assume that values of P come from a continuous uniform distribution. utilizing this fact, computing the expected value is equivalent to integrating over all possible values of P :
+EP {|1− 2axP |} =∫ 1 0 |1− 2axP | dP = (1− ax)sgn( 12 − ax).
+(10)
+Since the integral result becomes negative for 12 < ax < 1, we replace values in this interval by either 12 or 1.
+After integration, the resulting form of margin sampling strategy using positive and unlabeled data is as follows:
+x∗ = argminx∈U ( 1− p(x|+)p(x) ) sgn ( 1 2 − p(x|+)p(x) ) , (11)
+In which ax is replaced by its original value p(x|+) p(x) .
+To estimate p(x) and p(x|+), we can use any of the parametric or non-parametric density estimation approaches like kernel density estimation or Gaussian mixture density. For computing p(x|+), only positive data samples should be used while for p(x) all data can be utilized.
+Figure 1 depicts a visualization of margin sampling strategy for two class problems. The horizontal and vertical axis correspond to values of p(+|x) and p(−|x) respectively. The intensity of a point show the margin between posterior probability of the two classes corresponding to the coordinates of the points. Pseudo-code of the algorithm for active learning from positive and unlabeled data using margin sampling is depicted in figure 2.
+Require: Set of Positive Target Samples P , Set of Negative Outlier Samples N Require: Set of Unlabeled Data U 1: repeat 2: L = P +N 3: x∗ = argminx∈U ( 1− p(x|+)
+p(x)
+) sgn ( 1 2 − p(x|+) p(x) ) ,
+
+B. Entropy Based Active Learning from Positive and Unlabeled Data
+Another method for assessing uncertainty of data samples in active learning is the well-known entropy method. Entropy is a measure computed for continuous and discrete probability distributions which measures the uncertainty of the distribution. For a discrete distribution C, entropy is computed as:
+H(C) = −Σc∈Cp(c) log(p(c)). (12) Indeed, entropy is a measure of the amount of information included in a probability distribution. the more information a probability distribution carries, the more uncertainty exists in its values.
+For active learning tasks, entropy is computed for the posterior class distribution of each data sample. The posterior probability of each class, given the data sample can be considered a discrete probability distribution whose values are class labels. Using this definition and assuming that there are two classes (positive and negative) in the problem, The entropy-based active learning rule is derived as:
+xent = argmaxx∈U H(.|x) = −[p(+|x) log p(+|x) + p(−|x) log p(−|x)]. (13)
+In the same manner as section III-A and noting the oneclass nature of the problem, we can apply Bayes’ rule and
+substitute 6 into 13 which, after simplification, yielding the following equation for entropy:
+H = −[axP log(axP ) + (1− axP ) log(1− axP )]. (14) Note that we have used ax = p(x|+) p(x) and P = p(+) again as abbreviations for avoiding long expressions. Utilizing the same reasoning as in III-A, we consider P a random variable and compute the expected value of entropy with regard to P instead of computing entropy for single P . therefore the entropy-based sample selection rule becomes:
+x∗ = argmaxx∈U EP {−[axP log(axP ) + (1− axP ) log(1− axP )]}.
+(15)
+Assuming a continuous uniform distribution over P values, we reach the following rule:
+EP {H} = ∫ 1 0 −[axP log(axP ) + (1− axP ) log(1− axP )]dP = −a2x log(ax)+ax+(ax−1)2 log(1−ax)
+2ax .
+(16)
+Finally, the sample selection strategy for active learning using positive and unlabeled data is derived as:
+x∗ = argmaxx∈U −a2x log(ax)+ax+(ax−1)2 log(1−ax) 2ax , (17)
+In which ax = p(x|+) p(x) . Again, to compute p(x) and p(x|+) we can use any of the parametric or non-parametric density estimation methods.
+Figure 3 depicts a visualization of margin sampling strategy for two class problems. Algorithm for entropy based active learning is the same as 2, except line 3 which is replaced by 17.
+
+IV. EXPERIMENTS AND RESULTS
+For evaluation of the proposed methods, we have used various real-world datasets as well as an artificial dataset created to study various aspects of the algorithms. The artificial dataset was built from a mixture of five Gaussians,
+one of which was selected as target class and the rest as outliers. A number of datasets from the UCI repository [2] as well as the Caltech image dataset were used in our experiments for evaluation of the proposed active learning strategies[8]. For the Caltech images, CEDD features were extracted from each image [5]. Table I depicts properties of the datasets that have been used in our evaluations.
+
+A. Evaluation Criteria and Algorithms
+Since in many problems of learning from positive and unlabeled data the goal is indeed a retrieval task, performance measure from the field of information retrieval are popular for evaluation of one-class learning methods [6]. therefore we used a measure of information retrieval for evaluation of our methods.
+There are many performance measures used in the context of information retrieval, the most popular among them are precision and recall[13]. Here, we have used F1-measure as the performance measure. It is the harmonic mean of precision and recall which is more meaningful than any of them alone. Using this measure, we penalize situations in which only one of precision and recall has a high value and force the requirement that both of them be within an acceptable range.
+Our proposed approaches do not use unique properties of any specific one-class learning algorithms and are independent of the base one-class learner used. Therefore, any oneclass learning algorithm can be used as the base classifier. In the experiments, we used SVDD [15] as base classifier and kernel density estimation (KDE) as the density estimation method to find likelihood of positive and unlabeled data. SVDD was chosen because of its efficiency and popularity in different applications. KDE was selected because it is a well-known non-parametric density estimation approach and it does not require an expensive training phase.
+Although we used SVDD and KDE for the reasons mentioned above, other one-class learning methods (like one-class Gaussian processes [12]) or density estimation methods (like GMM) can be utilized in the algorithm as well. There is no restriction to use only boundary computing algorithms (like SVDD).
+
+B. Experiment Setup and Result
+For the experiment setup, initially 200 samples were selected as the pool of unlabeled data, from which samples are selected by the proposed active learning rule for querying. Then, from the remaining data samples, half of the target samples were selected for training and the other half, in addition to the non-target (outlier) samples was used as the unlabeled data for testing. All data selections were performed by random sampling.
+The Gaussian function was used as th kernel in both KDE and SVDD. The bandwidths h and σ as well as other parameters of the experiment were adjusted by crossvalidation.
+The goal is to compare different sample selection strategies. As the baseline method, we used random sample selection, as well as the method proposed in [10] and the approach of [9].
+We measured difference in F1-measure after adding each sample by any of the proposed and baseline strategies separately and compared them after adding 25 samples. Table II depicts the F1-measure gain after adding 25 samples for any of the mentioned active learning methods. The last two columns of this show the results of our two proposed methods.
+As can be inferred from tables, the two proposed methods perform better and yield more accurate results than other methods. This is mostly because these methods asses uncertainty of data samples and select the most uncertain.
+Moreover, we can see that the margin sampling approach and entropy method both give promising results and their performance is very similar. This is because of the fact that for two-class problems, both margin and entropy yield precise measures of uncertainty in prediction and utilize all information in the posterior distribution. However, for multi-class problems (which is out of the scope of this work) entropy outperforms margin and yields more precise uncertainty measures since it uses probability of all classes rather than just the two most likely ones.
+We also plotted the graph of precision against number of added samples for the Caltech Face dataset. Figure 4 depicts the graph for the five the active learning methods.
+Figure 5 depicts top 10 selected data by the margin
+method for two classes of USPS and MNIST datasets. As can be seen in the figure, selected data are abnormal representatives of their corresponding class and therefore can be considered uncertain or unconfident samples which are more informative and yield better efficiency gain if their label would be known.
+
+V. CONCLUSION
+We proposed an active learning algorithm which utilizes only positive and unlabeled data for selecting most uncertain samples for querying in active learning. Our approach can utilize many models of one-class learning as the base classifier and the density estimation method.
+The ideas presented in this paper can be utilized in other active learning paradigms as well. For example, a very wellknown and principled framework for active learning is the risk minimization approach which tries to find the data sample which yields a model with minimum possible risk on training set. The risk computation which involves both negative and positive class posterior information, can be easily adapted to work with positive and unlabeled data by direct computation of sample likelihood and the expectation approach presented in this paper.
+
+ACKNOWLEDGEMENT
+The authors would like to thank the AICTC Research Center for supporting this work.
+
+References
+[1]N. Abe,B. Zadrozny,J. LangfordOutlier detection by active learningProceedings of the 12th ACM SIGKDD international conference on Knowledge discovery and data mining, pages 504–509. ACM2006
+[2]M.F. Balcan,A. Broder,T. ZhangMargin based active learningLearning Theory, pages 35–502007
+[3]S.A. Chatzichristofis,Y.S. BoutalisCedd: Color and edge directivity descriptor: A compact descriptor for image indexing and retrievalProceedings of the 6th international conference on Computer vision systems, pages 312–322. Springer-Verlag2008
+[4]Y. Chen,X.S. Zhou,T.S. HuangOne-class svm for learning in image retrievalImage Processing, 2001. Proceedings. 2001 International Conference on, volume 1, pages 34–37. IEEE2001
+[5]F. Denis,R. Gilleron,A. Laurent,M. TommasiText classification and co-training from positive and unlabeled examplesProceedings of the ICML 2003 workshop: the continuum from labeled to unlabeled data, pages 80–87. Citeseer2003
+[6]R. Fergus,P. Perona,A. ZissermanObject class recognition by unsupervised scale-invariant learning2003
+[7]N. Grnitz,M. Kloft,U. BrefeldActive and semisupervised data domain descriptionMachine Learning and Knowledge Discovery in Databases, pages 407–4222009
+[8]J. He,M. Li,H.J. Zhang,H. Tong,C. ZhangGeneralized manifold-ranking-based image retrievalImage Processing, IEEE Transactions on, 15(10):3170–31772006
+[9]A. Holub,P. Perona,M.C. BurlEntropy-based active learning for object recognitionComputer Vision and Pattern Recognition Workshops, 2008. CVPRW’08. IEEE Computer Society Conference on, pages 1–8. IEEE2008
+[10]M. Kemmler,E. Rodner,J. DenzlerOne-class classification with gaussian processesComputer Vision–ACCV 2010, pages 489–5002011
+[11]C.D. Manning,P. Raghavan,H. Schutzeand Ebooks CorporationIntroduction to information retrieval, volume 1. Cambridge University Press Cambridge, UK2008
+[12]B. SettlesActive learning literature surveyTechnical Report 1648, University of Wisconsin-Madison2010
+[13]D.M.J. Tax,R.P.W. DuinSupport vector data descriptionMachine learning, 54(1):45–662004
+[14]Simon Tong,Edward Y. ChangSupport vector machine active learning for image retrievalIn ACM Multimedia,2001
+[15]B. Zhang,W. ZuoLearning from positive and unlabeled examples: A surveyInformation Processing (ISIP), 2008 International Symposiums on, pages 650–654. IEEE2008

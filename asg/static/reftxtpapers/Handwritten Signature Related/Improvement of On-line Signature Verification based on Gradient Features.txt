@@ -1,0 +1,77 @@
+Improvement of On-line Signature Verification based on Gradient Features
+Yumiko Kawazoe,Wataru Ohyama,Tetsushi Wakabayashi
+
+
+Abstract
+This paper proposes a new on-line signature verification technique which employs gradient features and a pooled within-covariance matrix of training samples not only of the user but also of the others. Gradient features are extracted from a signature image reflecting the velocity of pen movement as the grayscale so that both on-line and off-line features are exploited. All training samples of different signatures collected in design stage are pooled together with the user’s samples and used for learning within-individual variation to reduce required sample size of the user to minimum number. The result of evaluation test shows that the proposed technique improves the verification accuracy by 4.9% when user’s sample of size three is pooled with samples with others. This result shows that the samples of different signatures are useful for training within-individual variation of a specific user.
+
+I. INTRODUCTION
+Automatic signature verification, a behavioral biometrics, has been studied by many researchers[1], [2], [3], [4]. It can be performed using a tablet with a stylus or using the scanned signature image. The former is called on-line verification and the later is called off-line verification. Online verification with the availability of dynamic information such as stroke order, velocity, or local pressure has already had commercial applications.
+Most of the techniques for the on-line signature verification are based on waveform analysis of time series data in terms of Dynamic Programming (DP) or Hidden Markov Model (HMM)[2], [3], [4]. However the research topics on accuracy improvement and reduction of required size for training sample are still remaining to solve the problems such as:
+• The shape of signature image (off-line features) is not directly analyzed for its verification while on-line features are focused on, • Signatures can be easily reproduced once a temporal waveform stored as reference in a system is stolen, • The characteristic of an individual’s signature can only be established using an appropriate number of signature specimens. Since human signature could vary overtime, too few samples will increase the false rejection rate of genuine signatures while too many samples will be labor intensive for the user.
+Aiming to solve these problems this paper proposes a new on-line signature verification technique which employs gradient features [5], [6] and a pooled within-covariance matrix of training samples not only of the user but also of the others.
+Gradient features are extracted from a signature image reflecting the velocity of pen movement as the grayscale so that both on-line and off-line features are exploited. All training samples of different signatures collected in design stage are pooled together with the user’s samples and used for learning within-individual variation to reduce required sample size of the user to minimum number. The gradient features and their statistical parameters have advantage in that the signature can not be reproduced from the features nor parameters. The proposed technique can be combined with other on-line verification techniques based on DP or HMM to achieve higher performance. It can be applied directly to off-line signature verification, too.
+The remaining of this paper is organized as follows: The next section presents the signature verification technique consisting of image generation II-A, gradient feature extraction II-B, verification II-C and training II-D. Section III details the experimental settings, results and discussions. Finally, Section IV concludes with future topics.
+
+B. Feature Extraction
+The gradient feature vector is extracted from the generated signature image. The gradient feature vector is composed of directional histogram of gradient of the image. Signature image is segmented into blocks and 576 dimensional feature vector is composed of the local directional histograms. The gradient feature extraction is performed as in the following steps[5], [6]:
+Step 1: A 2 × 2 mean filtering is applied 5 times on the input image. Step 2: The gray-scale image obtained in Step 1 is normalized so that the mean gray scale becomes zero with maximum value 1. Step 3: The normalized image is initially segmented into 17(width) × 7(height) blocks. Compromising trade-off between accuracy and complexity, this block size is decided from the experiment. Step 4: A Roberts filter is then applied on the image to obtain gradient image. The arc tangent of the gradient (direction of gradient) is initially quantized into 32 directions and the strength of the gradient is accumulated with each of the quantized direction. The strength of Gradient f(x, y) is defined as follows:
+f (x, y) = √ (∆u)2 + (∆v)2 (2)
+and the direction of gradient θ (x, y) is:
+θ (x, y) = tan−1 ∆v ∆u
+(3)
+where
+∆u = g (x + 1, y + 1) − g (x, y) (4)
+and
+∆v = g (x + 1, y) − g (x, y + 1) (5)
+and g (x, y) is the gray level of (x, y) point. Step 5: Histograms of the values of 32 quantized directions are computed in each of 17 × 7 blocks. Step 6: Directional histogram of 17 × 7 blocks is down
+sampled into 9× 4 blocks and 16 directions using Gaussian filters. Finally, a 9 × 4 × 16 = 576 dimensional feature vector is obtained.
+Figure 3 illustrates the gradient feature extraction. Figure 3(a)(b)(c) show the mean filtered image (Step1), the block segmentation (Step 3) and the gradient image (Step 4), respectively. The direction and the strength are represented by the hue and the brightness in Figure 3(c), respectively.
+C. Verification
+Regularized Mahalanobis distance is calculated for the obtained feature vector, and the signature is decided to be genuine (forgery) if the distance is less (greater) than a threshold. The Mahalanobis distance is defined by
+g (X) = (X − M l)T Σ−1w (X − M l) , (6)
+where X is the feature vector, M l is the mean vector of the l-th writer and Σw is the pooled within-covariance matrix, respectively [7]. Details of learning parameters M l and Σw are described in Subsection II-D.
+Generally the rank of Σw is less or equal to the total sample size minus the number of writers. Hence Σw will be
+singular if the feature dimension is greater than the rank. We regularize Σw to avoid the singularity problem as follows,
+(1 − α)Σw + α trace{Σw}
+n I, (7)
+where I denote the identity matrix.
+
+D. Training
+The parameters of the Mahalanobis distance are estimated as follows.
+We assume that the variations within individuals have common variation, which can be substituted to other individual’s variation with different signature. Base on the assumption, all training samples of different signatures collected in design stage are pooled together with the user’s samples and used for learning within-individual variation to reduce required sample size of the user. Figure 4 shows the block diagram of the training stage.
+Image generation and feature extraction are performed to signatures of the user and the others. The Mean vector M l is calculated from the feature vectors of the l-th writer (user). The pooled within-covariance matrix Σw is calculated from the feature vectors extracted from all writers.
+
+III. EXPERIMENT
+A. Data Acquisition
+Signature data of 45 individuals were collected by a tablet PC. All individuals signed after some practice to get along with the writing equipment. While the writer of the genuine signature is not allowed to see his/her earlier signatures, the forger write the signature seeing the genuine signature.
+The genuine signatures were collected in four days. Total of 42 signatures/individual, 15 signatures in the first day and 9 signatures/day in the following three days were collected. Total of 36 forgeries/signature, 9 forgeries/forger by 4 forgers, were collected. Total samples consists of 1,890 genuine signatures (42 specimens/individual) and 1,620 skilled forgeries (36 specimens/forgery) .
+B. Verification Experiment 1
+Experiment 1 was performed to reveal the relationship between the verification accuracy and the sample size of others when only one signature of the user is available. The number of writers is 30 in this experiment. The mean vector M l is substituted by the single feature vector of the user and the pooled within-covariance matrix is the one of other writers.
+Figure 5 shows the relationship between the verification accuracy with even FRR and FAR and the sample size of other writers.
+The number of other writers are 0, 15, 20, 24 and the number of signatures/writer are 3, 6, 9 and 12. This result shows that the samples of other individuals are effectively
+improves the verification accuracy when only one signature of the user is available. The verification accuracy was improved by 3.3% by utilizing the samples by others.
+C. Verification Experiment 2
+Experiment 2 was performed to reveal the similar relationship when three signatures of the user are available. The number of writers is 45 in this experiment.
+Figure 6 shows the relationship between the verification accuracy and the sample size of other writers.
+The verification accuracy was improved by 4.9% by utilizing the samples by others.
+Figure 7 shows the DET curves with different number of samples and writers. The verification accuracy with even FRR and FAR is 91.87% when 42 samples/writer by 44 other writers are used.
+
+IV. CONCLUSIONS AND FUTURE WORK
+This paper proposed a new on-line signature verification technique which employs gradient features and a pooled within-covariance matrix of training samples not only of the user but also of the others. The result of evaluation test
+showed that the proposed technique improved the verification accuracy by 4.9% when user’s sample of size three is pooled with samples with others. It is encouraging to know that the samples of different signatures were useful for training within-individual variation of a specific user.
+We compared the performance of two feature extraction techniques, the gradient feature and the Modified Direction Feature [8], using a public database GPDS-160 [9] with similar experimental settings. The gradient feature produced the better VA of 83.22% with even FRR and FAR which is 4.49% better than the VA of the MDF. The details are described in [10].
+Following studies are remaining as future research topics: The pooled within-covariance matrixes can vary depending on the structure of characters, strokes and the numbers in the signatures. Analysis of the difference and optimization of the pooled within-covariance matrixes for specific user will improve the verification accuracy.
+The proposed technique can be combined with other online verification techniques based on DP or HMM to achieve higher performance. It can be applied directly to off-line signature verification, too.
+
+References
+[1]R. Plamondon,G. LoretteAutomatic signature verification and writer identification-The state of the artPattern Recognition, Vol.22, No.2, pp.107-131, 1989.1989
+[2]P. Zhao,A. Higashi,Y. SatoOn-Line Signature Verification by Adaptively Weighted DP MatchingIEICE Trans.Inf.&Syst., Vol.E79-D, No.5, pp.535-541, 1996.1996
+[3]Y. Komiyama,T. Ohishi,T.MatsumotoA Pen Input On-Line Signature Verifier Integrating Position, Pressure and Inclination TrajectoriesIEICE Trans.Inf.&Syst., Vol.E84-D, No.7, pp.833-838, 2001.2001
+[4]J. Fierrez,J. Ortega-Garcia,D. Ramos,J. Gonzalez- RodriguezHMM-based on-line signature verification: Feature extraction and signature modelingPattern Recognition Letters, Vol.28, No.16, pp.2325-2334, 2007.2007
+[5]T. Wakabayashi,S. Tsuruoka,F. Kimura,Y. MiyakeIncreasing the feature size in handwritten numeral recognition to improve accuracySystems and Computers in Japan, Vol.26, pp.2046-2053, 1995.1995
+[6]M. Shi,Y. Fujisawa,T.Wakabayashi,F. KimuraHandwritten numeral recognition using gradient and curvature of gray scale imagesPattern Recognition, Vol.35, pp.2051-2059, 2000.2000
+[7]R. Duda,P. Hart,D. StorkPattern Classification (Second Edition)John Wiley & Sons, Inc.0
+[8]V. Nguyen,M. Blumenstein,G.LeedhamGlobal Features for the Off-Line Signature Verification ProblemProc. of ICDAR2009, pp.1300-1304, 10th International Conference on Document Analysis and Recognition, 2009. 4132009
+[9]M. Ferrer,J. Alonso,C. TraviesoOffline geometric parameters for automatic signature verification using fixedpoint arithmeticIEEE Trans. PAMI, No.27, pp.993-997, 2005.2005
+[10]V. Nguyen,Y. Kawazoe,T. Wakabayashi,M. Blumenstein,U. PalPerformance Analysis of the Gradient Feature and the Modified Direction Feature for Off-line Signature VerificationProc. of ICFHR2010. 4142010
