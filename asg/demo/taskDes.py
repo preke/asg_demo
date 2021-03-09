@@ -8,26 +8,18 @@ Created on Thu Jun 11 15:28:09 2020
 from nltk.tokenize import sent_tokenize
 from nltk.tokenize import word_tokenize
 from summa.summarizer import summarize
+from . import views
+
 import pandas as pd
 import numpy as np
 
 # line 66, 88 change the title for the category descroption
 no2word = {2: "two", 3: "three", 4: "four", 5: "five", 6: "six"}
-Survey_dict = {
-    '2742488': 'Energy Efficiency in Cloud Computing',
-    '2830555': 'Cache Management for Real-Time Systems',
-    '2907070': 'Predictive Modeling on Imbalanced Data',
-    '3073559': 'Malware Detection with Data Mining',
-    '3274658': 'Analysis of Handwritten Signature'
-}
 
-Survey_Topic_dict = {
-    '2742488': ['energy'],
-    '2830555': ['cache'],
-    '2907070': ['imbalanced'],
-    '3073559': ['malware', 'detection'],
-    '3274658': ['handwritten', 'signature']
-}
+Survey_dict = views.Survey_dict
+Survey_Topic_dict = views.Survey_Topic_dict
+
+
 
 
 def readReference(df):
@@ -194,7 +186,10 @@ def extractTopicSent(abslist, introlist):
 
 def combineSentence(sents):
     if len(sents) == 1:
-        text = " ".join(sents[0])
+        if len(sents[0]) > 1:
+            text = " ".join(sents[0])
+        else:
+            text = " ".join(sents[0][0])
     else:
         sentences = []
         for sent in sents:
@@ -255,7 +250,8 @@ def cleanComma(text):
             new_text.append(word[i])
         else:
             new_text.append(word[i])
-    new_text.append(word[i])
+    # print(word)
+    new_text.append(word[-1])
     clean_text = ""
     for word in new_text:
         if len(clean_text) == 0:
@@ -277,15 +273,25 @@ def cleanComma(text):
 
 
 def absGen(fileID, df_selected, category_label):  # Abstract Section generation
+
+
+
     topic = Survey_Topic_dict[fileID]
+
+    print(topic)
+
     summ = None
     # refs = readReference()
     refs = readReference(df_selected)
     newRefs, aiRefs, abslist, introlist = sentText(refs)
-    # print(len(abslist))
+
     newabs, newintro = extractTopicRef(topic, abslist, introlist)
-    # print(len(newabs))
+    if len(newabs) == 0 or len(newintro) == 0:
+        newabs = abslist
+        newintro = introlist
+
     newabs, newintro = extractTopicSent(newabs, newintro)
+
     # print(len(newabs))
     sents = []
     for abstext in newabs:
@@ -294,7 +300,7 @@ def absGen(fileID, df_selected, category_label):  # Abstract Section generation
     # print(sents)
     text = combineSentence(sents)
     summ = summarize(text, words=100)
-    # print(summ)
+    print(summ)
     clean_sum = cleanSummary(summ)
     clean_sum = cleanComma(clean_sum)
     # categories = getReferenceCategories(fileID)  # return the categories of exisitng works
@@ -411,15 +417,31 @@ def selectIntroSentences(intros):
 
 
 def introGen(fileID, df_selected, category_label, category_description):  # Introduction Section generation
+
     topic = Survey_Topic_dict[fileID]
     One = False
     introNO = 0
     refs = readReference(df_selected)
     newRefs, aiRefs, abslist, introlist = sentIntroText(refs)
     newabs, newintro = extractTopicRef(topic, abslist, introlist)
+
+
+    if  len(newintro) == 0:
+
+        newintro = introlist
+
+
+
     newintro = extractTopicIntro(newintro)
+
+    if len(newintro) == 0:
+        newintro = introlist
+
+
+
     if One:
         intros = getIntroPara(newintro, introNO)
+
     else:
         intros = []
         for intro in newintro:
@@ -428,18 +450,27 @@ def introGen(fileID, df_selected, category_label, category_description):  # Intr
                 its += i
             intros.append(its)
     sentences = selectIntroSentences(intros)
+    if len(sentences) == 0:
+        sentences = intros
+
     introPara = combineSentence(sentences)
 
     if One:
         summ = summarize(introPara, words=50)
     else:
         summ = summarize(introPara, words=400)
+
+    if summ is None or len(summ) == 0:
+        summ = introPara
+
     sent = sent_tokenize(summ)
+
     summ = " ".join([s.strip() for s in sent])
     summ = summ.replace("\n", "")
     summ = summ.replace("< NO >", "")
     summ = summ.replace("< NO>", "")
     summ = summ.replace("<NO >", "")
+
     summ = cleanComma(summ)
     categories = category_label
     des = category_description

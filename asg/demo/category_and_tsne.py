@@ -7,6 +7,7 @@ from nltk.stem.lancaster import LancasterStemmer
 lancaster_stemmer = LancasterStemmer()
 from nltk.stem import WordNetLemmatizer
 wordnet_lemmatizer = WordNetLemmatizer()
+from summa import keywords
 TaggededDocument = gensim.models.doc2vec.TaggedDocument
 
 from sklearn.metrics.pairwise import cosine_similarity
@@ -186,6 +187,8 @@ class ref_category_desp(object):
 
         type_info = data_without_NaN['label'].value_counts()
         type_list = list(data_without_NaN['label'].unique())
+
+
         desp_list = []
 
         for type_item in type_list:
@@ -249,6 +252,7 @@ class ref_category_desp(object):
             desp_dict['category_desp'] = category_desp
             desp_dict['topic_word'] = topic_word
 
+
             desp_list.append(desp_dict)
         return desp_list
 
@@ -280,7 +284,9 @@ def clustering(df, n_cluster, survey_id):
         x_train.append(document)
         cnt += 1
 
-    model_dm = Doc2Vec(x_train, min_count=2, size=100, sample=1e-3, workers=4)
+    min_cnt = 2 if len(df)>20 else 1
+
+    model_dm = Doc2Vec(x_train, min_count=min_cnt, size=100, sample=1e-3, workers=4)
     model_dm.train(x_train, total_examples=model_dm.corpus_count, epochs=500)
     model_dm.save('model_dm')
     infered_vectors_list = []
@@ -449,12 +455,12 @@ def clustering(df, n_cluster, survey_id):
 
     ## get tsne fig
 
-    tsne = TSNE(n_components=2, init='pca', perplexity=15)
+    tsne = TSNE(n_components=2, init='pca', perplexity=10)
     X_tsne = tsne.fit_transform(np.array(infered_vectors_list))
     colors = scatter(X_tsne, df['label'])
-    ''' fix first
-    plt.savefig(IMG_PATH + 'tsne_' + survey_id + '.png', dpi=800)
-    '''
+
+    plt.savefig(IMG_PATH + 'tsne_' + survey_id + '.png', dpi=800, transparent=True)
+
     plt.close()
     return df, colors
 
@@ -465,8 +471,8 @@ def scatter(x, colors):
     sns.set_context("notebook", font_scale=1.5,
                     rc={"lines.linewidth": 2.5})
     # We choose a color palette with seaborn.
-    palette = np.array(sns.color_palette("muted", 10))
-    color_hex = sns.color_palette("muted", 10).as_hex()
+    palette = np.array(sns.hls_palette(8, l=0.4, s=.8))
+    color_hex = sns.color_palette(sns.hls_palette(8, l=0.4, s=.8)).as_hex()
     # We create a scatter plot.
     f = plt.figure(figsize=(8, 8))
     ax = plt.subplot(aspect='equal')
@@ -474,7 +480,7 @@ def scatter(x, colors):
                     c=palette[colors.astype(np.int)])
     c = [palette[x] if x >= 0 else (0.0, 0.0, 0.0) for x in colors]
     for i in range(x.shape[0]):
-        ax.text(x[i, 0], x[i, 1], '[' + str(i) + ']', fontsize=15, color=c[i], weight='1000')
+        ax.text(x[i, 0], x[i, 1], '[' + str(i) + ']', fontsize=20, color=c[i], weight='1000')
     plt.xlim(-25, 25)
     plt.ylim(-25, 25)
     ax.axis('off')
@@ -485,8 +491,20 @@ def scatter(x, colors):
 def get_cluster_description(df, survey_id):
     match_ratio = 70  # threshold for fuzzy matching
     summary_len = 30  # length of generated summary
+
     topic_selection = 'topic_bigram_list'  # topic_bigram_list #topic_word_list #topic_trigram_list
+    if len(df) <= 5:
+        match_ratio = 90
     input_DF = df
     category_desp = ref_category_desp(input_DF, survey_id)
-    description_list = category_desp.desp_generator(match_ratio=match_ratio, summary_len=summary_len, topic_selection='topic_bigram_list')
+    description_list = category_desp.desp_generator(match_ratio=match_ratio, summary_len=summary_len, topic_selection=topic_selection)
+
+    print(input_DF['topic_bigram'])
+    for i in range(len(description_list)):
+        if description_list[i]['topic_word'] == "":
+            print(list(input_DF['topic_bigram'])[i])
+            description_list[i]['topic_word'] = ' '.join(list(input_DF['topic_bigram'])[i][i%2].split('_'))
+            print(description_list)
+
+
     return description_list

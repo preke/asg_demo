@@ -40,6 +40,35 @@ STYLESHEETS
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
 <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
 
+<style>
+
+.file {
+    position: relative;
+    display: inline-block;
+    background: #D0EEFF;
+    border: 1px solid #99D3F5;
+    border-radius: 4px;
+    padding: 4px 12px;
+    overflow: hidden;
+    color: #1E88C7;
+    text-decoration: none;
+    text-indent: 0;
+    line-height: 20px;
+}
+.file input {
+    position: absolute;
+    font-size: 100px;
+    right: 0;
+    top: 0;
+    opacity: 0;
+}
+.file:hover {
+    background: #AADFFD;
+    border-color: #78C3F3;
+    color: #004974;
+}
+</style>
+
 <!-- ===========================
 FONTS & ICONS
 =========================== -->
@@ -109,23 +138,62 @@ FONTS & ICONS
 								<input type="radio" name="topics" id="option4" value="3073559"> Malware Detection with Data Mining
 							</label>
 							<label class="btn btn-default" style="height:80px">
-								<!--<input name="topics" id="option6" value="" disabled>-->
-							</label>
-							<label class="btn btn-default" style="height:80px">
 								<input type="radio" name="topics" id="option5" value="3274658"> Analysis of Handwritten Signature
+							</label>
+							<label class="btn btn-info" style="height:80px" onclick="sub_topic()">
+								Reference Selection
 							</label>
 
 						</div>
 						<br>
-
-						<div style="text-align: center">
-							<input class="btn btn-info" onclick="sub_topic()" value="Submit">
-						</div>
-						<!--ajax:    https://blog.csdn.net/u013398398/article/details/52136837-->
 					</form>
 				</div>
+
+						<!--<div class="input-group mb-3">-->
+						  <!--<div class="input-group-prepend">-->
+							<!--<span class="input-group-text" id="basic-addon1">@</span>-->
+						  <!--</div>-->
+							<!--<form action="" method="post", id="topic_input">-->
+								<!--{% csrf_token %}-->
+						  		<!--&lt;!&ndash;<input type="text" class="form-control" name="topics" id="option6" placeholder="Input a topic" aria-label="Username" aria-describedby="basic-addon1">&ndash;&gt;-->
+								<!--<input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">-->
+							<!--</form>-->
+						<!--</div>-->
+
+
+
+
+
 				<!--<div class="col-md-1"></div>-->
 			</div>
+			<br>
+
+			<form action="" method="post", id="topic_input" enctype=”multipart/form-data”>
+				{% csrf_token %}
+				<div class="row">
+					<div class="col-md-12">
+						<div class="col-xs-0 col-sm-0 col-md-0 col-lg-0">
+						</div>
+						<div class="input-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+							<input type="text" placeholder="Input topic by yourself" class="form-control" required="required" id="topic_input_box" name="topic">
+						</div>
+						<div class="col-xs-0 col-sm-0 col-md-0 col-lg-0"></div>
+					</div>
+				</div>
+				<br>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="col-md-8 file">
+							Choose Refs from your computer
+							<input id="file" type="file" name="file" multiple onchange="handleFiles(this.files)">
+						</div>
+						<button type="button" class="col-md-4 btn btn-info" onclick="upload_file()">
+							<i class="fa fa-paperclip" aria-hidden="true"></i>Upload Reference
+						</button>
+					</div>
+				</div>
+
+			</form>
 	</div>
 
 	<!-- ===========================
@@ -181,14 +249,58 @@ FONTS & ICONS
 
 <!-- =========================== Script ============================ -->
 {% block script %}
+{% endblock%}
 <script>
 	var global_refs = {};
+
+	const inputElement = document.getElementById("file");
+	inputElement.addEventListener("change", handleFiles, false);
+	function handleFiles() {
+  		const fileList = this.files; /* now you can work with the file list */
+	}
+
+    function upload_file(){
+		const ref_list = []
+    	const fileList = document.getElementById("file").files; /* now you can work with the file list */
+  		for (let i = 0, numFiles = fileList.length; i < numFiles; i++) {
+  			ref_list.push(fileList[i].name);
+  		}
+    	$.ajax({
+			type: "POST",
+			dataType: "json",
+			url: "/upload_refs",
+			data: {
+				'topic': $('#topic_input_box').val(),
+				'files': ref_list
+			},
+			success: function(result) {
+				for (let i = 0, len = result['references'].length; i < len; i++) {
+					document.getElementById("ref_list").innerHTML += "<div class=\"input-group\"><span class=\"input-group-addon\"><input name=\"refs\" type=\"checkbox\" value="+result['ref_ids'][i] + " checked></span><a href=" + result['ref_links'][i]+ " target=\"_blank\" class=\"list-group-item\">" + result['references'][i] + "</a></div>";
+				}
+				$("#refs").attr("style","display:inline;");
+			},
+			error: function(jqXHR, textStatus, errorThrown){
+				alert(jqXHR.responseText);
+				/*
+				alert(jqXHR.status);
+				alert(jqXHR.readyState);
+				alert(jqXHR.statusText);
+				alert(textStatus);
+				alert(errorThrown);
+				*/
+			}
+		});
+	}
+
+
     function sub_topic(){
+    	//alert($('#topic_form').serialize());
 		$.ajax({
 			type: "POST",
 			dataType: "json",
 			url: "/get_topic",
 			data: $('#topic_form').serialize(),
+
 			success: function(result) {
 				// alert(result);
 				for (let i = 0, len = result['references'].length; i < len; i++) {
@@ -285,7 +397,6 @@ FONTS & ICONS
 	}
 
 </script>
-{% endblock%}
 
 
 <!--necessary scripts and plugins-->

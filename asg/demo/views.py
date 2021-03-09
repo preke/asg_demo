@@ -12,8 +12,7 @@ import requests
 import time
 import pandas as pd
 import numpy as np
-from demo.taskDes import absGen, introGen, methodologyGen, conclusionGen
-from demo.category_and_tsne import clustering, get_cluster_description
+
 import traceback
 
 DATA_PATH = 'static/data/'
@@ -26,6 +25,8 @@ Survey_dict = {
     '3274658' : 'Analysis of Handwritten Signature'
 }
 
+
+
 Survey_Topic_dict = {
     '2742488' : ['energy'],
     '2830555' : ['cache'],
@@ -33,6 +34,8 @@ Survey_Topic_dict = {
     '3073559' : ['malware', 'detection'],
     '3274658' : ['handwritten', 'signature']
 }
+
+
 
 
 Survey_n_clusters = {
@@ -49,8 +52,94 @@ Global_category_description = []
 Global_category_label = []
 Global_df_selected = ""
 
+
+from demo.taskDes import absGen, introGen, methodologyGen, conclusionGen
+from demo.category_and_tsne import clustering, get_cluster_description
+
+
+class reference_collection(object):
+    def __init__(
+            self,
+            input_df
+    ):
+        self.input_df = input_df
+
+    def full_match_with_entries_in_pd(self, query_paper_titles):
+        entries_in_pd = self.input_df.copy()
+        entries_in_pd['ref_title'] = entries_in_pd['ref_title'].apply(str.lower)
+        query_paper_titles = [i.lower() for i in query_paper_titles]
+
+        # matched_entries = entries_in_pd[entries_in_pd['ref_title'].isin(query_paper_titles)]
+        matched_entries = self.input_df[entries_in_pd['ref_title'].isin(query_paper_titles)]
+        #print(matched_entries.shape)
+        return matched_entries,matched_entries.shape[0]
+
+    # select the sentences that can match with the topic words
+    def match_ref_paper(self, query_paper_titles,match_mode='full', match_ratio=70):
+
+        # query_paper_title = query_paper_title.lower()
+        # two modes for str matching
+        if match_mode == 'full':
+            matched_entries, matched_num = self.full_match_with_entries_in_pd(query_paper_titles)
+        return matched_entries, matched_num
+
 def index(request):
     return render(request, 'demo/index.html')
+
+
+@csrf_exempt
+def upload_refs(request):
+    import time
+    time.sleep(1)
+    topic = request.POST.get('topic')
+    files = request.POST.getlist('files[]')
+    global Global_survey_id
+    Global_survey_id = '001'
+    Survey_dict[Global_survey_id] = topic
+    Survey_Topic_dict[Global_survey_id] = [topic.lower()]
+
+    Survey_n_clusters[Global_survey_id] = 2
+
+    input_folder_dir = DATA_PATH + 'merge.tsv'
+    input_tsv = pd.read_csv(input_folder_dir, sep='\t', header=0)
+    query_paper_titles = [i.split('.')[0] for i in files]
+    print(query_paper_titles)
+
+    ref_set = reference_collection(input_tsv)
+    matched_entries_pd, matched_entries_num = ref_set.match_ref_paper(query_paper_titles, match_mode='full')
+
+    print(matched_entries_pd)
+    matched_entries_pd.to_csv(DATA_PATH + '001.tsv', sep='\t')
+
+    references, ref_links, ref_ids = get_refs(Global_survey_id)
+
+    # ref_links = ['#' for i in files]
+
+
+    ref_list = {
+        'references': references,
+        'ref_links': ref_links,
+        'ref_ids': ref_ids
+    }
+
+    ref_list = json.dumps(ref_list)
+    return HttpResponse(ref_list)
+
+    # print(files)
+    # print(request.POST['files[]'])
+
+
+    # references, ref_links, ref_ids = get_refs(topic)
+    # global Global_survey_id
+    # Global_survey_id = topic
+    # ref_list = {
+    #     'references' : references,
+    #     'ref_links'  : ref_links,
+    #     'ref_ids'    : ref_ids
+    # }
+    # ref_list = json.dumps(ref_list)
+    # return HttpResponse(ref_list)
+
 
 @csrf_exempt
 def get_topic(request):
@@ -69,6 +158,7 @@ def get_topic(request):
 @csrf_exempt
 def automatic_taxonomy(request):
     ref_dict = dict(request.POST)
+    print(ref_dict)
     ref_list = ref_dict['refs']
     global Global_ref_list
     Global_ref_list = ref_list
