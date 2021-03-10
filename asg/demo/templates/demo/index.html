@@ -67,6 +67,11 @@ STYLESHEETS
     border-color: #78C3F3;
     color: #004974;
 }
+
+.popover{
+    max-width: 100%; /* Max Width of the popover (depending on the container!) */
+
+}
 </style>
 
 <!-- ===========================
@@ -80,6 +85,8 @@ FONTS & ICONS
 <!--[if IE]>
 	<script src="https://cdn.jsdelivr.net/html5shiv/3.7.2/html5shiv.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
+	<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <![endif]-->
 </head>
 
@@ -184,7 +191,7 @@ FONTS & ICONS
 				<div class="row">
 					<div class="col-md-12">
 						<div class="col-md-8 file">
-							Choose Refs from your computer
+							Choose References from your computer (txt form)
 							<input id="file" type="file" name="file" multiple onchange="handleFiles(this.files)">
 						</div>
 						<button type="button" class="col-md-4 btn btn-info" onclick="upload_file()">
@@ -200,7 +207,7 @@ FONTS & ICONS
      References
     ============================ -->
 	<div class="col-md-12" style="display: none" id="refs">
-		<h2 align="left"> <span class="fas fa-copy"></span> Here are the most related references from our dataset: </h2>
+		<h2 align="left"> <span class="fas fa-copy"></span> Here are the Most Related References from Our Dataset: </h2>
 		<form action="" method="post", id="ref_form">
 			{% csrf_token %}
 			<div class="list-group pre-scrollable" id="ref_list">
@@ -216,7 +223,8 @@ FONTS & ICONS
      Taxonomy Result
     ============================ -->
 	<div class="col-md-12" style="display: none" id="taxonomy">
-		<h2 align="left"> <span class="fas fa-chart-pie"></span> The Clustering Result of Selected References is (re-ordered): </h2>
+		<h2 align="left"> <span class="fas fa-chart-pie"></span> The Categorization Result of Selected References based on Semantic Clustering : </h2>
+
 		<div class="row">
 			<div class="col-md-7" style="height:400px;">
 				<img src="#" style="width:400px;height:400px;", id="tsne_img">
@@ -240,6 +248,17 @@ FONTS & ICONS
     ============================ -->
 	<div class="col-md-12" style="display: none" id="survey">
 		<h2 align="left"> <span class="fas fa-scroll"></span> Here is the generated survey: </h2>
+		<div class="row">
+			<div class="col-md-0"></div>
+			<div class="col-md-12">
+				<button type="button" class="btn btn-info"  title="This is the Learned Survey Template"
+						data-toggle="popover" data-placement="bottom"
+						data-content="" id="template" style="float: right;">
+					Survey Template
+				</button>
+
+			</div>
+		</div>
 		<div class="container pre-scrollable col-md-12" style="max-height: 700px" id="survey_content">
 		</div>
 	</div>
@@ -251,6 +270,7 @@ FONTS & ICONS
 {% block script %}
 {% endblock%}
 <script>
+
 	var global_refs = {};
 
 	const inputElement = document.getElementById("file");
@@ -382,6 +402,14 @@ FONTS & ICONS
 					}
 				}
 				$("#survey").attr("style","display:inline;");
+				$("#template").popover({
+					html : true,
+					/* delay:{show:500, hide:1000},
+					container: 'body', */
+					content: function() {
+					 return content();
+					}
+				});
 			},
 			error: function(jqXHR, textStatus, errorThrown){
 				alert(jqXHR.responseText);
@@ -394,6 +422,10 @@ FONTS & ICONS
 				*/
 			}
 		});
+
+		function content() {
+			return "<img src=\'static/img/template.png\' >";
+		}
 	}
 
 </script>
