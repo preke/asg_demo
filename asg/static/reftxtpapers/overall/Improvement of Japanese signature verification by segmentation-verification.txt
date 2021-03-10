@@ -1,0 +1,70 @@
+Improvement of Japanese signature verification by segmentation-verification
+Yuta Kamihira,Wataru Ohyama,Tetsushi Wakabayashi,Fumitaka Kimura
+
+
+Abstract
+This paper proposes a new combined signature verification technique called s egmentation-verification based on three different off-line feature vectors extracted from full name Japanese signature image and from the sub-images of the first name and the last name. The Mahalanobis distance for each feature vector is calculated and the final decision (verification) is performed by SVM based on the three Mahalanobis distances. In the evaluation test the proposed technique achieved 94.30% verification accuracy, which is 1.03% higher than the best accuracy obtained for the full name signature image. This result shows that the proposed segmentation-verification approach improves Japanese signature verification accuracy significantly.
+
+I. INTRODUCTION
+Automatic signature verification, a behavioral biometrics, has been studied by many researchers[1-4]. It can be performed using the scanned signature image or using a tablet with a stylus. The former is called off-line verification and the later is called on-line verification. On-line verification with the availability of dynamic information such as stroke order, velocity, or local pressure has already had commercial applications. Most of the techniques for the on-line signature verification are based on waveform analysis of time series data in terms of Dynamic Programming (DP) or Hidden Markov Model (HMM) [2,3,4]. However the problems such as accuracy improvement and reduction of required size for training sample are still remaining as the research topics. In particular, offline verification using the shape of signature image (off-line features) has still room for improvement. The characteristic of an individuals signature can only be established using an appropriate number of signature specimens. Since human signature could vary overtime, too few samples will increase the false rejection rate of genuine signatures while too many samples will be labor intensive for the user.
+Aiming to solve these problems this paper proposes a new SVM based technique for combining verification results obtained by signature verification techniques using off-line features.
+The off-line feature based technique employs gradient feature vector representing the shape of signature image[7]. By combining multiple verification results, it is possible to verify the signature with more features than ever. The proposed technique can be applied to combine multiple results to achieve higher performance.
+The rest of this paper is organized as follows: Section 2 describes signature segmentation method (2.1), and the signature verification techniques based on the gradient features (2.2), and the combining technique by SVM (2.3). Section 3 details the experimental settings, results and discussions. Finally, Section 4 concludes with future topics.
+
+B. Signature verification using gradient features
+The gradient feature based technique consists of each steps for image generation, feature extraction, training and verification.
+1) Image Generation: A signature image reflecting the velocity of pen movement as the gray scale is generated from a series of coordinates and time. Points with higher (lower) pen velocity are drawn with brighter (darker) grayscale.
+Size normalization and smoothing are applied to the input data. The pen velocity is obtained as a quotient of the distance to the duration between adjacent points.
+The brightness (grayscale) 𝑃𝑖 is defined by
+𝑃𝑖 = 𝑣𝑖 − 𝑣𝑚𝑖𝑛
+𝑣𝑚𝑎𝑥 − 𝑣𝑚𝑖𝑛 × 𝑃𝑚𝑎𝑥, (1)
+where 𝑣𝑖 is the velocity and 𝑣𝑚𝑖𝑛, 𝑣𝑚𝑎𝑥 and 𝑃𝑚𝑎𝑥 are minimum velocity, maximum velocity and the maximum brightness, respectively.
+The values are set to 𝑃𝑚𝑎𝑥 = 250, 𝑣𝑚𝑖𝑛 = 0, 𝑣𝑚𝑎𝑥 = 50,000 in the following experiments. The signature image is dilated towards 4-neighborhood by gray scale morphology operation so that the strokes have predefined width (7).
+Fig. 4 shows examples of generated images for a genuine signature (a) and the forgery (b).
+2) Feature Extraction: The gradient feature vector is extracted from the generated signature image[5], [6]. The gradient feature vector is composed of directional histogram of gradient of the image. Signature image is segmented into blocks and 576 dimensional feature vector is composed of the local directional histograms. The gradient feature extraction is performed as in the following steps:
+Step 1: A 2×2 mean filtering is applied 5 times on the input image. Step 2: The gray-scale image obtained in Step 1 is normalized so that the mean gray scale becomes zero with maximum value 1. Step 3: The normalized image is initially segmented into 17(width) × 7(height) blocks for full name, 9(width) × 7(height) blocks for first name and last name. Compromising trade-off between accuracy and complexity, this block size is decided from the experiment. Step 4: A Roberts filter is then applied on the image to obtain gradient image. The arc tangent of the gradient (direction of gradient) is initially quantized into 32 directions and the strength of the gradient is accumulated with each of the quantized direction. The strength of Gradient 𝑓(𝑥, 𝑦) is defined as follows:
+𝑓 (𝑥, 𝑦) = √ (Δ𝑢) 2 + (Δ𝑣) 2 (2)
+and the direction of gradient 𝜃 (𝑥, 𝑦) is:
+𝜃 (𝑥, 𝑦) = tan−1 Δ𝑣
+Δ𝑢 (3)
+where
+Δ𝑢 = 𝑔 (𝑥+ 1, 𝑦 + 1)− 𝑔 (𝑥, 𝑦) (4) and
+Δ𝑣 = 𝑔 (𝑥+ 1, 𝑦)− 𝑔 (𝑥, 𝑦 + 1) (5)
+and 𝑔 (𝑥, 𝑦) is the gray level of (𝑥, 𝑦) point. Step 5: Histograms of the values of 32 quantized directions are computed in each of blocks. Step 6: For full name, Directional histogram of 17× 7
+blocks is down sampled into 9× 4 blocks and 16 directions using Gaussian filters. For first name and last name, Directional histogram of 9 × 7 blocks is down sampled into 5× 4 blocks and 16 directions using Gaussian filters. Finally, 9× 4× 16 = 576 dimensional feature vector is obtained in full name, and 5 × 4 × 16 = 320 dimensional feature vector is obtained in first name and last name.
+Figure 5 illustrates the gradient feature extraction. Figure 5(a), (b) and (c) show the mean filtered image (Step1), the block segmentation (Step 3) and the gradient image (Step 4), respectively. The direction and the strength are represented by the hue and the brightness in Figure 5(c), respectively.
+3) Verification: Regularized Mahalanobis distance is calculated for the obtained feature vector. The Mahalanobis distance is defined by
+𝑔 (𝑿) = (𝑿 −𝑴𝑙)𝑇 Σ−1𝑤 (𝑿 −𝑴𝑙) , (6)
+where 𝑿 is the feature vector, 𝑴𝑙 is the mean vector of the 𝑙-th writer and Σ𝑤 is the pooled within-covariance matrix, respectively.
+Generally the rank of Σ𝑤 is less or equal to the total sample size minus the number of writers. Hence Σ𝑤 will be singular if the feature dimension is greater than the rank. We regularize
+Σ𝑤 to avoid the singularity problem as follows,
+(1− 𝛼)Σ𝑤 + 𝛼 trace{Σ𝑤}
+𝑛 𝑰, (7)
+where 𝑰 denote the identity matrix.
+
+C. Combining technique by SVM
+SVM is a learning algorithm that classifies the input to two classes.
+Regularized Mahalanobis distances are calculated by techniques describe in (2.2) . These outputs are rescaled so that they range from -1 to 1 for the learning sample. The rescaled outputs and the final decision (genuine or forgery) for the learning sample are used to train the combining SVM.
+Used kernel of the SVM is Gaussian.
+III. EXPERIMENT
+
+A. Data Acquisition
+Signature data of 19 individuals were collected by a tablet PC. All individuals signed after some practice to get along with the writing equipment. While the writer of the genuine signature is not allowed to see his/her earlier signatures, the forger make the signature seeing the genuine signature. The genuine signatures were collected in four days. Total of 42 signatures/individual, 15 signatures in the first day and 9 signatures/day in the following three days were collected. Total of 36 forgeries/signature, 9 forgeries/forger by 4 forgers, were collected. Total samples consists of 798 genuine signatures (19 specimens/individual) and 684 skilled forgeries (19 specimens/forgery) . Up to six signatures/user collected in the first day are used for training individual techniques. The rest of signatures are used for test. The combining SVM is trained and tested by two fold cross validation for the test data. Namely the test data is divided into two subsets and one of the subsets is tested by the SVM by the other subset. The result for these two subsets is used to obtain the average verification accuracies.
+B. Verification Experiment
+In order to show the effectiveness of the proposed method the verification accuracies of each image as well as the SVM combined technique are evaluated by verification test.
+Figure 6 shows the DET curve when three signatures/user are used for training individual verifiers and Figure 7 shows the DET curves when six signatures/user are used. Since only one SVM is trained for all class (individuals) we have single DET curve with single threshold.
+Table 1 shows the verification accuracies with even FRR (False rejection rate) and FAR (False accept rate).
+When three signatures/user are used for training the proposed combined technique achieved 92.25% verification accuracy, which is 3.07% higher than the better accuracy obtained from each image. When six signatures/user are used for training the proposed combined technique achieved 94.30% verification accuracy, which is 1.03% higher than the better accuracy obtained from each image.
+
+IV. CONCLUSIONS AND FUTURE WORK
+This paper proposed a new SVM based technique for combining verification result of full name signature and segmented signature using off-line features. The result of evaluation test showed that combining multiple verification results by SVM improves signature verification accuracy significantly.
+Following studies are remaining as future research topics: (1) Using different features and different algorithms to further improve the verification accuracy, (2) application to signature verification of other script than Japanese and application to accuracy improvement of off line signature verification and (3) testing the proposed method on a public dataset.
+
+References
+[1]R. Plamondon,G. LoretteAutomatic signature verification and writer identification-The state of the artPattern Recognition,1989
+[2]P. Zhao,A. Higashi,Y. SatoOn-Line Signature Verification by Adaptively Weighted DP MatchingIEICE Trans.Inf.&Syst., Vol.E79-D, No.5,1996
+[3]Y. Komiyama,T. Ohishi,T. MatsumotoA Pen Input On-Line Signature Verifier Integrating Position, Pressure and Inclination TrajectoriesIEICE Trans.Inf.&Syst., Vol.E84-D, No.7,2001
+[4]J. Fierrez,J. Ortega-Garcia,D Ramos,J. Gonzalez-RodriguezHMMbased on-line signature verification: Feature extraction and signature modelingPattern Recognition Letters,2007
+[5]T. Wakabayashi,S. Tsuruoka,F. Kimura,Y. MiyakeIncreasing the feature size in handwritten numeral recognition to improve accuracySystems and Computers in Japan,1995
+[6]M. Shi,Y. Fujisawa,T.Wakabayashi,F. KimuraHandwritten numeral recognition using gradient and curvature of gray scale imagesPattern Recognition,2000
+[7]Yumiko Kawazoe,Wataru Ohyama,Tetsushi Wakabayashi,Fumitaka KimuraImprovement of On-line Signature VerificationBased on Gradient Features. ICFHR2010,2010

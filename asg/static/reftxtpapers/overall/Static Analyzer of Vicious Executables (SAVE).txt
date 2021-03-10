@@ -1,0 +1,202 @@
+Static Analyzer of Vicious Executables (SAVE)
+
+Sung@cs.nmt.edu,dennisxu@cs.nmt.edu,pchavez@cs.nmt.edu,srinivas@cs.nmt.edu
+
+topics of information security. Software obfuscation, a general technique that is useful for protecting software from reverse engineering, can also be used by hackers to circumvent the malware detection tools. Current static malware detection techniques have serious limitations, and sandbox testing also fails to provide a complete solution due to time constraints.
+In this paper, we present a robust signature-based malware detection technique, with emphasis on detecting obfuscated (or polymorphic) malware and mutated (or metamorphic) malware. The hypothesis is that all versions of the same malware share a common core signature that is a combination of several features of the code. After a particular malware has been first identified, it can be analyzed to extract the signature, which provides a basis for detecting variants and mutants of the same malware in the future. Encouraging experimental results on a large set of recent malware are presented.
+
+1. Introduction
+Due to the increasing prevalence of malware (trojans, worms, and virues, etc.) of all sorts and the significant economic loss they incur to individuals and organizations, one of the current computer security topics of great interest is malware detection.
+A classification of malware based on payload, enabling vulnerability, and propagation mechanism gives three generations [2].
+
+First generation
+Malware that shares the properties of a virus Requires human action to trigger replication and spreading Propagates via email and file sharing
+Examples: Melissa, LoveLetter, VBScript worm, SoBig
+
+Second generation
+Malware that shares the properties of a worm Does not require human intervention for replication and spreading Automatic scanning of victims for vulnerabilities Hybrid in nature, blended with viruses and trojans Propagates via Internet Examples: Slapper worm, SQL Slammer worm, and Blaster worm
+
+Third generation
+Pre-compiled vulnerable targets Exploits known and unknown vulnerabilities Employs multiple attack vectors Geographical region- or organization-specific malware Attacks security technologies and products Since theoretical studies have established that there is no algorithm that can detect all types of viruses [3,4], heuristic techniques have been proposed and utilized. Current commercial anti-virus software, however, are mostly ineffective in scanning polymorphic and metamorphic versions of identified malware. Detection techniques that use program annotation have been proposed; however, the amount of time required for analysis and annotation, as reported by the authors, is too high for even fairly simple malware to be, in our view, practical [5,6].
+Our work is based on the assumption that an original malware M contains a malicious set of systems calls S. A variant of the original malware, O(M), that is obtained by applying an obfuscation technique O retains the functionality of M and contains a set of system calls S’. The problem is then to calculate a similarity measure between S and S’. We apply the traditional obfuscation techniques (described in section 3.3) to original malware (executables) to generate (polymorphic) variants. Then the functionality of the mutants is verified to ensure the validity and fairness of comparison. Next, the variants
+Proceedings of the 20th Annual Computer Security Applications Conference (ACSAC’04) 1063-9527/04 $ 20.00 IEEE
+are tested against eight commercial anti-virus tools. To our surprise all the commercial scanners failed to detect variants obtained through simple obfuscations. When they are tested using our algorithm (named SAVE for Static Analyzer of Vicious Executables) that is based on the similarity measure of sequences of systems calls, the results proved to be much more accurate.
+
+2. Obfuscation
+Obfuscation is to obscure information such that others cannot construe the true meaning. This is certainly true for code obfuscation where the objective is to hide the underlying logic of a program. As the opposite of code optimization where the goal is to minimize the execution time or memory size, code obfuscation seeks to maximize the ‘obscurity’ of the code [9] such that others are prevented from gaining knowledge about it.
+With respect to malware, code obfuscation is an appealing technique to hinder detection. A simple obfuscation, requiring very little effort on the part of the virus writer, may render a known virus completely undetectable to the commercial scanners.
+Applying a clever obfuscating transformation to a malware amounts to some kind of self-decrypting encryption. The malicious code is rendered incomprehensible while retaining its harmful functionality when activated.
+
+2.1 Obfuscation theory
+A concise description of code obfuscation was presented by Collberg and Thomborson. Given a program P and a set of obfuscation transformations T we want to generate a program P’ such that:
+P’ retains the functionality of P P’ is difficult to reverse engineer P’ performs comparably to P (i.e. the cost of obfuscation is minimized) Obfuscation transformations need to be resilient. After applying transformation Ti to program statement Sj and generating an obfuscated statement Sj’, it must be prohibitively hard to build an automated tool that can generate Sj from Sj’.
+
+2.2 Classification
+For simplicity we have classified the obfuscated malware into five types. Generally, the complexity and ‘robustness’ of the malware increases as their type indices increases.
+Type 1: Null operations and dead code insertion
+NOPs are inserted into the malicious code. There is virtually no modification to data or control flow. An example of a type 1 transformation is presented in Figure 1 below. On the left we have the original code and on the right we have the modified code with null operations inserted after every two lines.
+
+Original code
+After transformation
+Inserting null operations is similar to inserting white space in a document: it may take longer to read but no more difficult as the content remains the same. Type 2: Data modification
+Some data obfuscating transformation is applied, such as string splitting or variable type replacement. For example, we could replace a Boolean variable with two integers. If they are equal, the statement is true, otherwise it is false. In the example below, Figure 2, x is a Boolean variable and a and b are integers. The code on the left is the original control flow and the code on the right performs exactly the same but has a different signature.
+
+Original code and meaning
+Transformed code and meaning
+Type 3: Control flow modification
+Control flow obfuscating transformations are applied. Code is swapped around and jump instructions are inserted. For example, we could copy the contents of a subroutine to another location in the file and add
+Proceedings of the 20th Annual Computer Security Applications Conference (ACSAC’04) 1063-9527/04 $ 20.00 IEEE
+jumps to and from the subroutine. The code would function exactly the same but look quite different. In Figure 3 below, three lines of code have been shifted to some location (denoted as [shift]) and helper code has been inserted.
+
+Original code
+After transformation
+Type 4: Data and control flow modification
+Pull out all the stops and combine data and control flow transformations. At this level junk code is inserted and variables can be completely replaced with large sections of needless code. For example, we can modify all Boolean variables as above and transpose the program’s entry point as in Figure 4.
+Type 5: Pointer aliasing
+The last technique is to introduce pointer aliasing. Variables are replaced with global pointers and functions are referred to by arrays of function pointers. This type of transformation is relatively easy to implement using high level languages that allow pointer references but tricky (at best) using assembly languages. Pointer aliasing can be as simple as changing a = b into *a = **b or as complex as converting all variables and functions into an array of pointers to be referenced by pointers to pointers.
+
+2.3 Obfuscation used in this project
+In our research we discovered that most commercial virus scanners could be defeated with very simple obfuscation techniques. For example, simple program entry point modifications consisting of two extra jump instructions effectively defeated most scanners. Therefore, we only used the bare minimum of obfuscation needed to foil detection. Our goal is to show how trivial it is to modify recent malware to beat existing scanning techniques using only the compiled executable and a few tools.
+The obfuscation process is presented in Figure 5. The binary code is disassembled into a more readable format so we can more easily understand the program. Once we have the disassembled program and have understood it, we pick an area to perform obfuscation. The first target when applying a control flow transformation is to attack the program’s entry point; but when using a data transformation we generally have to take a guess. We decide where and what modifications need to be performed and change the binary file directly, using the disassembled version as a guide or map. Once all modifications have been made, the file is examined using the anti-virus scanners.
+All variants with the exception of the MyDoom virus were generated using off-the-shelf hex editing tools. We obtained a copy of the MyDoom.A source code and made all our modifications using the Microsoft Visual development suite. The Hackman hex editing utility was used to generate all other variants [11].
+Proceedings of the 20th Annual Computer Security Applications Conference (ACSAC’04) 1063-9527/04 $ 20.00 IEEE
+
+3. Malware used for analysis
+Four recent viruses (executables) are used for analysis and experiments. The description of them given below is based on the payload, enabling vulnerability, propagation medium, and the systems infected.
+W32.Mydoom: A mass mailing worm and a blended back door that arrives as an attachment with file extensions .bat, .cmd, .exe, .pif, .scr or .zip [7]. The payload performs a denial of service against www.sco.com and creates a proxy server for remote access using TCP ports 3127 through 3198. Infects all Windows systems. W32.Blaster: Exploits windows DCOM RPC vulnerability using TCP port 135. The payload launches a denial of service attack against windowsupdate.com, might cause systems to crash and opens a hidden remote cmd.exe shell. Propagates via TCP ports 135, 4444 and UDP port 69. Infects only Windows 2000 and XP. W32.Beagle: A mass mailing worm blended with a back door. The worm contains large scale email with extensions, .wab, .htm, .xml, .nch, .mmf, .cfg, .asp, and etc. [7]. Uses its own SMTP engine, TCP port 2745 to spread and also tries to spread via file sharing networks like Kazza. Infects all Windows systems.
+Win32.Bika: According to the virus library it is a harmless per-process memory resident parasitic Win32 virus. It infects only Win32 applications [8]. The virus writes itself to the end of the file while the host file is infected. Once the host program is infected it starts the virus hooks “set current directory” Win32 API functions (SetCurrentDirectoryA, SetCurrentDirectoryW) that are imported by the host program and stays as a background thread of infected process, and then infects files in the directories when current directory is being changed. The virus does not manifest itself.
+
+4. SAVE
+Our algorithm of calculating similarity measure is performed directly on Microsoft Windows Portable Executable (PE) binary code. It is structured into two steps which are illustrated in Figure 6.
+First, the PE code is (optionally) decompressed and passed through a PE file parser, producing the intermediate representation which consists of a Windows API calling sequence. We map each Windows API to a global 32-bit integer id number. The 16 most significant bits of the integer represent a particular Win32 module (dynamically linked library), and the last 16 bits represent a particular API in this module. The API calling sequence consists of a sequence of these global id numbers that represent the static calling sequence of the corresponding API
+Proceedings of the 20th Annual Computer Security Applications Conference (ACSAC’04) 1063-9527/04 $ 20.00 IEEE
+functions. This sequence is compared to a known malware sequence or signature (from the signature database) and is passed through the similarity measure module to generate the similarity report. The detection decision is made based on this similarity report.
+The PE binary parser transforms the PE binary file into API calling sequence. It uses two components, W32Dasm Version 8.9 and a text parser for disassembled code. W32Dasm by URSoftWare Co. is a commercial disassembler, which disassembles the PE code and outputs assembly instructions, imported modules, imported APIs, and recourse information. The text parser parses the output from W32Dasm to a static API calling sequence, which becomes our signature.
+
+4.1 Similarity measures
+A signature is an API sequence of a known virus that has been previously identified. Let’s denote it Vs (vector of signature). The API sequence of a suspicious PE binary file is denoted Vu (vector of unknown). To identify whether the new executable with signature Vu is an obfuscated version of the virus represented by Vs, we measure the similarity between Vs and Vu.
+4.1.1 Euclidian distance. One of the most common measures is the Euclidean distance measure:
+2 1 |)||,min(|
+1 2)(),( −= =
+VuVs
+i
+us ii vvVuVsD (1)
+However, Euclidean distance may not be a good similarity measure in some situations. For example, consider the three vectors below. Most people would perceive V1 and V2 as having a high similarity while V3 is quite different from the other two.
+
+V1 = (1, 9, 1, 9, 1, 9, 1, 9, 1, 9, 1, 9)
+V2 = (9, 1, 9, 1, 9, 1, 9, 1, 9, 1, 9, 1)
+V3 = (5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5)
+If the Euclidean distance is used, the distance between V1 and V2 is greater than that between V2 and V3.
+D(V1, V2) = 27.72 D(V1, V3) = 13.86
+Use of sequence alignment will help solve this problem [12].
+4.1.2 Sequence alignment. Consider the following two sequences: “WANDER” and “WADERS”, the best alignment should be
+
+WANDERWA-DERS
+The optimal alignment algorithm can be conceptualized by considering a matrix with the first sequence placed horizontally at the top and the second sequence placed vertically on the side. Each position in the matrix corresponds to a position in the first and second sequence. Any alignment of the sequences corresponds to a path through grid.
+Using paths in the grid to represent alignments provides a method of computing the best alignments. The score of the best path up to that position can be placed in each cell. Beginning at the top left cell, the scores are calculated as the sum of the score for the element pair determined by the score of the row and column heading (0 for mismatches and 1 for matches) and the highest score in the grid above and to the left of the cell.
+Figure 8 shows the alignment algorithm step by step. Let’s take a deeper look at the shadowed 4 and 3 squares. 4 is generated as a max score in left above matrix plus the score for matching, that is 3 plus 1. 3 is calculated as a max score in left above matrix plus score for mismatching, that is 3 plus 0.
+After applying the above algorithm, the two original sequences become “WANDER-” and “WA-DERS”. In our case, API sequences Vs and Vu are inserted with some zeros to generate Vs’ and Vu’, which have optimal alignment. The algorithm has a complexity of )( us llO × , where
+us ll , are the length of sequence Vs and Vu.
+Proceedings of the 20th Annual Computer Security Applications Conference (ACSAC’04) 1063-9527/04 $ 20.00 IEEE
+4.1.3 Similarity functions. We apply the traditional similarity functions on Vs’ and Vu’. Cosine measure, extended Jaccard measure, and the Pearson correlation measure are popular measures of similarity for sequences. The cosine measure is given below and captures a scale-invariant understanding of similarity.
+22
+)( ),( uVsV
+uVsV uVsVS
+T C ′⋅′ ′′ =′′
+p
+i
+p
+ip vV
+1
+=
+The extended Jaccard measure [13] is computed as
+uVsVuVsV
+uVsV uVsVS
+T
+T J ′′−′+′ ′′ =′′ 2
+2
+2
+2
+)( ),(
+which measures the ratio of the number of shared attributes of Vs’ and Vu’ to the number possessed by Vs’ or Vu’.
+Pearson’s correlation measure is defined below and measures the strength and direction of the linear relationship between Vs’ and Vu’.
++ ′−′′−′ ′−′′−′=′′ 1 . )()( 2 1 ),(
+22
+)(
+uVuVsVsV
+uVuVsVsV uVsVS
+T P
+The reason to utilize three different measures is that none of them is capable of giving the best results for all sequences measure. The following Table 1 illustrates three examples to demonstrate how these measures mutually correct each other. ( indicates the best output, indicates the false output, and ? indicates the acceptable but not the best output ).
+The first example shows a shortened version of the most common case in our experiments. A tiny change in the API sequence indicates that two files perform very similar functions, that is to say the suspicious executable is an obfuscated virus. The effective output in this case is 1.0. The cosine measure gives the best output. The second and third examples show two exceptions that can not be measured correctly by the cosine measure. The second shows two different sequences, whose effective output is 0.0. Jaccard measure outputs the best result. In the third example Pearson measure gives the expected result.
+Proceedings of the 20th Annual Computer Security Applications Conference (ACSAC’04) 1063-9527/04 $ 20.00 IEEE
+In the current version of SAVE, we calculate the mean value of ),()( uVsVS C ′′ , ),()( uVsVS J ′′ and ),()( uVsVS P ′′ . For a particular
+measure between a virus signature and a suspicious binary file, let’s denote this mean value as ),()( uVsVS i m ′′ , which stands for the similarity
+between virus signature i and suspicious binary file. Our similarity report is generated by calculating the
+),()( uVsVS i m ′′ value for each virus signature in the
+signature database. The index of the largest entry in the similarity report indicates the most possible virus the
+suspicious file is (a variant of). Let’s denote the index
+as maxi . By comparing this largest value with a threshold, we make a decision whether the binary file is piece of malware and what it is. In our experiments, the threshold 0.9 seemed to work quite well.
+The following Table 2 shows the preliminary results of our recent investigation of the MyDoom worm and several other recent worms and viruses, using eight different (commercial) scanners and proxy services. ( indicates detection, indicates failure to detect, and ? indicates only an “alert”; all scanners used are most current and updated version).
+Table 1: Mutual correction between measures
+)(),( uVsV ′′ ),()( uVsVS C ′′ ),()( uVsVS J ′′ ),()( uVsVS P ′′
+(1,2,3,4,5,6), (1,2,3,9,5,6)
+0.9316 0.8160 ? 0.8631 ?
+(1,2,1,2,1,2), (8,9,8,9,8,9)
+0.9656 0.2097 1.0000
+(1,1,1,1,1,2),
+(1,1,1,1,1,100)
+0.6832 0.0204 1.0000
+Table 2: Polymorphic malware detection using different scanners
+N M 1 M 2 D P K F A SAVE
+W32.Mydoom.A W32.Mydoom.A V1 W32.Mydoom.A V2 W32.Mydoom.A V3
+W32.Mydoom.A V4
+W32.Mydoom.A V5 ?
+W32.Mydoom.A V6
+W32.Mydoom.A V7
+W32.Bika
+W32.Bika V1
+W32.Bika V2
+W32.Bika V3
+W32.Beagle.B
+W32.Beagle.B V1
+W32.Beagle.B V2
+W32. Blaster.Worm
+W32. Blaster.Worm V1
+W32. Blaster.Worm V2
+W32. Blaster.Worm V3
+W32. Blaster.Worm V4
+Proceedings of the 20th Annual Computer Security Applications Conference (ACSAC’04) 1063-9527/04 $ 20.00 IEEE
+N – Norton, M 1 – McAfee UNIX Scanner, M 2 – McAfee, D – Dr. Web, P – Panda, K – Kaspersky, F – F-Secure, A – Anti Ghostbusters, SAVE – NMT developed Static Analyzer for Vicious Executables.
+The obfuscation techniques used to produce the polymorphic versions of different malware tested in the experiments include control flow modification (e.g. Mydoom V2, Beagle V2), data segment modification (e.g., Mydoom V1, Beagle V1), and insertion of dead code (e.g., Bika V1). Our ongoing experiments also include investigation of metamorphic versions. As can be seen from the last column of table 1, NMT’s SAVE, a signature based detection algorithm, performs the most accurate detection.
+
+5. Conclusions and future work
+Because malware can conceivably become more
+lethal (so-called “3 rd generation” worms use multiple attack vectors to exploit both known and unknown vulnerabilities, and spread even faster by attacking prescanned targets with lightning speed) in the future, it is important that the scanners are capable of detecting polymorphic (obfuscated, or variant) and metamorphic (mutated or evolved versions) versions of known malware. The currently available scanners, however, are inadequate since they are not able to detect even slightly obfuscated versions of known malware.
+Our results differ significantly from other groups’ recent results:
+1. Our analysis is based on static scanning (no
+sandboxing, proxy testing, or code de-obfuscation is involved); so it runs at least an order of magnitude faster. 2. Our obfuscation is based on executables (and not
+on assembly code or high-level source code that is usually not available). 3. Our results are based on some of the latest
+malware targeting current OS platforms−not dated malware intended for now legacy systems. The presented results clearly reveal the alarming deficiency of current scanning techniques and the tremendous potential of our approach. In view of the serious looming threat of future generation malware, the following topics will need to be investigated,
+1. Development of signatures for different types
+of malware: even thought the sequence of API system calls provides a potentially effective basis for defining the signature, more sophisticated (statically constructed) signatures
+must be investigated to deal with polymorphic versions of known malware. 2. Development of tools for malware scanning:
+since for each malware the signature is different, it is useful to have a tool that assists in the (static and dynamic) analysis of malware code and the development of effective signatures. 3. Metamorphic malware: mutated or evolved
+versions of malware are even more difficult to detect since their functionality has changed from the original. Signature based detection again provides the best hope and we will investigate static techniques for detection.
+
+6. Acknowledgments
+Support for this research received from ICASA (Institute for Complex Additive Systems Analysis, a division of New Mexico Tech), a Department of Defense IASP Capacity Building grant, and an NSF SFS Capacity Building grant, is gratefully acknowledged. We would also like to acknowledge the assistance of Authonis Suliman, Karthikeyan Ramamoorthy and Xie Tao in carrying out the numerous experiments.
+
+7. References
+[1] N. Weaver, V. Paxson, S. Staniford, and R.Cunningham, “A Taxonomy of Computer Worms”, First Workshop on Rapid Malcode (WORM), 2003, pp. 11-18.
+[2] G. Eschelbeck, “Worm and Virus Defense:How Can We Protect the Nation’s Computers From These Threats?”, Before the Subcommittee on Technology, Information Policy, Intergovernmental Relations and the Census House Government Reform Committee, September 10, 2003 .
+[3] F. Cohen, “Computer viruses: Theory andexperiments”, Computers and Security, Vol. 6, 1987, pp. 22-35.
+[4] Chess and S. White, “An UndetectableComputer Virus”, Virus Bulletin Conference, September 2000.
+[5] J. Bergeron, M. Debbabi, M. M. Erhioui andB. Ktari, “Static Analysis of Binary Code to Isolate Malicious Behaviors”, In Proceedings of the IEEE 4 th International Workshops on Enterprise Security (WETICE'99), Stanford University, California, USA, 1999, IEEE Press.Proceedings of the 20th Annual Computer Security Applications Conference (ACSAC’04) 1063-9527/04 $ 20.00 IEEE
+[6] M. Christodorescu and S. Jha, “StaticAnalysis of Executables to Detect Malicious Patterns”, Usenix Security Symposium, 2003, pp. 169-186.
+[7] Symantec Cooperationhttp://securityresponse.symantec.com/avcen ter/.
+[8] Virus Libraryhttp://www.viruslibrary.com/virusinfo/Win3 2.Bika.htm.
+[9] Collberg and C. Thomborson,“Watermarking, Tamper-Proofing, and Obfuscation - Tools for Software Protection”, IEEE Transactions on Software Engineering Vol. 28:8, 2002, pp. 735-746.
+[10] S. Krishnaswamy, M. Kwon, D. Ma, Q.Shao, and Y. Zhang, “Experience with software watermarking”, In the Proceedingsof 16th Annual Computer Security Applications Conference (ACSAC'00), 2000, pp.308-316.
+[11] Hackman Hex editor,http://www.technologismiki.com/en/indexh.html.
+[12] W.C. Wilson, “Activity Pattern Analysis bymeans of Sequence-Alignment Methods”, Journal of Environment and planning, Vol. 30, 1998, pp. 1017-1038.
+[13] Strehl and J. Ghosh, “Value-based customergrouping from large retail data-sets”, In the Proceedings of SPIE Conference on Data Mining and Knowledge Discovery, Vol. 4057, 2000, pp. 32-40.Proceedings of the 20th Annual Computer Security Applications Conference (ACSAC’04) 1063-9527/04 $ 20.00 IEEE

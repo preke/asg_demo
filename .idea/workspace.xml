@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f373dea4-4352-4076-b2ab-d2b70f57aeaa" name="Default Changelist" comment="" />
+    <list default="true" id="f373dea4-4352-4076-b2ab-d2b70f57aeaa" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/asg/demo/templates/demo/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/asg/demo/templates/demo/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asg/demo/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/asg/demo/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asg/model_dm" beforeDir="false" afterPath="$PROJECT_DIR$/asg/model_dm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asg/static/data/001.tsv" beforeDir="false" afterPath="$PROJECT_DIR$/asg/static/data/001.tsv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asg/static/img/tsne_2742488.png" beforeDir="false" afterPath="$PROJECT_DIR$/asg/static/img/tsne_2742488.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/asg/static/img/tsne_3274658.png" beforeDir="false" afterPath="$PROJECT_DIR$/asg/static/img/tsne_3274658.png" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,26 +72,27 @@
           <entry key="png" value="1" />
           <entry key="py" value="3" />
           <entry key="tsv" value="7" />
+          <entry key="txt" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="HTML" value="1" />
           <entry key="Image" value="1" />
-          <entry key="PLAIN_TEXT" value="7" />
+          <entry key="PLAIN_TEXT" value="10" />
           <entry key="Python" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="html" value="954" />
-          <entry key="py" value="1403" />
+          <entry key="html" value="955" />
+          <entry key="py" value="1452" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="HTML" value="954" />
-          <entry key="Python" value="1403" />
+          <entry key="HTML" value="955" />
+          <entry key="Python" value="1452" />
         </counts>
       </usages-collector>
     </session>
@@ -113,20 +121,20 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/asg/demo/templates/demo/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2775">
-              <caret line="185" column="49" selection-start-line="185" selection-start-column="49" selection-end-line="185" selection-end-column="49" />
+            <state relative-caret-position="476">
+              <caret line="277" column="263" selection-start-line="277" selection-start-column="263" selection-end-line="277" selection-end-column="263" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/asg/demo/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="315">
-              <caret line="21" column="17" lean-forward="true" selection-start-line="21" selection-start-column="17" selection-end-line="21" selection-end-column="33" />
+            <state relative-caret-position="526">
+              <caret line="119" column="22" selection-start-line="119" selection-start-column="22" selection-end-line="119" selection-end-column="22" />
               <folding>
                 <element signature="e#2#41#0" expanded="true" />
               </folding>
@@ -199,9 +207,9 @@
         <option value="$PROJECT_DIR$/asg/static/css/style.css" />
         <option value="$PROJECT_DIR$/asg/demo/urls.py" />
         <option value="$PROJECT_DIR$/asg/static/data/merge.py" />
-        <option value="$PROJECT_DIR$/asg/demo/views.py" />
         <option value="$PROJECT_DIR$/asg/demo/taskDes.py" />
         <option value="$PROJECT_DIR$/asg/demo/category_and_tsne.py" />
+        <option value="$PROJECT_DIR$/asg/demo/views.py" />
         <option value="$PROJECT_DIR$/asg/demo/templates/demo/index.html" />
       </list>
     </option>
@@ -285,6 +293,13 @@
               <item name="static" type="462c0819:PsiDirectoryNode" />
               <item name="img" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="asg_demo" type="b2602c69:ProjectViewProjectNode" />
+              <item name="asg_demo" type="462c0819:PsiDirectoryNode" />
+              <item name="asg" type="462c0819:PsiDirectoryNode" />
+              <item name="static" type="462c0819:PsiDirectoryNode" />
+              <item name="reftxtpapers" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
@@ -296,6 +311,7 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/asg/static/reftxtpapers" />
       <recent name="$PROJECT_DIR$/asg/static/data" />
     </key>
   </component>
@@ -328,7 +344,7 @@
     <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.22362868" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.23206751" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -339,7 +355,7 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Version Control" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Terminal" order="8" visible="true" weight="0.19489796" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.19489796" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
       <window_info anchor="bottom" id="Python Console" order="10" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -412,20 +428,29 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/asg/demo/templates/demo/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2775">
-          <caret line="185" column="49" selection-start-line="185" selection-start-column="49" selection-end-line="185" selection-end-column="49" />
-        </state>
-      </provider>
+    <entry file="file://$PROJECT_DIR$/asg/static/reftxtpapers/Cache Management Related/A Comparison of Memory Allocators for Real-Time Applications.txt">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/asg/static/reftxtpapers/Cache Management Related/.txt">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/asg/static/reftxtpapers/overall/Random KNN.txt">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/asg/demo/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="21" column="17" lean-forward="true" selection-start-line="21" selection-start-column="17" selection-end-line="21" selection-end-column="33" />
+        <state relative-caret-position="526">
+          <caret line="119" column="22" selection-start-line="119" selection-start-column="22" selection-end-line="119" selection-end-column="22" />
           <folding>
             <element signature="e#2#41#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/asg/demo/templates/demo/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="476">
+          <caret line="277" column="263" selection-start-line="277" selection-start-column="263" selection-end-line="277" selection-end-column="263" />
         </state>
       </provider>
     </entry>

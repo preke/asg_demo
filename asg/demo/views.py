@@ -16,6 +16,7 @@ import numpy as np
 import traceback
 
 DATA_PATH = 'static/data/'
+TXT_PATH = 'static/reftxtpapers/overall/'
 
 Survey_dict = {
     '2742488' : 'Energy Efficiency in Cloud Computing',
@@ -103,18 +104,21 @@ def upload_refs(request):
     input_folder_dir = DATA_PATH + 'merge.tsv'
     input_tsv = pd.read_csv(input_folder_dir, sep='\t', header=0)
     query_paper_titles = [i.split('.')[0] for i in files]
-    print(query_paper_titles)
+
+
 
     ref_set = reference_collection(input_tsv)
     matched_entries_pd, matched_entries_num = ref_set.match_ref_paper(query_paper_titles, match_mode='full')
 
-    print(matched_entries_pd)
+    # print(matched_entries_pd)
     matched_entries_pd.to_csv(DATA_PATH + '001.tsv', sep='\t')
 
     references, ref_links, ref_ids = get_refs(Global_survey_id)
 
-    # ref_links = ['#' for i in files]
+    ref_links = [TXT_PATH+i for i in files]
 
+    for i in ref_links:
+        print(i)
 
     ref_list = {
         'references': references,

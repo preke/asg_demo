@@ -1,0 +1,84 @@
+Theoretical Analysis of a Performance Measure for Imbalanced Data
+Sos Baynat
+sanchez}@uji.es
+
+1. Introduction
+Most of learning methods assume that the classes of the problem share similar prior probabilities. However, in many real-world tasks the ratios of prior probabilities between classes are significantly skewed. This is known as the imbalance problem [10]. A two-class data set is said to be imbalanced when one of the classes is heavily under-represented as regards the other class [6]. Because of examples of the minority and majority classes usually represent the presence and absence of rare cases, respectively, they are also known as positive and negative examples.
+As claimed by many authors [2, 3, 8], the use of plain accuracy (error) rates to evaluate the classification performance in imbalanced domains might produce misleading conclusions, since they do not take misclassification costs into account, are strongly biased to favor the majority class, and are sensitive to class skews.
+Most of alternative metrics are formulated as combinations of accuracy (error) rates measured separately on each class, to alleviate biased results. Nevertheless, none of these show up how dominant the accuracy of an individual class is over another, nor distinguish the contribution of each class to the overall performance.
+∗Partially supported by the Spanish Ministry of Education and Science under grants CSD2007–00018, AYA2008–05965–C04–04/ESP and TIN2009–14205–C04–04, and by Fundació Caixa Castelló– Bancaixa under grant P1–1B2009–04.
+This paper discusses a generalization of a new metric to estimate the classifier performance on two-class imbalanced data sets. It quantifies a trade-off between an index of how balanced both class accuracies are and some (unbiased) measure of overall accuracy. The first term is intended to explain the balance degree between class accuracies, and it favors those cases with higher accuracy rate on the positive class. Some illustrative examples and an extensive theoretical study are performed to better understand the differences between the measure here proposed and other well-known metrics.
+
+2. Performance evaluation measures
+Traditionally, classification accuracy (Acc) and/or error rates have been the standard metrics used to estimate the performance of learning systems. For a twoclass problem, they can be easily derived from a 2 × 2 confusion matrix as that given in Table 1.
+However, empirical and theoretical evidences show that these measures are biased with respect to data imbalance and proportions of correct and incorrect classifications. These shortcomings have motivated a search for new metrics based on simple indexes, such as the true positive rate (TPrate) and the true negative rate (TNrate). The TPrate (TNrate) is the percentage of positive (negative) examples correctly classified.
+One of the most widely-used evaluation methods in the context of class imbalance is the ROC curve, which is a tool for visualizing and selecting classifiers based on their trade-offs between benefits (true positives) and costs (false positives). A quantitative representation of a ROC curve is the area under it (AUC) [1]. For just one run of a classifier, the AUC can be computed as [9] AUC = (TPrate+ TNrate)/2.
+1051-4651/10 $26.00 © 2010 IEEE DOI 10.1109/ICPR.2010.156
+62117
+Kubat et al. [7] use the geometric mean of accuracies measured separately on each class, with the aim of maximizing the accuracies of both classes while keeping them balanced, Gmean = √ TPrate · TNrate.
+Both AUC and Gmean minimize the negative influence of skewed distributions of classes, but they do not show up the contribution of each class to the overall performance, nor which is the prevalent class. This means that different combinations of TPrate and TNrate may produce the same result for those metrics.
+Recently, Ranawana and Palade [8] introduced the optimized precision, which can be computed as,
+OP = Acc− |TNrate− TPrate| TNrate+ TPrate
+(1)
+This represents the difference between the global accuracy and a second term that computes how balanced both class accuracies are. High OP values require high global accuracy and well-balanced class accuracies. However, OP can be strongly affected by the biased influence of the global accuracy.
+
+3. Generalizing a new performance metric
+This section provides a generalization of a primary index reported in [4], named Index of Balanced Accuracy (IBA). The main purpose of the generalized IBA will be to weight a measure suitable to evaluate the performance in imbalanced domains. The weighting factor will aim at favoring those results with better classification rates on the minority class.
+The generalized IBA can be formulated as follows:
+IBAα(M) = (1 + α ·Dom) · M (2)
+where (1 + α · Dom) is the weighting factor and M represents any performance metric.
+The Dom term, called dominance, is defined as Dom = TPrate−TNrate within the range [−1,+1], and it is here used to estimate the relationship between the TPrate and TNrate. The closer the dominance is to 0, the more balanced both individual rates are. If TPrate > TNrate, then Dom > 0; otherwise, Dom < 0.
+The value of Dom is weighted by α ≥ 0 to reduce its influence on the result of the particular metric M. Thus the weighting factor in Eq. 2 is within the range [1−α, 1+α]. Note that if α = 0 or TPrate = TNrate, the IBAα turns into the measure M. In practice, one should select a value of α depending on the metric used.
+
+3.1. Formulating IBAα with Gmean
+As a representative example, this paper will use Gmean because this is a suitable, well-known perfor-
+mance measure for class imbalanced problems. Hence IBAα can now be rewritten in terms of Gmean as:
+IBAα(Gmean) = (1 + α ·Dom) ·Gmean (3)
+Since α will depend on the metric M, the following study is devoted to empirically set an appropriate value of α for the particular case of IBAα(Gmean). Also, this example will allow to clear up the behavior differences of IBAα with respect to other metrics.
+Let f(θ) be a classifier that depends on a set of parameters θ. Suppose that θ should be optimized so that f(θ) can discriminate between the two classes of a particular imbalanced problem (with a ratio 1:10). Let T and V be the training and validation sets, respectively. During learning, seven possible configurations (θ1, θ2, . . . , θ7) have been obtained from T , and then the corresponding classifiers f(θi) have been run over V . Table 2 reports the results of some measures used to evaluate each classifier f(θi). The last step in learning should be to pick up the best configuration θ∗ according to the performance measure adopted.
+Note that configurations θ1 and θ7 correspond to cases with a clearly biased behavior, whereas θ4 produces a perfect balance between TPrate and TNrate. The rest of configurations θ2, θ3, θ5 and θ6 produce less differences between TPrate and TNrate.
+For this example, AUC is of no value at all since all configurations give the same value. Accuracy would select the biased θ1 because it strongly depends on the majority class rate. Both Gmean and OP suggest the most balanced configurations (θ3, θ4, θ5), ignoring the fact that the minority class is usually the most important. While Gmean does not distinguish between θ3 and θ5, OP would prefer θ3 rather than θ5 because its computation is affected by the accuracy. These drawbacks can be overcome when using the IBAα measure by appropriately tuning the parameter α. One can see that IBA0.05 and IBA0.1 select θ5 or θ6, which correspond to the moderate cases with the highest TPrate.
+Results of IBA0.2 show a biased tendency of IBAα towards TPrate for high and moderate values of α. This effect is due to the strong influence of Dom on IBAα, what justifies the need of α to weight its importance. This study suggests that the use of small values of α allow to correct this effect and thus, we propose α =
+0.05 for the calculation of IBAα(Gmean).
+
+4. The theoretical analysis of IBAα
+Two theoretical studies are performed to explore the possible advantages of IBAα (with α = 0.05 and M = Gmean) over other metrics. One computes Pearson correlation coefficients in order to devise how IBAα is correlated with other metrics that might be deemed as good or bad choices to tackle the imbalance. The second study analyzes how sensitive the metrics are under different types of changes to the confusion matrix.
+
+4.1. Correlation analysis
+Five collections of classifier output tuples based on different imbalance ratios were generated as in [5]. A classifier output tuple consists of a list of n numeric values between 0 and 1 which represent, for n hypothetical samples, the probabilities of belonging to the positive class (classifier outputs). All tuples were generated from a main ranked list where the i-th component is the “true” probability pi of belonging the instance i to the positive class. However, in contrast to [5], this list was defined considering a particular imbalance level in the assignment of true probabilities. For example, for an imbalance ratio of 1:3, the first 75% of instances in the list were linked to probabilities within the range [0, 0.5] (negative class), while the rest were associated to probabilities in (0.5, 1] (positive class). Given an imbalance true tuple as the one just described, a perturbed tuple was generated by randomly fluctuating the true probabilities p of negative samples within the range [max(0, p − ϵn),min(1, p + ϵn)], and the true probabilities p of positive samples within the range [max(0, p − ϵp),min(1, p + ϵp)]. The use of two distortion terms, ϵn for the negative class and ϵp for the positive class, allows to simulate different scenarios of biased learning: for ϵn > ϵp, a greater proportion of negative samples should be “misclassified”, while for ϵn < ϵp the positive class should be the most affected.
+Table 3 is an example of a true tuple (T) with 12 samples and an imbalance ratio of 1 : 3, along with two derived perturbed tuples, P1 and P2, obtained from (ϵn = 0.3, ϵp = 0) and (ϵn = 0, ϵp = 0.3), respectively. Items typed in bold face represent misclassified samples. P1 simulates the outputs of a classifier focused on the positive class, while P2 contains the results of a biased classifier that favors the negative class.
+The five collections of classifier output tuples used in the analysis were drawn from five different imbalance ratios expressed in terms of the percentage of positive samples: 5%, 10%, 15%, 20% and 25%. Each collection was composed of 130 tuples distributed in 10 per
+each of the 13 combinations of distortion terms ranging from (ϵn = 0.6, ϵp = 0) to (ϵn = 0, ϵp = 0.6) with steps (−0.05, 0.05) and satisfying ϵn + ϵp = 0.6.
+
+T 0.06 0.11 0.17 0.22 0.28 0.33 0.39 0.44 0.5 0.67 0.83 1.0
+An independent correlation matrix between all pairs of metrics was built for each collection. Correlation coefficients were plotted in Figure 1 to make easier the understanding of results. The axes X and Y correspond to the correlation values in the range [−1,+1] and the percentage of positive samples, respectively.
+Several comments related with IBA0.05(Gmean) can be drawn from Figure 1:
+• IBAα shows a very low (negative) correlation with Acc, which has been proven not to be appropriate for imbalanced domains. Besides, the correlation coefficient of IBAα in terms of absolute value is slightly lower than those of AUC and Gmean, which are even positive.
+• IBAα has a very high (positive) correlation with AUC and Gmean, suggesting that IBAα can be suitable for imbalanced distributions.
+• IBAα appears to be clearly the most correlated measure with TPrate, which represents the classifier performance on the most important class (the minority one).
+• IBAα presents a very low (negative) correlation with TNrate. Although AUC and Gmean show very low correlations with TNrate, their coefficients are positive.
+Despite OP was defined in the context of class imbalance, it is strongly correlated with Acc, TPrate and TNrate, due to the great influence of accuracy on it.
+
+4.2. Invariance properties
+This second analysis intends to assess invariance properties of various metrics with respect to four basic changes to the confusion matrix of Table 1. A measure is said to be invariant to a certain change if it cannot distinguish a new configuration from the previous one. In general, a robust performance measure should detect every matrix transformation. Four invariance properties [9] are here used to demonstrate that IBAα is more sensitive to changes than the remaining metrics.
+p1 invariance under the exchange of TP with TN and FN with FP .
+p2 invariance under a change in TN , while all other matrix entries remain the same.
+p3 invariance under a change of FP , while the other matrix entries do not change. p4 invariance under scaling: TP → k1TP , TN → k2TN , FP → k1FP , FN → k2FN , where k1, k2 > 0.
+Table 4 reports the invariance properties of the measures considered in this paper. ’+’ and ’–’ indicate invariance and non-invariance, respectively. As can be observed, IBAα is the only measure capable of detecting all types of changes, what suggests that it is more sensitive to changes than the other metrics.
+
+5. Conclusions
+We have analyzed a generalization of a new metric, IBAα, to evaluate the classifier performance in twoclass imbalanced problems. It is defined as a trade-off between a global performance measure and a simple signed index to reflect how balanced the individual accuracies are. High values of IBAα are achieved when the accuracies of both classes are high and significantly balanced. Unlike most metrics, IBAα does not take care of the overall accuracy only, but also intends to favor classifiers with better results on the positive class.
+Two theoretical studies have shown the benefits of the new metric when compared to other measures. In this sense, it has been proven that IBAα is strongly correlated with AUC and Gmean (generally accepted as good measures for imbalance problems). However, unlike AUC and Gmean, IBAα is more correlated with
+TPrate and less (and negatively) correlated with accuracy. Also, a study on invariance properties has shown that IBAα is more sensitive to changes to the confusion matrix than the other measures here considered.
+
+References
+[1]P.W. BradleyThe use of the area under the ROC curve in the evaluation of machine learning algorithmsPatt. Recog.,1997
+[2]S. Daskalaki,I. Kopanas,N. AvourisEvaluation of classifiers for an uneven class distribution problemAppl. Artif. Intell.,2006
+[3]C. Ferri,J. Hernández-Orallo,R. ModroiuAn experimental comparison of performance measures for classificationPatt. Recog. Lett.,2009
+[4]V. Garcı́a,R.A. Mollineda,J.S. SánchezIndex of balanced accuracy: A performance measure for skewed class distributionsIn 4th IbPRIA,2009
+[5]J. Huang,C.X. LingConstructing new and better evaluation measures for machine learningIn 20th IJCAI,2007
+[6]N. Japkowicz,S. StephenThe class imbalance problem: a systematic studyIntell. Data Anal.,2002
+[7]M. Kubat,S. MatwinAddressing the curse of imbalanced training sets: one-sided selectionIn 14th ICML,1997
+[8]R. Ranawana,V. PaladeOptimized Precision - A new measure for classifier performance evaluationIn IEEE CEC,2006
+[9]M. SokolovaAssessing invariance properties of evaluation measuresIn Workshop on Testing of Deployable Learning and Decision Systems,2006
+[10]Y. Sun,A.K.C. Wong,M.S. KamelClassification of imbalanced data: A reviewInt’l. J. Patt. Recog. Artif. Intell.,2009

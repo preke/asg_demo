@@ -1,0 +1,152 @@
+Fuzzy Support Vector Machines
+Chun-Fu Lin,Sheng-De Wang
+genelin@hpc.ee.ntu.edu.tw).,sdwang@hpc.ee.ntu.edu.tw).
+
+Index Terms—Classification, fuzzy membership, quadratic programming, support vector machines (SVMs).
+I. INTRODUCTION
+THE theory of support vector machines (SVMs) is a newclassification technique and has drawn much attention on this topic in recent years [1]–[5]. The theory of SVM is based on the idea of structural risk minimization (SRM) [3]. In many applications, SVM has been shown to provide higher performance than traditional learning machines [1] and has been introduced as powerful tools for solving classification problems.
+An SVM first maps the input points into a high-dimensional feature space and finds a separating hyperplane that maximizes the margin between two classes in this space. Maximizing the margin is a quadratic programming (QP) problem and can be solved from its dual problem by introducing Lagrangian multipliers. Without any knowledge of the mapping, the SVM finds the optimal hyperplane by using the dot product functions in feature space that are called kernels. The solution of the optimal hyperplane can be written as a combination of a few input points that are called support vectors.
+There are more and more applications using the SVM techniques. However, in many applications, some input points may not be exactly assigned to one of these two classes. Some are more important to be fully assinged to one class so that SVM can seperate these points more correctly. Some data points corrupted by noises are less meaningful and the machine should better to discard them. SVM lacks this kind of ability.
+In this paper, we apply a fuzzy membership to each input point of SVM and reformulate SVM into fuzzy SVM (FSVM) such that different input points can make different constributions to the learning of decision surface. The proposed method enhances the SVM in reducing the effect of outliers and noises in data points. FSVM is suitable for applications in which data points have unmodeled characteristics.
+The rest of this paper is organized as follows. A brief review of the theory of SVM will be described in Section II. The FSVM
+Manuscript received January 25, 2001; revised August 27, 2001. C.-F. Lin is with the Department of Electrical Engineering, National Taiwan University, Taiwan (e-mail: genelin@hpc.ee.ntu.edu.tw). S.-D. Wang is with the Department of Electrical Engineering, National Taiwan University, Taiwan (e-mail: sdwang@hpc.ee.ntu.edu.tw). Publisher Item Identifier S 1045-9227(02)01807-6.
+will be derived in Section III. Three experiments are presented in Section IV. Some concluding remarks are given in Section V.
+II. SVMs
+In this section we briefly review the basis of the theory of SVM in classification problems [2]–[4].
+Suppose we are given a set of labeled training points
+(1)
+Each training point belongs to either of two classes and is given a label for . In most cases, the searching of a suitable hyperplane in an input space is too restrictive to be of practical use. A solution to this situation is mapping the input space into a higher dimension feature space and searching the optimal hyperplane in this feature space. Let denote the corresponding feature space vector with a mapping from to a feature space . We wish to find the hyperplane
+(2)
+defined by the pair , such that we can separate the point according to the function
+if if
+(3)
+where and . More precisely, the set is said to be linearly separable if there exist such that the inequalities
+if if
+(4)
+are valid for all elements of the set . For the linearly separable set , we can find a unique optimal hyperplane for which the margin between the projections of the training points of two different classes is maximized. If the set is not linearly separable, classification violations must be allowed in the SVM formulation. To deal with data that are not linearly separable, the previous analysis can be generalized by introducing some nonnegative variables such that (4) is modified to
+(5)
+The nonzero in (5) are those for which the point does not satisfy (4). Thus the term can be thought of as some measure of the amount of misclassifications.
+1045-9227/02$17.00 © 2002 IEEE
+The optimal hyperplane problem is then regraded as the solution to the problem
+(6)
+where is a constant. The parameter can be regarded as a regularization parameter. This is the only free parameter in the SVM formulation. Tuning this parameter can make balance between margin maximization and classification violation. Detail discussions can be found in [4], [6].
+Searching the optimal hyperplane in (6) is a QP problem, which can be solved by constructing a Lagrangian and transformed into the dual
+(7)
+where is the vector of nonnegative Lagrange multipliers associated with the constraints (5).
+The Kuhn–Tucker theorem plays an important role in the theory of SVM. According to this theorem, the solution of problem (7) satisfies
+(8)
+(9)
+From this equality it comes that the only nonzero values in (8) are those for which the constraints (5) are satisfied with the equality sign. The point corresponding with is called support vector. But there are two types of support vectors in a nonseparable case. In the case , the corresponding support vector satisfies the equalities and . In the case , the corresponding is not null and the corresponding support vector does not satisfy (4). We refer to such support vectors as errors. The point corresponding with is classified correctly and clearly away the decision margin.
+To construct the optimal hyperplane , it follows that
+(10)
+and the scalar can be determined from the Kuhn–Tucker conditions (8).
+The decision function is generalized from (3) and (10) such that
+(11)
+Since we do not have any knowledge of , the computation of problem (7) and (11) is impossible. There is a good property of SVM that it is not necessary to know about . We just only need a function called kernel that can compute the dot product of the data points in feature space , that is
+(12)
+Functions that satisfy the Mercer’s theorem can be used as dotproducts and thus can be used as kernels. We can use the polynomial kernel of degree
+(13)
+to consturct a SVM classifier. Thus the nonlinear separating hyperplane can be found as the solution of
+(14)
+and the decision function is
+(15)
+III. FSVMs
+In this section, we make a detail description about the idea and formulations of FSVMs.
+
+A. Fuzzy Property of Input
+SVM is a powerful tool for solving classification problems [1], but there are still some limitataions of this theory. From the training set (1) and formulations discussed above, each training point belongs to either one class or the other. For each class, we can easily check that all training points of this class are treated uniformly in the theory of SVM.
+In many real-world applications, the effects of the training points are different. It is often that some training points are more important than others in the classificaiton problem. We would require that the meaningful training points must be classified correctly and would not care about some training points like noises whether or not they are misclassified.
+That is, each training point no more exactly belongs to one of the two classes. It may 90% belong to one class and 10% be meaningless, and it may 20% belong to one class and 80% be meaningless. In other words, there is a fuzzy membership associated with each trainging point . This fuzzy membership can be regarded as the attitude of the corresponding training point toward one class in the classification problem and the value can be regarded as the attitude of meaningless. We extend the concept of SVM with fuzzy membership and make it an FSVM.
+
+B. Reformulate SVM
+Suppose we are given a set of labeled training points with associated fuzzy membership
+(16)
+Each training point is given a label and a fuzzy membership with , and sufficient small . Let denote the corresponding feature space vector with a mapping from to a feature space .
+Since the fuzzy membership is the attitude of the corresponding point toward one class and the parameter is a measure of error in the SVM, the term is a measure of error with different weighting. The optimal hyperplane problem is then regraded as the solution to
+(17)
+where is a constant. It is noted that a smaller reduces the effect of the parameter in problem (17) such that the corresponding point is treated as less important.
+To solve this optimization problem we construct the Lagrangian
+(18)
+and find the saddle point of . The parameters must satisfy the following conditions:
+(19)
+(20)
+(21)
+Apply these conditions into the Lagrangian (18), the problem (17) can be transformed into
+(22)
+and the Kuhn–Tucker conditions are defined as
+(23)
+(24)
+The point with the corresponding is called a support vector. There are also two types of support vectors. The one with corresponding lies on the margin of the hyperplane. The one with corresponding is misclassified. An important difference between SVM and FSVM is that the points with the same value of may indicate a different type of support vectors in FSVM due to the factor .
+
+C. Dependence on the Fuzzy Membership
+The only free parameter in SVM controls the tradeoff between the maximization of margin and the amount of misclassifications. A larger makes the training of SVM less misclassifications and narrower margin. The decrease of makes SVM ignore more training points and get wider margin.
+In FSVM, we can set to be a sufficient large value. It is the same as SVM that the system will get narrower margin and allow less miscalssifications if we set all . With different value of , we can control the tradeoff of the respective training point in the system. A smaller value of makes the corresponding point less important in the training.
+There is only one free parameter in SVM while the number of free parameters in FSVM is equivalent to the number of training points.
+
+D. Generating the Fuzzy Memberships
+To choose the appropriate fuzzy memberships in a given problem is easy. First, the lower bound of fuzzy memberships must be defined, and second, we need to select the main property of data set and make connection between this property and fuzzy memberships.
+Consider that we want to conduct the sequential learning problem. First, we choose as the lower bound of fuzzy memberships. Second, we identify that the time is the main property of this kind of problem and make fuzzy membership
+be a function of time
+(25)
+where is the time the point arrived in the system. We make the last point be the most important and choose , and make the first point be the least important and choose . If we want to make fuzzy membership be a linear function of the time, we can select
+(26)
+By applying the boundary conditions, we can get
+(27)
+If we want to make fuzzy membership be a quadric function of the time, we can select
+(28)
+By applying the boundary conditions, we can get
+(29)
+
+IV. EXPERIMENTS
+There are many applications that can be fitted by FSVM since FSVM is an extension of SVM. In this section, we will introduce three examples to see the benefits of FSVM.
+
+A. Data With Time Property
+Sequential learning and inference methods are important in many applications involving real-time signal processing [7]. For example, we would like to have a learning machine such that the points from recent past is given more weighting than the points far back in the past. For this purpose, we can select the fuzzy membership as a function of the time that the point generated and this kind of problem can be easily implemented by FSVM.
+Suppose we are given a sequence of training points
+(30)
+where is the time the point arrived in the system. Let fuzzy membership be a function of time
+(31)
+such that .
+Fig. 1 shows the result of the SVM and Fig. 2 shows the result of FSVM by setting
+(32)
+The numbers with underline are grouped as one class and the numbers without underline are grouped as the other class. The value of the number indicates the arrival sequence in the same interval. The smaller numbered data is the older one. We can easily check that the FSVM classifies the last ten points with high accuracy while the SVM does not.
+
+B. Two Classes With Different Weighting
+There may be some applications that we just want to focus on the accuracy of classifying one class. For example, given a point, if the machine says 1, it means that the point belongs to this class with very high accuracy, but if the machine says
+1, it may belongs to this class with lower accuracy or really belongs to another class. For this purpose, we can select the fuzzy membership as a function of respective class.
+Suppose we are given a sequence of training points
+(33)
+Let fuzzy membership be a function of class
+if if
+(34)
+Fig. 3 shows the result of the SVM and Fig. 4 shows the result of FSVM by setting
+if if
+(35)
+The point with is indicated as cross, and the point with is indicated as square. In Fig. 3, the SVM finds the optimal hyperplane with errors appearing in each class. In Fig. 4, we apply different fuzzy memberships to different classes, the FSVM finds the optimal hyperplane with errors appearing only in one class. We can easily check that the FSVM classify the class of cross with high accuracy and the class of square with low accuracy, while the SVM does not.
+
+C. Use Class Center to Reduce the Effects of Outliers
+Many research results have shown that the SVM is very sensitive to noises and outliners [8], [9]. The FSVM can also apply to reduce to effects of outliers. We propose a model by setting the fuzzy membership as a function of the distance between the point and its class center. This setting of the membership could not be the best way to solve the problem of outliers. We just propose a way to solve this problem. It may be better to choose a different model of fuzzy membership function in different training set.
+Suppose we are given a sequence of training points
+(36)
+Denote the mean of class as and the mean of class as . Let the radius of class 1
+(37)
+and the radius of class
+(38)
+Let fuzzy membership be a function of the mean and radius of each class
+if if
+(39)
+where is used to avoid the case . Fig. 5 shows the result of the SVM and Fig. 6 shows the result of FSVM. The point with is indicated as cross, and the point with is indicated as square. In Fig. 5, the SVM finds the optimal hyperplane with the effect of outliers, for example, a square at ( 3.5,6.6) and a cross at (3.6, 2.2). In Fig. 6, the distance of the above two outliers to its corresponding mean is equal to the radius. Since the fuzzy membership is a function of the mean and radius of each class, these two points are regarded as less important in FSVM training such that there is a big difference between the hyperplanes found by SVM and FSVM.
+
+V. CONCLUSION
+In this paper, we proposed the FSVM that imposes a fuzzy membership to each input point such that different input points can make different constributions to the learning of decision surface. By setting different types of fuzzy membership, we can easily apply FSVM to solve different kinds of problems. This extends the application horizon of the SVM.
+There remains some future work to be done. One is to select a proper fuzzy membership function to a problem. The goal is to automatically or adaptively determine a suitable model of fuzzy membership function that can reduce the effect of noises and outliers for a class of problems.
+
+References
+[1]C. BurgesA tutorial on support vector machines for pattern recognition,Data Mining and Knowledge Discovery,1998
+[2]C. Cortes,V.N. VapnikSupport vector networks,Machine Learning,1995
+[3]V.N. VapnikThe Nature of Statistical Learning TheoryNew York: Springer-Verlag1995
+[4]B. Schölkopf,C. Burges,A. SmolaAdvances in Kernel Methods: Support Vector LearningCambridge, MA: MIT Press1999
+[5]M. Pontil,A. VerriMassachusetts InstTechnol.1997
+[6]N. de Freitas,M. Milo,P. Clarkson,M. Niranjan,A. GeeSequential support vector machines,Proc. IEEE NNSP’99,1999
+[7]I. Guyon,N. Matić,V.N. VapnikDiscovering Information Patterns and Data CleaningCambridge, MA: MIT Press1996
+[8]X. ZhangUsing class-center vectors to build support vector machines,in Proc. IEEE NNSP’99,1999

@@ -1,0 +1,126 @@
+Online Signature Verification Based on Biometric Features
+Nan Li,Jiafen Liu,Qing Li,Xubin Luo,Jiang Duan
+auroralinan2@gmail.com,,jfliu@swufe.edu.cn,,t@swufe.edu.cn,,xubinluo@gmail.com,,t@swufe.edu.cn
+
+Abstract
+Since current signatures are generally not verified carefully, frauds by forging others signature always happen. This paper tried to authenticate user automatically with electronic signatures on mobile device. We collected coordinates, pressure, contact area and other biometric data when users sign their name on touch screen smart phone. Then we used four different classification algorithms, Support Vector Machine, Logistic Regression, AdaBoost and Random Forest to build a specific signature verification model for each user, and compared the verification accuracy of these algorithms. The experimental result on 42 persons’ dataset shows that these four algorithms have satisfactory performance on Chinese signature verification, and Adaboost has the best performance with error rate of 2.375%.
+
+I. INTRODUCTION
+With the continuous advance of the paperless office, electronic signatures are gradually replacing handwritten signatures in various fields. The most beneficial reason for electronic signatures taking place of handwritten signatures is resource saving. To get electronic signatures, users are required to sign his/her name on the touch screen of a digital panel, a tablet or a smart phone rather than on paper. For those companies that have a large requirement for receipts or contracts, electronic signatures can help them reduce considerable expenditure. Nowadays, many communications, retailing, hotels and many other serviceoriented industries are beginning to use electronic signature to authenticate user or produce non-repudiation evidence. Especially in financial industries such as banks and insurance which are in greater demand for signatures, electronic signatures are widely adopted in China. So if the reliability of electronic signatures can be guaranteed, more companies and industries are willing to use electronic signatures instead of handwritten ones.
+In terms of security, electronic signatures have better reliability than handwritten signatures. Generally handwritten signatures are highly vulnerable to imitate. People have to authenticate handwritten signatures by hand, and it is neither reliable nor efficient because of judges background knowledge and limited experience. Even if we can turn the handwritten signature to an image and authenticate it automatically, it is unreliable. Because offline-handwritten signatures contain no information of writing process, we can only authenticate it by computing the similarity of shape and structure. As for electronic signatures, we could collect more information with touchscreen besides shape and structure of characters, such as writing speed, pressure, size of contact area and other biometric features. These biometric features can be used to reproduce the writing process and often reflect users writing habits. Since each person has unique writing habit and it is hard to imitate, signature verification based on biometric features is feasible.
+This paper explored the feasibility of automatic signature identification on a smart device to tell whether the signer is the real user. The rest of this paper is organized as follows. We first briefly describe the related work in Section 2. The design details for our signature verification experiment are presented in Section 3. We then compared performance of 4 different classification methods in signatures verification using our experimental data in Section 4. This paper is concluded with speculation on how the current prototype can be further improved in Section 5.
+
+II. BACKGROUND AND RELATED WORK
+In general, signature verification methods are mainly divided into 2 categories: offline verification and online verification. Offline signature verification mainly uses static graphic information to authenticate signer. While online signature verification can make use of more dynamic information, such as velocity, acceleration and pressure of writing a signature, which is more difficult to imitate. Hence online signature verification generally has higher accuracy rate than offline verification[1].
+In online verification, the first thing is to extraction features from signature data, which consist of global features and local ones[2]. Global features describe characteristics of the entire signature, such as total time of writing, number of strokes, and size of signature and so on. Local features show the signature trait at a time point or during a short period, such as the local velocity and angle of a stroke. Besides direct feature extraction, hidden Markov model[35] and wavelet analysis[6-8] are also widely used.
+1530-1605/16 $31.00 © 2016 IEEE DOI 10.1109/HICSS.2016.683
+55267
+After feature extraction, researchers tried several different methods to verify electronic signatures. One is matching algorithm[9,10]. It compared the similarity between a test signature and the template. Classification is also widely used to verify signatures. For example, SVM (Support Vector Machine)[4,8,11,12], which is considered as one of the best classification algorithm, performs well in small samples and get a low error rate of about 3%. Artificial neural networks[6,13,14], decision tree[15] and other methods are also be adopted in signature verification.
+Because there is no common signature database for test, different researchers collected their experimental data individually to test their verification schemes, and it is hard to compare their results. The First International Signature Verification Competition (SVC2004) [16] was held in 2004, and 13 teams participated in. In the competition, the champion came up with a scheme with error rate close to 2.8%. Kumiko Yasuda [17] recorded video through the webcams and tracked the pen tip moves to extract signature data, and that provided a new way for online signature verification. S. Rashidi[18] adopted DCT (Discrete Cosine Transform) as feature extraction method, and reduced EER of two tasks to 3.61% and 2.04% respectively on the signature dataset of SVC2004. Yasmine Guerbai [19] used one-class classifier for offline signature verification, and used soft threshold to improve the classification accuracy, but the final result is not really satisfactory because of the limitation of one-class classifier.
+
+III. EXPERIMENTAL DESIGN AND SETTINGS
+We invited 42 participants to our experiment to collect signature characteristic data. Each participant is required to sign his or her own name 50 times firstly. To imitate imposters, we got a negative sample set of 20 for each participant. Since there might be more than one imposter in reality, we assigned forgery task of one person to 4 different participants and asked them to imitate the signature 5 times each. Thats to say, all 50 positive samples were generated by the names real owner, and 20 negative samples were generated by other 4 participants. We developed an App to collect data such as signatures coordinate, pressure, contact area, and etc. After extracting features from data, we built a classifier based on SVM, Logistic Regression, Adaboost and Random Forest. Then we compared the results and got conclusion.
+The experiment consists of three parts. The first part is collecting the signature data, the second part is extracting features, and the third part is building a verification model. The framework of our experiment is sketched in Figure 1.
+
+A. Data collection
+Experimental data was collected using a smartphone LGG2 based on Android 4.4, we collected a total of 42 participants data. Firstly the experimenter needed to enter
+his or her name, and then used a finger to sign his name 50 times on the touch screen. After that, the experimenter was asked to imitate 20 signatures as negative samples. Our APP will assign 4 other participants names to him/her randomly, and each name should be written for 5 times.
+When an experimenter wrote his/her signature, our App will record the user’s name, current number of writing times, current time, coordinates x, y of current position, pressure, contact area of the screen and the status of current position. When the app detected finger movement, it will create a point, thus each signature can be regarded as a series of points and it is usually between 80 and 300 points depending on the importer. Each point will be a set consists of the above 8 data items. A sample signature is shown in Figure 2.
+Signature data sample is shown in Figure 3. Features listed in Figure 3 are explained in detail as follows: Users name (name) is entered by the participant before he or she writes name; Current writing number (number of signature) is marked to distinguish different signatures, and its value is between 1-50 in our experiment;
+Current time (time) was collected by Android systems touchEvent API MotionEvent.getEventTime();
+Current Location coordinate x, y (coordinate X, coordinate Y) were gotten by Android systems API MotionEvent.getX() and MotionEvent.getY(). These API regards the left bottom of the screen as zero point; Pressure (pressure) was attained by API MotionEvent.getPressure();
+The contact area of the screen (size) was collected by API MotionEvent.getSize();
+The current state (status) was gotten by calling API MotionEvent.getAction().This API returns DOWN, UP and MOVE three states to denote the start, midway and the end of a stroke.
+
+B. Feature extraction
+Because each participant differs greatly in length of name and writing style, number of points of signatures varies. But classification algorithms we adopted requires equal feature numbers, so we have to extract features from raw data to get feature vector.
+We use Python as programming language and extract the following 57 features listed in Figure 4 to compose feature vector.
+In these features, the velocity was extracted according to the distance change per unit time between two consecutive points, and the acceleration was extracted according to the velocity change per unit time between two consecutive points. Velocity and acceleration both contain three directions, x-axis, y-axis, and in the plane.
+As for features in Average Type, we extracted average velocity of the signature (x-axis, y-axis and overall), average acceleration, average pressure and average contact area.
+Figure 2. One of the signatures
+For features in Maximum Type, we extracted maximum speed, maximum acceleration, maximum pressure and maximum contact area of the signature. Besides, we extracted the moment when these maximum values appear in the signature.
+Features in Minimum Type are extracted with the same way as Maximum Type.
+In Other Type features, Total Time represents the total time of writing a signature, Break Times means the amount of strokes in one signature, Total Points represents the total number of points of a signature, Maximum Coordinate, Minimum Coordinate and Average Coordinate represent the largest, minimum and the center of x, y coordinates respectively. Maximum Coordinate Position, and Minimum Coordinate Position represent the moment of the maximum and minimum coordinate appears in the signature. Size of signature is on behalf of the total area of the signature using size of the minimum rectangle to contain the signature, Total Distance of Move is on behalf of the total moving distance on the screen.
+After feature extraction, the raw data was converted to a 57-dimensional feature vector. So far, we have 50 positive samples feature vectors and 20 negative samples feature vectors for each of 42 participants.
+C. Verification model
+We mainly used four classification algorithm to build the verification model, including SVM, Logistic Regression, AdaBoost and Random Forest.
+SVM (Support Vector Machine) is a binary-class classification model. Its basic model is a maximum interval linear classifier in the feature space. For linear separable data set, SVM learns to be a linear classifier through interval maximization. For non-linear separable data set, SVM makes the data set linearly separable in the high-dimensional space by using kernel trick. Assuming that a given training data set in the feature space is:
+T = {(x1, y1) , (x2, y2) , · · · , (xN , yN )}
+There is a hyperplane f (x) = ωT · x + b, the objective function of maximum interval classifier can be defined as
+max 1 ‖ω‖ s.t. yi ( ωT · xi + b ) ≥ 1, i = 1, · · · , n Logistic Regression is a log-linear model. Binomial logistic regression model is a classification model, which is represents by conditional probability distribution P (Y|X), in the form of parameterized logistic distribution. The conditional probability distribution is shown below:
+P (Y = 1|x) = exp (ω · x+ b) 1 + exp (ω · x+ b)
+P (Y = 1|x) = 1 1 + exp (ω · x+ b)
+AdaBoost is one of the most representative boosting method. For a classification problem, building a weak classifier with rough rule is easier than building a strong classifier. Boosting method obtains a strong classifier by combining several weak classifiers after learning repeatedly. AdaBoost improves the weight of which is misclassified in the previous
+round and reduces the weight of which is correctly classified. The final classifier of AdaBoost is:
+G (x) = sign (f (x)) = sign
+( M∑
+m=1
+αmGm (x)
+)
+Where G(x) is the final classifier, m is the number of weak classifiers, Gm (x) is the weak classifier for each step, and αm is the weight of each classifier. Random Forest is a kind of classifier applying several trees in the sample training and predicting, and constituted by several decision tree. CART (Classification and Regression Tree) is the most frequently used. For each tree, the training set is sampled with replacement from total training samples, which means that some of the samples will appear multiple times in the training set. The features are selected without replacement from all features. Assuming that the total number of features is M, generally we select sqrt(M), 1/2sqrt(M) or 2sqrt(M) features. The advantages of Random Forest are that it can handle high-dimensional data and has a fast training speed without feature selection. Besides, Random Forest is able to detect mutual influence between features during training, and after training it can give a list about which features are more important.
+We used a famous python machine learning package named scikit-learn when operating experiment with the application of the module SVC, Logistic Classifier and Random Forest Classifier. The methods to assess parameters are FAR and FRR. FRR (False Rejection Rate) represents the rate of regarding the negative samples as positive samples. FAR (False Acceptance Rate) represents the rate of treating the positive samples as the negative.
+For each experimenter, we randomly selected a part of data from his positive samples and negative samples as the training dataset, and the remaining portion as a test dataset.
+In model SVM and Logistic Regression, we adjusted parameters C (error term) to train, and use test set to find the best parameters C which has the lowest error rate. In model Adaboost, we adjusted the number of weak classifiers to find the best parameters n estimators which has the lowest error rate. In model Random Forest, by immobilizing the number of trees in a forest and changing the number of features for each tree, find the best parameters max features which has the lowest error rate. Then, calculating the rate of misclassification of each model.
+Finally, we analyzed and compared these four classification algorithms and estimated the reliability of our models. In addition, we compared the pros and cons of four classification algorithms.
+
+IV. RESULT AND ANALYSIS
+From 50 positive samples of each participant, we randomly selected 30 as training data, and the remaining 20 as test data. From 20 negative samples, 10 were randomly selected as training data, while the other 10 as test sample. Each experiment is repeated 50 times, and we chose the average value as the final result. Finally, we used FAR and FRR values to evaluate the results of the algorithms.
+
+A. SVM
+Model SVM used ”poly” and linear kernel, expression as follows:
+Parameter C (error term) selected from the following values, c svm = [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0, 10.0, 50.0, 100.0], the remaining parameters use the default settings. Training the feature vectors of 42 experimenters. The results are shown in Figure 5 and Figure 6.
+Finally, the average FRR of 42 experimenters using poly kernel is 5.05%, the average FAR is 11.5% and the total error rate is 16.55%.
+The average FRR of 42 experimenters using linear kernel is 4.43% the average FAR is 10.68% and the total error rate is 15.01%.
+
+B. Logistic Regression
+For Model Logistic Regression, parameter C (error term) selected from the following values, c log = [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0, 10.0, 50.0, 100.0], and the remaining parameters use the default settings. Training the feature vectors of 42 experimenters using Logistic Regression Classifier. The results are shown in Figure 7.
+Finally, the average FRR of 42 experimenters is 1.625%, the average FAR is 6.17% and the total error rate is 7.795%.
+
+C. Adaboost
+For Model Adaboost, we changed the number of weak classifiers to train the model and find the best number of classifiers. The number will be chosen between 40 and 59. The results are shown in Figure 8.
+Finally, the average FRR of 42 experimenters is 0.185%, the average FAR is 2.19% and the total error rate is 2.375%.
+
+D. Random Forest
+We selected CART to constitute Random forest, used the ’gini’ coefficient as the evaluation parameter of CART, and elected 20 as the total amount of trees in forest. Since the total number of features is 57, the parameter ”feature amount per tree” (max features) was chosen between 4 and 19. The results are shown in Figure 9.
+Finally, the average FRR of 42 experimenters is 0.34%, the average FAR is 2.44% and the total error rate is 2.78%.
+Additionally, Random Forest will give a list about the importance of each feature. We put all experimenters importance list into one list and calculated the importance of all features. The top 10 important features are shown in
+Table I.
+In summary, Random Forest Classifier and Adaboost both get satisfying results, their classification accuracy were
+Table I TOP 10 MOST IMPORTANT FEATURES
+1 Whole Distance y
+2 Average Size
+3 Total Time
+4 Whole Distance
+5 Whole Distance x
+6 Average Pressure
+7 Size of Signature
+8 Max y
+9 Average Speed y
+10 Average Speed x
+significantly higher than SVM and Logistic Regression. Random Forest classification can make error rate as low as 2.78% and the best classifier, Adaboost, can make error rate be as low as 2.375%. For all four classifiers, FRR values are quite low. That indicates these four classifiers have high recognition rates in positive samples, and they are not likely to be misclassified as negative samples. But FAR values are higher than FRR values, and there are big fluctuations in SVM and Logistic Regression models. We figure out that these two belong to binary-class classification algorithms, and they have a poor performance when our negative samples from 4 imposters may not be merged into one class roughly. For Adaboost, by iterative empowerment, samples that are misclassified will be highly corrected in the next step. For Random Forest, each tree in forest marks a partition of sample space. Because Adaboost and Random Forest cut the sample space step by step, so they have better description of positive samples and better adaptability to negative samples, therefore perform better in our classification experiment. It is worthy to note that due to using multiple weak classifiers, the training speed of Adaboost is the slowest in four models. It might be severe when the model comes up with a large data set.
+
+V. CONCLUSION AND FUTURE WORK
+Since electronic signature data is generally collected on smart device, we can get richer data via capacitive touch screen and hence improve the result of signature verification. After collecting 2,940 electronic signatures of 42 participants on smartphone, we extracted 57 representative features to construct feature vector. SVM, Logistic Regression, Adaboost and Random Forest are adopted to train and test the model respectively. Experimental results show that in our experiment settings, the classic binary algorithm SVM and Logistic Regression have, worse performance, but Adaboost and Random Forest have satisfactory results in verification, and the best one is Adaboost Classifier.
+But there are still some drawbacks in this paper. First of all, the features we extracted from raw data are empirically derived, rather than select by importance of features. Among these four models, only Random Forest algorithm compared the importance of each feature. In our future study, we will try some feature extraction algorithms, such as PCA (Principal Component Analysis), to obtain some typical features. And we expect a higher classification efficiency since data and algorithms may be more reliable than human experience. Secondly, we mainly used the biometric information of the electronic signature for verification, and discarded the graphical signature features (offline signature verification), which may increase the accuracy of signature verification. We will try to make better use of all kinds of signature data and extract effective features to improve the verification accuracy as our future work.
+
+ACKNOWLEDGMENT
+This work was supported by National Natural Science Foundation of China [60903201, 91218301]; and the Fundamental Research Funds for the Central Universities [JBK120505, JBK140129].
+
+References
+[1]R. Bajaj,S. ChaudhurySignature verification using multiple neural classifiers, Pattern Recognition, Elsevier, Volume1997
+[2]Julian Fierrez-Aguilar,Stephen Krawczyk,Javier Ortega- Garcia,Anil K. JainFusion of Local and Regional Approaches for On-Line Signature Verification, Advances in Biometric Person AuthenticationIWBRS2005
+[3]JGA Dolfing,EHL AartsOn-line Signature Verication with Hidden Markov ModelsPattern Recognition, IEEE, Brisbane, Qld., Vol. 21998
+[4]J.R. EdsonJustinoa, Flvio Bortolozzia, Robert Sabourin, A comparison of SVM and HMM classifiers in the off-line signature verification, Pattern Recognition Letters, Elsevier, Volume2005
+[5]MENG Ming,WU Zhong-Cheng,YU Yong,GE Yun-JianOnline Signature Verification Based on Segment Features and HMMPattem Recognition and Aitificial Intelligence, Volume 202007
+[6]DZ Lejtman,SE GeorgeOn-line handwritten signature verification using wavelets and back-propagation neural networksDocument Analysis and Recognition, IEEE, Seattle, WA2001
+[7]PS Deng,HYM Liao,CW Ho,HR TyanWavelet-based offline handwritten signature verificationComputer vision and image, Elsevier, Volume 761999
+[8]MA Hai-bao,LIU Man-danZHANG cenA Method of On line Handwritten Signature Verification Based on Wavelet Packet Analysis and SVM, Journal of East China University of Science and Technology (Natural Science Edition),Vol. 332007
+[9]Anil K. Jain,Friederike D. Griess,Scott D. ConnellOn-line signature verificationPattern Recognition, Elsevier,2002
+[10]Alisher Kholmatov,Berrin YanikogluIdentity authentication using improved online signature verification method, Pattern Recognition Letters, Elsevier, Volume2005
+[11]Hairong Lv,Wenyuan Wang,Chong Wang,Qing ZhuoOffline Chinese signature verification based on support vector machines, Pattern Recognition Letters, ElsevierVolume 26,2005
+[12]ZHANG Da-Hai,WANG Zeng-FuFeature Extraction and Personalized Feature Selection for Online Signature VerificationPattem Recognition and Aitificial Intelligence, Volume 222009
+[13]Kai Huang,Hong YanOff-line signature verification based on geometric feature extraction and neural network classification, Pattern Recognition, Elsevier, Volume1997
+[14]H. Baltzakisa,N. PapamarkosA new signature verification technique based on a two-stage neural network classifierEngineering Applications of Artificial Intelligence, Elsevier, Volume 142001
+[15]CHENG-JIANG WANG,DI DAICHINESE HANDWRIT- ING SIGNATURE AUTHENTICATION USING DATA MIN- ING TECHNIQUE2007 International Conference on Wavelet Analysis and Pattern Recognition, Beijing, China2007
+[16]S. Rashidi,A. Fallah,F. TowhidkhahFeature extraction based DCT on dynamic signature verificationScientia Iranica, Elsevier, Volume2012
+[17]Yasmine Guerbai,Youcef Chibani,Bilal HadjadjiThe effective use of the one-class SVM classifier for handwritten signature verification based on writer-independent parameters, Pattern Recognition, Elsevier, Volume2015

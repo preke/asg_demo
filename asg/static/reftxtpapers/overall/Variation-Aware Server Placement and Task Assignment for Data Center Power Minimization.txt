@@ -1,0 +1,313 @@
+Variation-Aware Server Placement and Task Assignment for Data Center Power Minimization
+Ali Pahlavan,Mahmoud Momtazpour,Maziar Goudarzi
+pahlavan@ce.sharif.edu,momtazpour@ee.sharif.edu,goudarzi@sharif.edu
+
+Keywords-Data center, Power reduction, Process variation, Server placement, Task assignment.
+I. INTRODUCTION Increasing power consumption cost of information and communication technology (ICT) and information technology (IT) equipments due to higher demands for data centers in IT industry has brought data center power reduction strategies into focus [1]. In recent years, there has been an increasing interest in power reduction of data centers, including both IT equipments and cooling devices. To this end, the authors in [2] have shown that energy consumption of the cooling system encompasses more than half of total energy consumption in a large scale data center by a typical breakdown of how the electrical capacity is divided among the various loads. Another research in [3] presents several thermal-aware methods for task assignment to reduce total power consumption of data centers. However, these methods are inefficient in online power management due to the computational overhead of the CFD simulations used. The work in [4], [5] are also other examples of online task assignment based on CFD simulation. There are also few examples in which a sensor-based online scheduling is used with lower computational overhead [6], [7]. Authors in [1] also developed a mathematical method to consolidate ON servers in chassis and racks.
+To the best of our knowledge, this paper is the first to consider process variation in data center power reduction. As
+we scale to nanometer region, the amount of process variation increases which in turn results in a huge deviation in the leakage power consumption of the manufactured chips. Intel has reported that process variability can cause up to 20X variation in chip leakage power in high-end processors manufactured in 180nm technology [8]. Leakage power consumption along its variability has been considered as a major concern for the next 15 years design technology [9]. Therefore, the power consumption of identically manufactured servers in a data center cannot be considered to be identical anymore, resulting in a heterogeneous data center. Without consideration of process variation, existing struggles in data center power management are incomplete. For example, thermal-aware researches such as [3] may result in setting improper cooling temperature due to the non-uniformity of servers power consumption caused by process variation. This leads to increased hardware failure rate and response time due to overheated servers. Chassis consolidation approach introduced in [1] may also result in an inappropriate selection of ON chassis without taking process variation into account. This in turn, affects proper cooling temperature selection and the overall power consumption of data center.
+In this paper, we propose a variation-aware server placement and task assignment algorithm to minimize total power consumption of data centers. The server placement method tries to find the optimum server placement in a data center based on the power characteristics of servers and the heat recirculation model of the data center. The heat recirculation in a data center can be modeled as a Cross Interference Matrix by using CFD tools as used in [6]. Then, we use variation-aware chassis consolidation technique along with task assignment process to reduce data center power consumption. This will ensure that incoming tasks are assigned to minimum number of ON chassis among those that have lower impact on total power consumption. We formulate our task assignment and chassis consolidation technique as an Integer Linear Programming method. Simulation results reveal improvement in total power consumption of data center in comparison with random server placement method. In summary, our contributions in this work are described as follows:
+• To the best of our knowledge, we are the first to tackle variation effect in data center power optimization.
+978-0-7695-4701-5/12 $26.00 © 2012 IEEE DOI 10.1109/ISPA.2012.29
+158
+• We introduce a server placement method that determines the best position for each server based on its power consumption characteristics under process variation and the heat recirculation model of the data center. This ensures that power-greedy servers are placed in chassis having lower contribution to the total power consumption of the data center.
+• We also consider process variation when performing chassis consolidation for task assignment. This guarantees that the use of power-greedy chassis is minimized, leading to a more efficient power reduction.
+The rest of paper is organized as follows. In section 2, we explain consolidation concept and process variation conditions. Section 3 introduces server and cooling system power model to calculate total power consumption of data center via a mathematical formulation. In section 4, we propose our server placement algorithm and formulate task assignment using an Integer Linear Programming (ILP) method. Section 5 is related to simulation environment and evaluated results. Finally, we draw our conclusion and talk about future work in the last section.
+II. PRELIMINARIES
+
+A. Related Work
+The authors in [3] proposed a method to minimize the total energy consumption of data center while considering thermal management for their reliable function. They have used CFDbased simulations in order to evaluate their task scheduling methods such as Minimal Computing Energy (MCE) which is the best one among others. The aforementioned algorithm tries to minimize the total number of running servers and turn off all other idle ones. The algorithm first assigns the tasks to the nodes having the lowest inlet temperature. In another CFDbased work [5] an analysis of a data center with temperature variation has been presented. The authors have obtained static provisioning for an arbitrary distribution of cooling resources that will lead to a reference state. They try to minimize the inlet temperature by dividing the workload on other available systems.
+CFD-based techniques are often time consuming and complex. This issue will not lead to tackling online scheduling problem efficiently [10]. Therefore, fast thermal evaluation models are developed such as [6], [7]. In [6], the goal is to reduce the peak inlet temperature in order to obtain the lowest power consumption of cooling system using heat recirculation model. As a result, 20% to 30% cooling power saving will occur in different data center utilization rates. In [7] fast prediction of temperature distribution is done using distributed sensors to reduce energy consumption in high performance data centers considering recirculation properties. So, this method is suitable for real time and online management. The authors in [10] demonstrated a thermal aware resource management method considering heat transfer properties and workloads having thermal features. Their scheduling algorithm will result in reduced power consumption without performance degradation.
+Reference [1] presented the chassis consolidation technique as a mathematical optimization problem and a heuristic algorithm. Optimization problem has been solved via ILP. Their experiments show that they gain 13% power saving for different utilization rates in comparison with the technique lacking consolidation.
+None of the above works considers process variation effects on total power consumption of high performance servers. As will be explained below, variability effects in nanometer-scale technologies has caused dramatic variations in leakage and total power consumption of processor cores especially in high performance processors [8]. Such variation effects are visible in today processors and are expected to further rise with technology scaling when further approaching atomic scales. Process variation effects are already studied in highperformance multiprocessor and embedded systems [11], [12], [13], but to the best of our knowledge such effects have not been previously considered at data center scales.
+
+B. Consolidation Effect
+Server consolidation is the process of assigning incoming tasks to minimum number of servers and shutting down the idle servers to save power [14]. In the new data center generation, blade servers are placed in chassis with shared power and cooling units [3]. Due to high power consumption of these chassis, the concept of chassis consolidation has been introduced [1]. In this technique, we try to assign tasks to minimum number of servers such that the number of ON chassis is also minimized. In a homogenous data center with identically manufactured chassis and servers, minimizing the number of ON chassis and servers will directly result in total data center power minimization. However, as the semiconductor technology scales into ever deeper regimes, the increasing variation in the power consumption of servers may cause the data center to be more heterogeneous. Therefore, the ideal non-variation-aware chassis consolidation strategy may not be effective anymore since the power consumption of servers is not identical due to process variation effect. In this paper, we introduce an ILP-based variation-aware chassis consolidation method to find the optimal consolidation plan for the data center in the presence of process variation.
+
+C. Process Variation
+Sources of variations and uncertainties are referred to three categories: Process, Environmental and Design variations. Process variation is defined as the inability to precisely control the transistor or interconnection parameters such as channel width (Weff), channel length (Leff) and threshold voltage (Vth) or width and spacing of interconnects. Environmental variation includes temperature, supply voltage and interconnect factors. Design variation is related to timing analysis, transistor models and circuit simulations [15]. Process Variation is divided into die-to-die and intra-die or within-die forms. Within-die variation refers to variation in transistor parameters across identically designed neighboring transistors in a single chip while die-to-die variation refers to deviation in process parameters across different identically designed chips in a wafer. Intel has reported that process variability can cause up to 30% deviation in frequency and up to 20X variation in chip leakage power in high-end processors
+manufactured in 180nm technology [8]. So, the power consumption of identically designed servers in a data center cannot be identical anymore. For example, a Blade Server with 50W total power consumption (considering that leakage power can contribute to almost 40% of total power consumption [16]) can have up to 400W leakage power at worst case. The process variation can also be categorized into systematic and random effects. Systematic effects include lithographic lens aberration, and random ones comprise doping density fluctuation as a sample [17]. In summary, process variation is categorized into systematic die-to-die variation, random die-to-die variation, systematic within-die variation and random within-die variation.
+
+D. Data Center Configuration
+A data center comprises a hierarchical structure typically from top to down: Rows, Racks, Chassis and Servers. Fig. 1 depicts a data center configuration with four rows of racks forming hot and cold aisles. Each rack contains several chassis. Each chassis consists of several single or multi-core servers along with a shared power unit and a cooling fan. The data center also has a Computer Room Air Conditioning (CRAC) unit that circulates hot and cold airs in order to keep the data center temperature below a certain limit. The cold air current is dispensed through the leaky tiles located on the elevated floor, and then it is sucked by the chassis fans from the cold aisles. The hot air exits the other side of chassis toward hot aisles and then leaves the data center’s room by the available intakes of air conditioning unit on the ceiling located above the hot aisles. This data center configuration is similar to one used in [1].
+III. DATA CENTER POWER MODEL
+
+A. Power Model of Blade Servers
+In this work, we model the total power consumption of a data center with two components: IT equipment’s power consumption and cooling device’s power consumption. The power consumption of IT equipment is comprised of server power consumption and chassis power consumption. The chassis power accounts for its cooling fan and AC to DC power convertor. The server power comprises two parts: core power consumption and uncore power consumption. The uncore power consumption of a server is the power consumed by its memory controller, I/O drivers and any other components except the processing cores [1]. The power consumption of the processing cores is also referred as core power. The difference between power consumption values for
+different utilization rates is small compared to the total power consumption of the chassis, and hence we simply assume that the active power consumption of a server is largely independent of its utilization level as also assumed in similar researches [6]. Also the tasks on the servers can be run in different voltage frequency scaling level (Lvf). The voltage frequency (V-F) level of each server is adjusted based on the type of running tasks in the process of assigning the tasks and is fixed until the end of the execution interval of that task. Therefore, the power consumption of blade servers is calculated as follow:
+.i iBase iUncore iCoreP P P P= + + (1)
+Each term in (1) is specified as:
+, , , ,1 1 s vf
+iBase i
+iUncore i i N L
+iCore i j k i j kj k
+P P a s
+P b r
+δ
+= =
+= =
+=
+where PiBase denotes ith chassis power consumption excluding the power consumption of its inner servers. PiUncore presents uncore power consumption of the ith chassis which equals uncore power consumption of all ON servers within it. So, ai and si denote the uncore power consumption of a server and the number of ON servers in the ith chassis respectively. In (2), PiCore, bi,j,k denotes power consumption of jth active core in an ith chassis which is set to kth voltage frequency (V-F) level. This scaling is due to process variation that causes different power consumption of servers in any V-F scaling. Ns is the number of servers in a chassis. We define binary variable r such that, ri,j,k=1 if jth server in ith chassis runs at kth V-F level and ri,j,k=0 for other V-F levels (i.e., for any i and j). The number of ON servers doesn’t exceed the number of available servers in a chassis (Ns) automatically with considering the dimension and type (binary) of variable r. Finally, the power consumption of blade servers in Nc chassis is calculated as a vector as follow:
+1 1 , .s vfN L j k P a s C C b rδ = = = + + = (3)
+Equation (3) is adopted from [1] which P, δ and C denote [P1,P2,…,PNc]T, [δ1,δ2,…,δNc]T and [C1,C2,…,CNc]T vectors respectively. Operator presents element-by-element matrix and array product. Therefore, and denote and respectively. Array contains core power consumption of all chassis; and C is computed as the summation of power of ON servers in all chassis. Finally, the total power consumption of IT equipments (Ps) in a data center is calculated as:
+1
+. cN
+s i i P P = =
+(4)
+where Pi represents power consumption of ith chassis.
+
+B. Power Consumption of Cooling Unit
+CRAC performance as a cold air supplier of data center room depends on several factors such as outgoing air speed and main material used in construction of CRAC [1].
+(2)
+Energy consumption of CRAC is determined according to Coefficient of Performance (COP) criterion. COP shows the efficiency of CRAC and is defined with the ratio of removed amount of heat (Qs) by the cooling system to total energy consumption of CRAC (ECRAC) for cooling air process [18]. So, COP is specified as:
+/ .s CRACCOP Q E= (5)
+In our work, we use COP model of HP Utility Data Center’s CRAC. The COP varies with supplied cold temperature of CRAC (Ts) [18]. The COP model is defined as:
+20.0068 0.0008 0.458.s sCOP T T= + + (6)
+So the cooling power consumption may be specified as follows [18]:
+/ .CRAC sP P COP= (7)
+where Ps is IT power consumption and COP denotes coefficient of performance of CRAC.
+
+C. Total Power Cost
+Total power of data center contains IT power consumption and CRAC power that are accounted in part A and B respectively. IT power consumption contains core and uncore power consumption of servers. Therefore, data center power cost is the sum of all chassis and CRAC power consumption without considering power losses due to electrical power conversion and distribution network comprising UPS, AC-DC and DC-DC converters and also the switch gear and conductors [1]. Total power cost (PDCTC) is the summation of (4) and (7) and can be written as:
+1
+1(1 ) . cN
+DCTC i i P P COP = = + (8)
+Finally, by replacing (1) in (7), we obtain:
+, , , , 1 1 1 1 1
+1(1 )( ). vfc c c s LN N N N
+DCTC i i i i j k i j k i i i j k P a s b r COP δ = = = = =
+= + + + (9)
+IV. PROPOSED SERVER PLACEMENT AND TASK ASSIGNMENT METHOD
+In this section, we demonstrate our proposed server placement algorithm based on heat recirculation effects. Then, we present a variation-aware chassis consolidation and task assignment method based on the obtained server placement strategy.
+
+A. Problem Statement
+In Fig. 2 we see the design flow for our proposed server placement and task assignment algorithm. We consider the data center specification as an input for our server placement block in the first step. Our server placement algorithm solves the ILP problem in order to select 10% of servers and specifies the optimum placement in such a way that the data center power consumption is minimized in each step. This process continues until 100% of servers are selected and placed. Ultimately, we solve ILP to find optimum task scheduling and consolidation plan for a given workload and placement.
+
+B. Server Placement Method
+In this section, we formulate our server placement method by using ILP. Since total power consumption of a data center depends on server utilization, finding an optimal server placement for a fixed server utilization rate may not be optimum for other values of server utilization at run-time. Therefore, the objective of the ILP problem is considered to be the average power consumption of data center over different server utilization values in the interval 10%-100%. In order to solve the IPL problem, we use a partitioning technique.
+To this end, we first considered a specified percent of data centers utilization (ui) and obtained the best selection and placement of servers leading to minimized total power consumption of data center including both IT equipment and cooling system power consumption. For example, in a 10% utilized data center, the ILP selects 10% of servers and finds an optimum placement for them. In the next step, considering that 10% of servers are optimally placed, the ILP tries to find the optimum placement for an additional 10% of servers for a 20% utilized data center. This procedure continues until 100 percent utilization (un) is achieved and all of the servers are placed in chassis.
+The optimal server placement problem for serving different data center utilization rates is as follows:
+OBJECTIVE FUNCTION:
+,1 1
+1
+1(1 ) ( ) .c nN Si i i iDCSP j j j j j k kj k
+n
+MIN P X a e Place Pv COP
+for i u to u
+δ = = = + + +
+=
+(10)
+CONSTRAINTS:
+,1
+,1 1
+,
+1 2
+1 2
+1 2
+1. , ,..., , 1,2,...,
+2. .
+3. , ,...,
+4. 1 , ,...,
+n
+c n
+Si i i i j j j j j j k kk
+i i s j c
+N S i j k sj k
+i j k
+n
+n
+cPc X a e Place Pv i u u u j N
+T DPc T
+Place N i u u u
+Place i u u u
+δ =
+= =
+= + + = =
++ ≤
+≤ =
+≤ =
+1 1
+,1
+1
+1
+1 2
+1 2
+1 2 1
+5. , ,..., , 1,2,...,
+6. , ,...,
+7. 0 , ,...,
+8.
+n c
+n
+c
+S N
+k j
+Si i j j kk
+N i j ij
+i i
+i i j j
+n
+n
+n
+n
+ce Place i u u u j N
+e M i u u u
+Place Place i u u u
+X e
+= =
+=
+=
++ −
+= = =
+= =
+− ≥ =
+≤ ≤
+,
+1 2
+1 2
+, ,..., , 1,2,...,
+9. {0,1} 1,2,..., , 1,2,...,
+10. {0,1} , ,..., , 1,2,...,
+i j s
+j k
+i j
+n
+n
+c
+c n
+c
+X N i u u u j N
+Place j N k S
+X i u u u j N
+= = ∈ = =
+∈ = = where and respectively denote total and j
+th chassis power consumption in utilization ui. Vector shows the server power consumption under process variation effect. Binary variable is defined to indicate whether the j
+th chassis is on ( ) or off ( ). Also, binary variable ! " indicates which servers are placed in different chassis under a specific utilization ui. On the other hand, " is used to specify the number of placed servers in jth chassis which does not exceed the server capacity. Parameters #$ and % respectively determine total number of servers and number of needed running servers in utilization &'.
+Our goal (10) is to minimize data center total power consumption in each step by determining Ts. As formulated in constraints, several conditions should be taken into consideration. Power consumption is obtained using the variable X in such a way that for each chassis, it determines whether the chassis is on or off. Condition on (X = 1) occurs when at least one server is placed in the specified chassis. The second constraint talks about the fact that inlet temperature should not exceed critical value. The third one emphasizes that the number of placed servers should not violate the chassis capacity. Constraint (4) limits each server to be placed solely in one chassis. Constraint (5) is used to determine the number of servers placed in the jth chassis and Constraint (6) is used to determine chassis capacity limit. Constraint (7) is used in partitioning technique and guarantees that the optimal solution in utilization ui is transferred to the next step for placing the rest of servers in utilization ui+1. Constraint (8) states that if a chassis is turned off, no servers can be placed into it consequently.
+Equation (10) is a non-linear objective function due to the existence of coefficient COP which is a function of Ts. Hence, in order to solve such a problem, we call the ILP solver for fixed values of Ts in the range of 0 to 25 with an accuracy of 0.1. By comparing feasible solutions, the best placement having minimum power consumption is selected as the final solution.
+
+C. Heat Recirculation Model
+In this section, first we investigate the effect of heat recirculation on the power consumption of chassis. Then, we introduce a thermal model of the data center based on the heat
+recirculation which is used in the proposed task assignment method in the next section.
+Power consumption is equivalent to the amount of heat that is transferred per unit time. This fact is proved according to the law of energy conservation. Therefore, the amount of heat in a unit of time is carried by an air flow is calculated as [19]:
+.pQ fc Tρ= (12)
+where Q is defined as the heat rate in units of Watt (W), is defined as air density in units of Kg/m3, ( is air flow rate in term of m3/s, cp denotes the specific heat of air in units of J Kg-1 K-1 and T denotes air temperature in terms of Kelvin (K).
+Any chassis consumes energy according to law of energy conservation based on the difference of outgoing temperature of hot air (Tout) and cold air temperature entering the chassis (Tin). So the power consumption of the ith chassis (Pi) is defined as follow:
+( ).i ii i i p out inP Q P f c T Tρ= Δ = − (13)
+In order to obtain chassis power distribution, stable condition of chassis temperature and cold air temperature of CRAC is needed for reaching steady state of data center due to heat recirculation among the chassis. So, similar to [1], we assume that the tasks are running for a long period of time on the data center resulting in a stationary temperature profile. This is usually the case for using High Performance Computing (HPC) task such as HSPICE simulation that take several hours or days for running because the time granularity will change due to different incoming workload.
+Heat recirculation can be described as the amount of outlet heat rate of a chassis that affects the inlet heat rate of another chassis. The authors in [20] show that the heat recirculation can be defined as a Cross Interference Matrix. Cross interference matrix is denoted as ANc×Nc in chassis granularity in which Aij is the coefficient of thermal effect of ith chassis on the jth chassis. Therefore, the inlet heat rate of ith chassis (Qiin) is calculated as [7]:
+1
+. cN
+i j in i ji out s j Q P A Q Q = = + + (14)
+where Qiin, Qiout, Pi and Aij are known and Qs denotes the cold air rate of CRAC. We can transform heat rate to the temperature using thermodynamic constants in a vector form because, the inlet temperature of any chassis should be less than a specific value (Tc) to avoid overheating and eventually failing servers [10]. So, the relation between temperature and power consumption can be defined similar to [7] as:
+1 1. , [( ) ].Tin sT T D P D K A K K − −= + = − − (15)
+where Tin denotes inlet temperature vector of Nc chassis as )* $ * $ + , * $ -. / , P denotes power consumption vector of Nc chassis as [P1, P2,…, PNc]T, and Ts is the column vector with same values in all entries. Matrix K is the Nc×Nc diagonal one (K = diag(K1, K2,…,KNc)) in which 0 1( 2. Substituting P with (3) into (15), we have:
+( ).in sT T D a s Cδ= + + + (16)
+(11)
+where Tin, should not exceed Tc for all chassis. Our goal is to minimize total power consumption of data center (9) while determining optimum Ts to reduce both CRAC and whole data center power consumption. In this paper, typical Tc is 25°C [7].
+
+D. Chassis Consolidation and Task Assignment Method
+We consider the steady state of data center to solve our task assignment method. We assume that the characteristics of HPC tasks are specified as prior knowledge for setting V-F levels of servers. Desired V-F level for each server is determined from domain name servers (DNS) of the demands for instance [1]. Assume that Nl specifies the number of servers put in each V-F level as a problem input. Therefore, the total number of tasks (Nt) is calculated as 3 45 46 78 59 . We modeled chassis consolidation technique as an ILP formulation to minimize power consumption of data center. Similar to [1], we defined a binary variable Y to determine ON/OFF chassis. If Yi=1, the ith chassis is ON, else (Yi = 0) is OFF. So, the power consumption of chassis is modified as follow:
+, , , ,1 1 ( ).s vfN Li i i i i i j k i j kj kP Y a s b rδ = == + + (17)
+For ILP method, we correct the nonlinear relationship in (17) due to production of variables by adding other constraint : ; ; : 4 similar to [1]. This constraint states that if Yi=0, the number of ON servers in ith chassis (si) will be zero, else ; ; 4 . Therefore, : as well as : because, 3 3 <
+78 9 = 9 In summary, we formulate
+chassis consolidation technique for power optimization as:
+OBJECTIVE FUNCTION:
+, , , ,1 1 1{ ( )}. c s vfN N L i i i i i j k i j ki j k MIN Y a s b rδ = = = + + (18)
+CONSTRAINTS:
+, ,1 1
+, ,1
+, ,
+1. ( ) 2. 1,2,...,
+3. 1,2,...,
+4. 1 1,2,..., , 1,2,...,
+5.
+s vf
+vf
+s i i i i i c
+i i i c
+N L i i j kj k
+L i j kk
+i j
+c
+c
+c s
+T D Y as C T Y s YN i N
+s r i N
+r i N j N
+r
+δ
+= =
+=
++ + + ≤ ≤ ≤ =
+= =
+≤ = =
+1 1
+1
+, ,
+1,2,...,
+6.
+7. {0,1} 1,2,..., 8. {0,1} 1,2,..., , 1,2,..., , 1,2,...,
+c s
+vf
+N N l li j
+L l tl
+i
+i j k
+vf
+c
+c s vf
+N l L
+N N
+Y i N r i N j N k L
+= =
+=
+= =
+=
+∈ = ∈ = = =
+where Y denotes ON/OFF chassis as a vector [Y1,Y2,…,YNc]T. We do not consider cooling power consumption in the objective function due to the nonlinear relationship in total power consumption (9). To solve this problem, we call ILP solver for each Ts in the range 0 to 25 with an accuracy of 0.1. Then with the comparison of feasible solutions for each Ts, the optimum total power consumption is returned as the solution similar [1].
+V. SIMULATION AND ANALYSIS In this section, we present the simulation environment and experiments. We also demonstrate the simulation results and compare them via specific tables.
+
+A. Simulation Environment
+We use GAMS [21] to solve the ILP problems in this paper. The specification and parameters for data centers are as follows:
+The physical dimensions of the data center in the experiments are 9.6m × 8.4m × 3.6m which is considered a small scale one. There are two rows in the structure. Each row consists of five 42U racks. Each rack has five chassis with ten server slots. The type for each Blade Server is 7U Dell PowerEdge 1855 dual processor. Hence, the data center has a total number of 1000 single core servers of the same type [6]. There are two V-F levels (LVF = 2) except the zero V-F one which among LVF1 and LVF2, the first one has higher V-F level. Values for power of each chassis and server are illustrated in Table I [1].
+The CRAC unit is responsible for providing cold air in the room with the rate of f = 8m3/s. The flow rate of ith chassis, air density and specific heat of air are considered as fi = 0.2454 m3/s, = 1.19 Kg/m3 and cp = 1005 J Kg-1 K-1 respectively [6]. In our process variation model, 40 percent of total core power is related to leakage power [16]. We use systematic die-to-die variation and a Lognormal distribution for the corresponding model [17], [22]. Lognormal distribution parameters are μ = 3.024 and = 0.85 which are the mean and standard deviation respectively. These parameters are selected in such a way that the nominal value is the 40% of total power consumption and the leakage power continues up to 20 times the nominal value.
+
+B. Simulation Results
+We suppose that each task is assigned only to a certain server. We define different data center utilization rates based on varying number of assigned tasks. For instance, having a total number of 1000 servers, a 40% utilized data center means that 400 servers are executing the same number of tasks [1]. In this paper, we compare total power consumption and cooling cost in the case of Random Server Placement (RSP; several random placements were tested and the average was computed) and Optimal Server Placement (OSP) both having variationaware chassis consolidation. We consider four different workloads which are determined based on the ratio Nl to Nt. This ratio demonstrates what percentage of tasks works with LVF1 and what portion is applied for LVF2. Therefore, workload 1 denotes that all tasks (servers) work with LVF1. Similarly, workload 2 refers to the conditions in which 50% of tasks work with LVF1 and the rest with LVF2. The third workload is defined as 10% of tasks work with LVF1 and the rest with LVF2 and the last one (workload 4) is expressed in such a way that all tasks work with LVF2.
+VoltageFrequency
+Level
+Chassis Overhead ( )
+(W)
+Uncore Power of Server (a)
+(W)
+Core Power Consumption (b)
+(W)
+LVF1 820 60 25
+LVF2 820 60 12.5
+TABLE I. VOLTAGE-FREQUENCY PARAMETERS [1]
+In the following tables (Table II-V), total power consumption and Ts with power improvement percentage in different data center utilization rates are exhibited for the mentioned workloads. Table II shows more than 13% power saving for less than 50% utilized data center. We obtained up to 14.85% and 8.92% power improvement on average for workload 1. According to table III, under conditions which 50% of tasks work with LVF1 and the rest with LVF2, results reveal 6.64% power saving on average and up to 9.57% improvement. Table IV demonstrates up to 8.6% power saving and 5.97% improvement on average for workload 3. Finally, Table V specifies 6.24% power enhancement on average and up to 10.13% for workload 4. In general, we observe a descending order of power saving percentage in different data
+center utilization rates. On the other hand, results show that by using the proposed server placement method, we obtain more power saving in lower utilization rates. This is mainly due to the fact that our server placement method is incremental. This means that we try to place low power servers in the best location available in 10% utilization and continue to place other servers until we reach 100% utilization. Therefore, in higher utilization rates, the remaining servers are all high power servers which are going to be placed in worst locations available. As shown in the results, data center power consumption is even worsened in 100% utilization with respect to conventional random server placement. However, this is acceptable since in typical data centers, the average utilization is generally 20-30% [23].
+
+VI. CONCLUSION AND FUTURE WORK
+References
+[1]E. Pakbaznia,M. PedramMinimizing data center cooling and server power costsISLPED09 Proceeding of the 14 ACM/IEEE International Symposium on Low Power Electronics and Design, pp. 145-150, 2009.2009
+[2]R. SawyerCalculating total power requirements for data centersWhite Paper, 2004.2004
+[3]Q. Tang,K.S. Gupta,D. Stanzione,P. CaytonThermal-aware task scheduling to minimize energy usage of blade server based datacenters2 IEEE International Symposium on Dependable, Autonomic and Secure Computing, pp. 195-202, 2006.2006
+[4]J. Choi,Y. Kim,A. Sivaubramaniam,J. Srebric,Q. Wang,J. LceA CFD-based tool for studying temperdture in rack-mounted serverIEEE Trans. Comput, vol. 57, pp. 1129-1142, 2008.2008
+[5]A.H. Beitelmal,C.D. PatelThermo-Fluids provisioning of a high performance high density data centerDistributed and Parallel Databases, vol. 21, no. 2-3, pp. 227-238, 2007.2007
+[6]Q. Tang,K. Kumar,S. Gupta,V. GeorgiosEnergy-Efficient Thermal-aware task scheduling for homogeneous high-performance computing data centers: A cyber-physical approachIEEE Transaction on Parallel and Distributed Systems, vol. 19, no. 11, pp. 1458-1472, 2008.2008
+[7]Q. Tang,T. Mukherjee,K.S. Sandeep,K.S. Gupta,P. CaytonSensor-based fast thermal evaluation model for energy efficient high-performance datacentersProc. Int'l Conf. on Intelligent Sensing and Info. Process, pp. 203-208, 2006.2006
+[8]S. BorkarParameter variations and impact on circuits and microarchitecturesDesign Automation Conference, pp. 338-342, 2003.2003
+[9]L. Wang,G. Laszewski,J. Dayal,T.R. FurlaniThermal aware workload scheduling with backfilling for green data centersIEEE 28 Performance Computing and Communications Conference (IPCCC), pp. 289-296, 2009.2009
+[10]F. Wang,C. Nicopoulos,X. Wu,Y. Xie,N. VijaykrishnanVariation-aware task allocation and scheduling for MPSoCIEEE/ACM International Conference on Computer-Aided Design (ICCAD’07), Nov. 2007.2007
+[11]M. Momtazpour,M. Goudarzi,E. SanaeiVariation-Aware Task and Communication Scheduling in MPSoCs for Power-Yield MaximizationIEICE Trans. Fundamentals of Electronics, Communications and Computer Sciences (Special Section on "VLSI Design and CAD Algorithms"), E93-A(12), pp. 2542-2550, Dec. 2010.2010
+[12]M. Momtazpour,M. Goudarzi,E. SanaeiStatic Statistical MPSoC Power Optimization by Variation-Aware Task and Communication SchedulingElsevier Journal of Microprocessors and Microsystems, in press, Feb. 2012.2012
+[13]H. ChangCircuit timing leakage power analysis under process variationsA Phd Dissertation of University of Minnesota, Feb. 2006.2006
+[14]G.B. SirsiLeakage power optimization flowInternational Cadence Usergroup Conference, 2004.2004
+[15]S. Ghosh,K. RoyParameter variation tolerance and error resilency: new design paradigm for the nanoscale eraProceedings of the IEEE, vol. 98, no. 10, pp. 1718-1751, 2010.2010
+[16]J. Moore,J. Chase,P. Ranganathan,R. SharmaMaking scheduling ‘Cool’: Temperature-aware resource assignment in data centersUsenix Annual Technical Conference, 2005.2005
+[17]Y.A. CengelHeat transfer: a practical approach2 edition, McGraw-Hill, 2003.2003
+[18]R.E. RosenthalGAMS-a user guideGAMS Development Corporation, 2010.2010
+[19]R. Rao,A. Srivastava,D. Blaauw,D. SylvesterStatistical estimation of leakage current considering inter- and intra-die process variationLow Power Electronics and Design, ISLPED, pp. 84- 89, 2003.2003
+[20]L. Barroso,U. HolzleThe case for energy-proportional computingIEEE Computer, Jan 2007. Data Center Utilization (%) RSP Ts (°C) OSP Ts (°C) RSP Power Consumption (KW) OSP Power Consumption (KW) Power Saving (%) 10 24.22 24.8 14.99 13.48 10.13 20 24.12 24.5 30.15 27.29 9.48 30 23.75 24.2 45.54 41.44 8.99 40 23.24 23.6 61.34 56.15 8.47 50 22.29 22.5 77.71 71.85 7.53 60 21.16 21.4 95.08 88.61 6.8 70 19.91 20 113.63 107.27 5.6 80 18.56 18.6 134.03 127.92 4.56 90 17.14 17 156.49 152.42 2.59 100 14.7 14.2 188.34 191.78 -1.82 Power Saving Average (%) 6.24 1652007

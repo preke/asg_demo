@@ -275,7 +275,7 @@ FONTS & ICONS
 			},
 			success: function(result) {
 				for (let i = 0, len = result['references'].length; i < len; i++) {
-					document.getElementById("ref_list").innerHTML += "<div class=\"input-group\"><span class=\"input-group-addon\"><input name=\"refs\" type=\"checkbox\" value="+result['ref_ids'][i] + " checked></span><a href=" + result['ref_links'][i]+ " target=\"_blank\" class=\"list-group-item\">" + result['references'][i] + "</a></div>";
+					document.getElementById("ref_list").innerHTML += "<div class=\"input-group\"><span class=\"input-group-addon\"><input name=\"refs\" type=\"checkbox\" value="+result['ref_ids'][i] + " checked></span><a href=" + encodeURI(result['ref_links'][i])+ " target=\"_blank\" class=\"list-group-item\">" + result['references'][i] + "</a></div>";
 				}
 				$("#refs").attr("style","display:inline;");
 			},

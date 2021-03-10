@@ -1,0 +1,132 @@
+Instruction Cache Locking for Real-time Embedded Systems with Multi-tasks
+Tiantian Liu,Minming Li,Chun Jason Xue
+
+
+I. INTRODUCTION
+In a real-time embedded system with multi-tasks, a cache is shared by different tasks, which increases the complexity of cache management and the unpredictability of cache behavior. This unpredictability brings an overestimation of application’s worst-case execution time (WCET) and worst-case CPU utilization (WCU) which are two of the most important criteria for real-time embedded systems. An overestimation of WCU in turn leads to an unnecessary increased hardware cost of embedded systems, especially for real-time embedded systems which can not afford to miss deadlines or to be overloaded. One of the solutions to remedy the unpredictability is to apply cache locking technique. Cache locking is to select and lock some content of a program or data in the cache. It is supported by a wide selection of modern processors, such as ARM9 series [1], MPIS32 series [2], MPC603E, MCF5249 [3]. Two schemes of cache locking are possible: static and dynamic. In static cache locking scheme, cache contents are loaded at application start-up and remain unchanged until the application completes execution. In dynamic cache locking scheme, locked cache contents can change at specific reloading points based on the runtime information.
+Significant research efforts have been invested in cache locking problem. Puaut et al. have done a series of studies about I-Cache locking. In [4], they propose two greedy algorithms for static I-Cache locking for multi-tasks using
+This work is partially supported by a grant from the Research Grants Council of the Hong Kong Special Administrative Region, China [Project No. CityU 116907] and a grant from City University of Hong Kong [Project No. 7200106].
+two different metrics: minimizing the WCU and minimizing the interferences between tasks. In [5], the dynamic I-Cache locking problem is studied by finding different I-Cache locking states for different code regions. Campoy et al. use genetic algorithms for both static locking [6] and dynamic locking [7] in multi-task preemptive real-time systems. The genetic method is noted for its high time complexity. Falk et al. [8] take the changing of worse-case execution path into consideration during each step of optimization. They use an Execution Flow Graph (EFG) to model a program and adopt a greedy strategy to choose nodes in an EFG into cache. Liu et al. in [9] study the static locking problem for a single task in real-time embedded systems. An Execution Flow Tree (EFT ) is proposed to model an application and the problem is formulated using a linear programming model. The problem is proved to be NP-Hard and optimal algorithms are proposed for subsets of the problem with special properties and patterns.
+This paper utilizes static and dynamic I-Cache locking to minimize WCU for real-time embedded systems with multitasks. The I-Cache explored in this paper can be either directmapped or set-associated. The I-Cache can be reloaded using a cache filling instruction and the I-Cache locking can be applied to each line of I-Cache. Each task is denoted by an Execution Flow Tree (EFT ) or Execution Flow Graph (EFG). The ICache locking problem is to analyze the tasks during their compilation time, select a set of nodes from different tasks to be locked in the I-Cache statically or sets of nodes to be reloaded and locked in the I-Cache dynamically. The goal is to minimize the WCU of real-time embedded systems. The contributions of this paper are listed as follows:
+1) Analyze and compare the static and dynamic I-Cache locking for real-time embedded system with multi-tasks. 2) Prove the static locking problem is NP-Hard and propose algorithms to obtain the optimal solutions. 3) Propose an algorithm for dynamic locking by exploring region partition [5] and the static locking results.
+The remainder of this paper is organized as follows. Section II gives the Execution Flow Tree (EFT ) model of a task. Section III analysis the static locking problem for WCU minimization, prove that it is NP-Hard and propose pseudopolynomial algorithms to solve it optimally. For dynamic locking, an algorithm is proposed in Section IV which applies the region partition algorithm in [5] and the static locking results to obtain the dynamic locking decisions. Section V presents experimental results of the proposed algorithms compared with previous works. Finally, this paper is concluded in Section VI.
+1533-2306/09 $25.00 © 2009 IEEE DOI 10.1109/RTCSA.2009.59
+494
+
+II. TASK MODEL: EXECUTION FLOW TREE
+There is N periodic tasks Ti, 1 ≤ i ≤ N with each period peri. The tasks are scheduled in the processor using some scheduling methods. WCU [10] presents the busy proportion of a processor used in task computation. The following equation gives this ratio:
+WCU = ∑
+i
+WCET (Ti) peri
+(1)
+In this paper, an Execution Flow Tree (EFT ) is used for modelling a real-time program.
+Definition 1: An EFT is a weighted tree EFT = (V, E), where V represents the set of nodes and E represents the set of edges. Node v ∈ V represents a code block of the program and has three attributes: w(v) is the processing time when v is not in the cache, w′(v) is the processing time when v is in the cache, and s(v) is the size of v. Edge e(v, u) denotes a program control flow from node v to node u. It can be a sequential flow, a loop flow or a branch flow.
+Algorithm EFT CON in [9] constructs an EFT from an executable program code. An example of EFT is shown in Fig. 1. Fig. 1(a) is a code segment of the benchmark “Audio beam former” [11] and Fig. 1(b) is its corresponding EFT . For simplicity, the EFT ’s call functions are not presented recursively in this example. Algorithm EFT CON does recursively process the subroutines. There is a procedure Duplicate() in Algorithm EFT CON. If a node v has an indegree(v) at least 2, Duplicate() instantiates the structure starting from v by indegree(v) times, which ensures the output to be a tree. For example, node 31, 32 and 33 in Fig. 1 (b) are the duplicated nodes introduced by Duplicate().
+To calculate the WCU, we first need to obtain the WCET of each task. For an EFT , WCET is the length of its longest rootleaf path. For a root-leaf path Px = (px0px1 . . . px num(Px)) in an EFT where px0, px1, . . . , px num(Px) ∈ V and num(Px) is the number of edges on this path, Len(Px) represents the execution time needed if this path is chosen to execute in runtime. It can be calculated as: Len(Px) = ∑num(Px) y=0 (1 − δ(pxy)) ·w(pxy)+ δ(pxy) ·w′(pxy), where δ(pxy) = 1 if node
+pxy is put in the I-Cache and δ(pxy) = 0 otherwise. Then the WCET (Ti) can be calculated by the following equation:
+WCET (Ti) = max px∈Ti num(Px)∑ y=0 ((1 − δ(pxy)) · w(pxy) +
+δ(pxy) · w′(pxy)) (2)
+
+III. STATIC I-CACHE LOCKING
+A. Problem Analysis
+The WCU optimization problem by static I-Cache locking can be defined as follows. Given an I-Cache with size S and a set of EFT s representing tasks, we aim to put some nodes from different tasks into the cache so that the total size of the chosen nodes does not exceed S and the WCU of the system is minimized. With the equation (1) and (2) discussed in Section II, we formulate the static I-Cache locking problem as an integer linear programming instance as follows.
+min ∑
+1≤i≤N
+WCET (Ti) peri
+s.t.⎧⎪⎪⎪⎪⎪⎪⎪⎪⎨ ⎪⎪⎪⎪⎪⎪⎪⎪⎩ WCET (Ti) ≥ ∑num(Px) y=0 {(1 − δ(pxy)) · w(pxy)+ δ(pxy) · w′(pxy)} ∀ root-leaf path Px = px0, px1, . . . , px num(Px) in Ti ∑ pxy∈ S 1≤i≤N Vi s(pxy) · δ(pxy) ≤ S
+δ(pxy) ∈ {0, 1} The goal is to minimize the WCU for the EFT s by
+determining δ(v) for each v ∈ ⋃1≤i≤N Vi. Lemma 1: The static I-Cache locking problem for multitasks is NP-Hard. Proof: We simplify the static I-Cache locking problem to be with only one task T which has no branches. Then the problem is equivalent to the 0/1 knapsack problem.
+B. Algorithm for EFT s
+As pointed above, there are some duplicated nodes in an EFT which make the problem hard to solve. Therefore, in this section we focus on the EFT s without duplicated nodes.
+A dynamic programming method is used to compute the optimal solution for EFT s without duplicated nodes. First we introduce a virtual node v0 and attach each task Ti as a child of v0. We call this tree EFT total. Then, the standard method is used to transform EFT total into a binary tree, where first child becomes left child and next sibling becomes right child. Finally, we delete the virtual node v0 and obtain a binary tree BEFT total. We use EFT totalv to denote the subtree of EFT total rooted at node v. Similar symbols are used for BEFT total. The transformation is shown in Fig. 2.
+For the root node ai of each task Ti, the WCU optimization problem OPT (ai, s) is defined for it as: Given a cache size of s (0 ≤ s ≤ S, S is the total size of I-Cache), determine the selection of nodes to put into the cache so that ∑ i≤k≤N WCETk/perk is minimized. Because there
+are N subtrees of this kind in BEFT total, there are NS subproblems. As we can see, each subtree BEFT totalai in BEFT total corresponds to a set of subtrees in EFT total whose roots are subsequent siblings of ai and ai itself. These subtrees are exactly the tasks Tk(i ≤ k ≤ N) we want to sum for minimization. There exist the following recursive relations:
+OPT (ai, s) = ⎧⎪⎪⎪⎪⎪⎪⎨ ⎪⎪⎪⎪⎪⎪⎩ w(ai)/peri if(ai is a leaf & s < s(ai)) w′(ai)/peri if(ai is a leaf & s ≥ s(ai)) minα(ai)=0/1{min0≤j≤s−α(ai)·s(ai){ ((1 − α(ai)) · w(ai) + α(ai) · w′(ai) +OPT (al, j))/peri + OPT (ar, s− α(ai) · s(ai) − j)}} if(ai is not a leaf) (3)
+, where al and ar are the left and right child of ai respectively, and α(ai) = 1 if ai is put in cache and α(ai) = 0 otherwise.
+For any non-root node v of a task, the WCET optimization problem OPT (v, s) is defined for it as: Given a cache size of s (0 ≤ s ≤ S, S is the total size of I-Cache), determine the selection of nodes to put into the cache so that the WCET of subtree BEFT totalv is minimized. There are ( ∑ 1≤i≤N |Vi|−N)S subproblems. Because each subtree BEFT totalv corresponds to a set of subtrees in an EFT total, OPT (v, s) can be calculated by the following recursive relations:
+OPT (v, s) = ⎧⎪⎪⎪⎪⎪⎪⎨ ⎪⎪⎪⎪⎪⎪⎩ w(v) if(v is a leaf & s < s(v)) w′(v) if(v is a leaf & s ≥ s(v)) minα(v)=0/1{min0≤j≤s−α(v)·s(v){ max{(1 − α(v)) · w(v) + α(v) · w′(v) +OPT (vl, j), OPT (vr, s − α(v) · s(v) −j)}}} if(v is not a leaf) (4)
+, where vl and vr are the left and right child of v respectively, and α(v) = 1 if v is put in the cache and α(v) = 0 otherwise.
+The dynamic programming algorithm for static I-Cache locking on EFT s: SLEFTS is presented in Algorithm 1.
+In Algorithm 1, each OPT [v][s] keeps the optimal solution of the subproblem OPT (v, s) we defined above by three variables: V alue, Cachable and LeftGet, which respectively represent the minimized WCU or WCET of this subtree BEFTv , whether or not node v is selected into the cache and the cache size allocated to its left child. When all OPT [v][s] are obtained, we can trace back to find the final solution and record it in the final solution array δ[ ∑ 1≤i≤N |Vi|]. Since each
+Algorithm 1 SLEFTS(EFT s, S): Static I-Cache Locking for N Tasks presented by EFT s Require: A set of EFTi(Vi, Ei) where 1 ≤ i ≤ N , cache
+size S. Ensure: A set of nodes in EFTi (1 ≤ i ≤ N ) to put into the
+cache to minimize WCU. EFT total.root = v0; Attach each EFTi to EFT total as a child of v0; BEFT total =Transform(EFT total); //v0 deleted for every node v ∈ ⋃1≤i≤N Vi do
+for every size 0 ≤ s ≤ S do OPT [v][s].V alue = −1; //Initialization
+end for end for Call OptimizeIt(BEFT total.root, S, OPT );
+procedure OptimizeIt(v, s, OPT ) if OPT [v][s].V alue = −1 then
+if v is the root node of task Ti then OPT [v][s].V alue = minα(v)=0/1{min0≤j≤s−α(v)·s(v)
+{((1 − α(v)) · W (v) + α(v) · W ′(v) + OptimizeIt(vl, j, OPT ))/peri + OptimizeIt(vr, s − α(v) · s(v) − j, OPT )}};
+OPT [v][s].Cachable = argα(v) min α(v)=0/1 { min 0≤j≤s−α(v)·s(v)
+{((1 − α(v)) · W (v) + α(v) · W ′(v) + OptimizeIt(vl, j, OPT ))/peri + OptimizeIt(vr, s − α(v) · s(v) − j, OPT )}};
+OPT [v][s].LeftGet = argj min α(v)=0/1 { min 0≤j≤s−α(v)·s(v)
+{((1 − α(v)) · W (v) + α(v) · W ′(v) + OptimizeIt(vl, j, OPT ))/peri + OptimizeIt(vr, s − α(v) · s(v) − j, OPT )}};
+else OPT [v][s].V alue = minα(v)=0/1{min0≤j≤s−α(v)·s(v)
+{max{(1 − α(v)) · W (v) + α(v) · W ′(v) + OptimizeIt(vl, j, OPT ), OptimizeIt(vr, s − α(v) · s(v) − j, OPT )}}};
+OPT [v][s].Cachable = argα(v) min α(v)=0/1 { min 0≤j≤s−α(v)·s(v)
+{max{(1 − α(v)) · W (v) + α(v) · W ′(v) + OptimizeIt(vl, j, OPT ), OptimizeIt(vr, s − α(v) · s(v) − j, OPT )}}};
+OPT [v][s].LeftGet = argj min α(v)=0/1 { min 0≤j≤s−α(v)·s(v)
+{max{(1 − α(v)) · W (v) + α(v) · W ′(v) + OptimizeIt(vl, j, OPT ), OptimizeIt(vr, s − α(v) · s(v) − j, OPT )}}};
+end if end if return OPT [v][s].V alue; end procedure
+subproblem can be solved in O(S) time, the time complexity of Algorithm 1 is O( ∑ 1≤i≤N |Vi|S2).
+C. Algorithm for EFGs
+Notice that the duplicated nodes make the optimal solutions hard to find. When we go back to the original control graph without Duplicate(), we find some frequently appearing patterns which can be solved shown in Fig. 3. Let’s call the directed graph without the duplicating process an Execution Flow Graph (EFG). Fig. 3(a) and (b) show parts of EFGs. Node F , node 7 and node 8 have more than one parents and will be duplicated under the EFT model. As has been pointed out in [9], these patterns have some characteristics that enable the problem to be solved in pseudo-polynomial time using a bottom up dynamic programming method. Paths from a branching node will merge into and only merge into a single merging node. Meanwhile the merging node has and only has paths coming from the same branching node.
+Method to check whether an EFG exhibits these special patterns and to compute the optimal WCET of a pattern are given in [9]. Based on these, we propose SLEFGS for static locking problem on EFGs that exhibits the special patterns in Algorithm 2 which is also applicable to EFT -type tasks.
+In Algorithm 2, the procedure GMergeIt(EFG, Weight) is first called for those EFG-type tasks. It checks whether this EFG fits in the patterns and then computes the optimal WCET of each pattern in the EFG. It also merges the pattern into a new node. It will return an EFT for this EFG when all of the patterns are computed and merged. The remaining part is similar to Algorithm SLEFTS with only small modifications of the recursive equations. Because each node v can be a merged node, the weight value of node v should be modified as Weightv[p] which is the optimal WCET with a cache size of p for this merged node and has already been calculated by the procedure GMergeIt(). In this way, the optimal solutions for the subset of the general problem can be computed. The time complexity of Algorithm 2 is O( ∑ 1≤i≤N |Vi|S2).
+
+IV. DYNAMIC I-CACHE LOCKING
+A. Problem Analysis
+Dynamic I-Cache locking means the cache locking content can be changed during the runtime of a task at some specific reloading points. Given a task, its code is subdivided into
+Algorithm 2 SLEFGS(EFGs, S): Static I-Cache Locking for N Tasks presented by EFGs Require: A set of EFGi(Vi, Ei) where 1 ≤ i ≤ N , cache
+size S. Ensure: A set of nodes in EFGi (1 ≤ i ≤ N ) to put into
+the cache to minimize WCU. EFT total.root = v0; //Initialization for every node v ∈ ⋃1≤i≤N Vi do
+for every size 0 ≤ s ≤ S do OPT [v][s].V alue = −1; Weight[v][s] = { w(v) if(s < s(v)) w′(v) if(s ≥ s(v))
+end for end for //Compute the patterns of EFGs for every task Ti do
+if EFGi is not EFT -type then EFTi= GMergeIt(EFGi, Weight); end if Attach each EFTi to EFT total as a child of v0; end for BEFT total =Transform(EFT total); // v0 deleted Call GOptimizeIt(BEFT total.root, S, OPT );
+procedure GOptimizeIt(v, s, OPT ) if OPT [v][s].V alue = −1 then
+if v is the root node of task Ti then OPT [v][s].V alue = min0≤p≤s{min0≤j≤s−p
+{(Weightv[p] + GOptimizeIt(vl, j, OPT ))/peri +GOptimizeIt(vr, s − p − j, OPT )}};
+OPT [v][s].Cachable = argp min0≤p≤s{min0≤j≤s−p {(Weightv[p] + GOptimizeIt(vl, j, OPT ))/peri +GOptimizeIt(vr, s − p − j, OPT )}}; OPT [v][s].LeftGet = argj min0≤p≤s{min0≤j≤s−p {(Weightv[p] + GOptimizeIt(vl, j, OPT ))/peri +GOptimizeIt(vr, s − p − j, OPT )}};
+else OPT [v][s].V alue = min0≤p≤s{min0≤j≤s−p{max{
+Weightv[p] + GOptimizeIt(vl, j, OPT ), GOptimizeIt(vr, s − p − j, OPT )}}};
+OPT [v][s].Cachable = argp min0≤p≤s{min0≤j≤s−p {max{Weightv[p] + GOptimizeIt(vl, j, OPT ), GOptimizeIt(vr, s − p − j, OPT )}}}; OPT [v][s].LeftGet = argj min0≤p≤s{min0≤j≤s−p {max{Weightv[p] + GOptimizeIt(vl, j, OPT ), GOptimizeIt(vr, s − p − j, OPT )}}};
+end if end if return OPT [v][s].V alue; end procedure
+several regions. Each region has a selection of nodes to be locked in cache, named a locking cache state. When region switches, the cache content is modified to another locking cache state. This dynamic locking seems to be able to benefit the performance, since a specific locking state for a specific region is better than a global locking state. However, swapping in nodes also needs time, which results in a trade-off between the swapping cost and the WCET reduction. So for each switch of regions, we should compare the WCET reduction with the reloading cost to make decision. In the following section, we focus on dynamic I-Cache locking for EFGs in a general way.
+B. Algorithm for EFGs The RMI (Region Merging and Inlining) algorithm [5] is used to partition an EFG into regions, and Algorithm SLEFG [9] is used to obtain the optimal locking state for each region. For EFT -type tasks, we assign each node a weight array Weightv[p] and set Weightv[p] = w(v) when p < s(v) and Weightv[p] = w′(v) otherwise, then Algorithm SLEFG can also work for EFT -type tasks. The Algorithm DLEFGS is shown in Algorithm 3. For each task Ti, we first use the RMI algorithm to partition the task into regions: EFGRs. We use EFGRv to denote a region rooted at node v. Then, algorithm SLEFG is used to calculate the static optimal solution for each region EFGRv with a cache size of s. Suppose the results are recorded as follows:
+OPT (v, s).V alue =the optimal WCET of region EFGRv; OPT (v, s).Select = {v|v ∈ EFGRv is selected}; where 0 ≤ s ≤ S.
+Algorithm 3 DLEFGS(EFGs, S): Dynamic I-Cache Locking for N Tasks presented by EFGs Require: A set of EFGi(Vi, Ei) where 1 ≤ i ≤ N , cache
+size S. Ensure: Swapping information for each region to minimize
+WCU. Old Select = ∅; for every task Ti do
+Call RMI(EFGi, EFGRs); for every region EFGRv in execution order do
+WCETunswap=WCET(EFGRv , Old Select); Call CalcNewW(EFGRv , Old Select); Call SLEFG(EFGRv , S); // Algorithm in [9] WCETswap = OPT (v, S).V alue; if WCETswap < WCETunswap then
+EFGRv.SwapOrNot = 1; EFGRv.DynSelect = OPT (v, S).Select;
+else EFGRv.SwapOrNot = 0; EFGRv.DynSelect = Old Select; end if Old Select = EFGRv.DynSelect;
+end for end for
+In Algorithm 3, Old Select is the current locking state for the former region. For a region rooted at node v, WCET without changing the current locking state is obtained by procedure
+WCET(EFGRv , Old Select) which computes the WCET of EFGRv with the weight of node x ∈ Old Select changing to w′(x). Then procedure CalcNewW(EFGRv , Old Select) is called to calculate a new w′(x) for each node x in region EFGRv using the following equation:
+w′(x) = {
+w′(x) if x ∈ Old Select w′(x) + swap cost(x) if x ∈ Old Select
+This w′(x) considers the swapping cost for a node x that is not in the I-Cache at this moment. Using this w′(x) variable, SLEFG is called to calculate the new optimal WCET for region EFGRv as WCETswap = OPT (v, S).V alue. If WCETswap < WCETunswap, swapping should be applied to reduce WCET further, otherwise no swapping is needed. The new selection is recorded in EFGRv.DynSelect.
+The complexity of RMI is O(|Vi|2) for a task Ti [5]. For each region EFGRv , three procedures: WCET(), CalNewW() and SLEFG() are called. The time complexities of these three procedures for region EFGRv are O(|VEFGRv |), O(|VEFGRv |) and O(|VEFGRv |S2) respectively. The total time complexity of Algorithm DLEFGS is O( ∑ 1≤i≤N{|Vi|2+
+∑ EFGRv∈EFGi(|VEFGRv |+|VEFGRv |+|VEFGRv |S2)}) = O( ∑ 1≤i≤N |Vi|2S2).
+
+V. EXPERIMENTAL RESULTS
+The benchmarks used are shown in Table I. B1-B4 are benchmarks without duplicated nodes and represented by EFT s. B5-B10 are benchmarks with duplicated nodes but exhibiting the patterns, so their EFGs can be solved optimally.
+The benchmarks are grouped into five multi-task sets shown in Table II. Some sets are chosen randomly, while others are chosen purposely. For example, M3 includes some large benchmarks, while M4 includes some small ones. M5 has more tasks than other sets.
+First, Algorithm SLEFGS and DLEFGS are executed on M1-M5 under different cache sizes represented by the percentages of total tasks’ size. In Table III, the WCU of each set is
+shown as a normalized WCU. The base of comparison is the WCU corresponding to the static WCET analysis results [12]. The column “Avg” gives the average percentage of WCU by each algorithm compared with the base static WCU analysis. As can be seen from Table III, the proposed algorithms can achieve significant WCU reduction for all cache sizes compared to the static analysis. Even when the cache size is only 5-10% of the total tasks’ size, the algorithms can still select some small but WCET-critical nodes. On average, SLEFGS and DLEFGS can reduce the WCU by 32.8-36.3% and 39.6- 43.8% compared to WCU measured by static analysis.
+Then, we compare our work with the current best-known heuristic algorithms. We fix cache size to be 20% and 80% of the total tasks’ size. The algorithms under comparison are the static I-Cache locking algorithm in [8], Algorithm SLEFGS and Algorithm DLEFGS. The results are presented in Fig. 4 and 5, where Y-axis represents the normalized WCU, and Xaxis represents different multi-task sets.
+We can see from Fig. 4 and 5 that for some multi-task sets, the static algorithm in [8] obtains close results as the optimal solutions calculated by SLEFGS. That is because the heuristic algorithm in [8] considers the cost saving and node size at the same time and it can achieve approximate solutions for some applications. Our static algorithms can be used as a reference to see how good the previous heuristic solutions perform. It is also seen that the dynamic method not always works better than static method. When the given cache size is relatively large, SLEFGS sometimes works better than DLEFGS for multi-task sets with smaller tasks or too many
+tasks, for examples for M4 and M5 in Fig. 5. For M4, it is because the benchmarks in this set are relatively small so that a big cache size can not benefit for each single task while it can benefit the total static locking further. For M5, it is because too many tasks will introduce heavy reloading cost which almost overwhelms the WCU reduction by reloading.
+
+VI. CONCLUSION
+This paper studies static and dynamic I-Cache locking to minimize WCU for real-time embedded systems with multitasks. The static locking problem is proved to be NP-Hard and Algorithms SLEFTS and SLEFGS are proposed. For dynamic locking, we propose Algorithm DLEFGS based on the static locking results. The experiments comparing with previous works show that the proposed algorithms can reduce WCU further effectively. Some strategies on how to choose a specific locking method under different situations are also induced.
+REFERENCES [1] ARM: http://www.arm.com/ [2] MIPS: http://www.mips.com/. [3] Motorola: http://www.motorola.com/. [4] Isabelle Puaut, David Decotigny, Low-Complexity Algorithms for Static
+Cache Locking in Multitasking Hard Real-time Systems. In Proceedings of the 23rd IEEE Real-Time Systems Symposium (RTSS02): 114-123, 2002. [5] Alexis Arnaud, Isabelle Puaut, Dynamic Instruction Cache Locking in Hard Real-Time Systems. In Proceedings of the 14th International Conference on Real-Time and Network Systems, 2006. [6] A.M. Campoy, A. P. Ivars, F. Rodriguez and J. V. Busquets-Mataix, Static Use of Locking Caches vs Dynamic Use of Locking Caches for RealTime Systems. In IEEE Canadian Conference on Electrical and Computer Engineering: 1283-1286, 2003. [7] A.M. Campoy, A. P. Ivars and J. V. Busquets-Mataix, Dynamic Use of Locking Caches in Multitask, Preemptive Real-Time Systems. In Proceddings of the 15th World Congress of the International Federation of Automatic Control: 2007. [8] Heiko Falk, Sascha Plazar, Henrik Theiling, Compile-Time Decided Instruction Cache Locking Using Worst-Case Execution Paths. In Proceedings of the 5th IEEE/ACM international conference on Hardware/software codesign and system synthesis: 143-148, 2007. [9] Tiantian Liu, Minmin Li, Chun Jason Xue, Minimizing WCET for RealTime Embedded Systems via Static Instruction Cache Locking. In Proceedings of the 15th IEEE Real-Time and Embedded Technology and Applications Symposium (RTAS09): 2009. [10] Jane W.S. Liu, Real-time Systems. Prentice Hall: 40-41, 2000. [11] StreamIt: http://www.cag.lcs.mit.edu/streamit/shtml/benchmarks.shtml [12] F. Mueller, Timing Analysis for Instruction Caches. Real-Time Systems,
+18(2): 217-247, 2000.
+
+References
+[1]Alexis Arnaud,Isabelle PuautDynamic Instruction Cache Locking in Hard Real-Time SystemsIn Proceedings of the 14th International Conference on Real-Time and Network Systems,2006
+[2]A.M. Campoy,A.P. Ivars,F. Rodriguez,J.V. Busquets-MataixStatic Use of Locking Caches vs Dynamic Use of Locking Caches for Real- Time SystemsIEEE Canadian Conference on Electrical and Computer Engineering: 1283-12862003
+[3]Heiko Falk,Sascha Plazar,Henrik TheilingCompile-Time Decided Instruction Cache Locking Using Worst-Case Execution PathsIn Proceedings of the 5th IEEE/ACM international conference on Hardware/software codesign and system synthesis:2007
+[4]Tiantian Liu,Minmin Li,Chun Jason XueMinimizing WCET for Real- Time Embedded Systems via Static Instruction Cache LockingIn Proceedings of the 15th IEEE Real-Time and Embedded Technology and Applications Symposium2009
+[5]F. MuellerTiming Analysis for Instruction CachesReal-Time Systems, 18(2): 217-2472000

@@ -1,0 +1,106 @@
+Disturbing Neighbors Ensembles of Trees for Imbalanced Data
+Juan J. Rodrı́guez,José F. Dı́ez-Pastor,Jesús Maudes,César Garcı́a-Osorio
+jjrodriguez@ubu.es,jfdpastor@ubu.es,jmaudes@ubu.es,cgosorio@ubu.es
+
+Keywords-disturbing neighbors, bagging, classifier ensembles, Hellinger distance decision trees, model trees, decision trees, imbalanced data.
+I. INTRODUCTION
+In classification problems, imbalanced data requires specific consideration. Even performance measures can be inadequate. For instance, a classifier with 99% accuracy is not very useful if it always predicts the majority class and 99% of the examples are from this class. A commonly used measure for imbalanced data is the AUC: Area Under the ROC (Receiver Operation Characteristic) Curve [1].
+Classifiers designed to optimize accuracy can be inadequate for these problems. Hence, several specific approaches have been proposed [2]. For instance, there are decision tree methods for imbalanced data [3].
+As for conventional classification problems, ensemble methods are among the most successful approaches. Instead of using a single classifier, several of them are constructed using some method, called the base method, and the predictions of the ensemble are obtained combining the predictions of the base classifiers. Some ensemble methods for imbalance data have been proposed, e.g., [4]–[6].
+When using ensembles for imbalanced data, the ensemble method and/or the base method can be or not specific methods for imbalanced data. Interestingly, recent works [3], [7] indicate that when using decision trees as the base classifiers, the best ensemble method is Bagging [8] that is not specific for imbalance and one of the simplest ensemble methods. In [3] Bagging has better results than Boosting [9], Majority Bagging [10], SMOTE [11] and a combination
+of undersampling and SMOTE [12]. In [7] Bagging has better results for imbalanced data than Random Subspaces [13], AdaBoost [14], MultiBoost [15], LogitBoost [16], undersampling and SMOTE.
+This work considers another ensemble method, Disturbing Neighbors [17], for imbalanced data. It is compared with Bagging, but both methods are also combined in the DN - Bagging method. Other ensemble methods are not considered because Bagging had the best results in [3], [7].
+Three tree methods are used as base classifiers. First, C4.5 [18] a method that is not specific for imbalanced data. These type of trees are named univariate, because each internal node only considers one attribute. Each leave predicts one of the classes.
+The second used method is HDDT [3], based on Hellinger distance, a method designed for imbalanced data. The obtained trees with HDDT have the same structure as C4.5 trees, but the construction is different. In these trees, the best attribute for splitting a node is seleccted according to this distance:
+dH(P (Y+), P (Y−)) = √∑ i∈V (√ P (Y+|Xi)− √ P (Y−|Xi) )2
+where Y+ and Y− are the two classes and V is the set of values of the attribute.
+The third method is M5P [19], [20], it generates model trees. M5P is a method for regression, predicting numeric values. The leaves contain a linear model. They have been previously used for classification [21] with good results. In this method the classes are codified as zeroes and ones. Recently, model trees have been proposed for imbalanced data [7].
+As an example, Figure 1 shows a decision tree obtained from the glass4 dataset. The attributes that appear in the internal nodes (e.g., Mg, Na) are the attributes from this dataset. An interesting detail of this tree is that it seems unnecessarily complex because the three leftmost leaves predict the positive class and the remaining leaves predict the negative class. Siblings leaves with the same prediction are useful because they assign different probabilities to the classes. For instance, these probabilities are used to construct the ROC curve and calculate the AUC.
+978-0-7695-4913-2/12 $26.00 © 2012 IEEE DOI 10.1109/ICMLA.2012.181
+83
+This tree was obtained with a method that is not specific for imbalanced data (i.e, C4.5). With Hellinger trees the obtained tree is different but with the same format. On the other hand, model trees have a different format because they have a linear model at the leaves. Figure ?? also shows a model tree obtained from the same dataset.
+In this tree, the linear models are represented as LM 1, LM 2,. . . , LM 8. For instance, LM 1 is:
+−6.049RI − 0.051Na− 0.013Mg + 0.046K + 9.962 The value of this linear model is used as the probability of one of the classes (the class that is codified as one). It is possible to have values smaller than zero or greater than one with this equation, in these case the probabilities would be considered as zero or one, respectively.
+The rest of the paper is organized as follows. Disturbing Neighbor ensembles are described in Section II. The experiments are presented in Section III. Finally, Section IV presents the conclusions.
+
+II. DISTURBING NEIGHBOR ENSEMBLES
+As many other ensemble methods (e.g., Bagging, Random Subspaces) the Disturbing Neighbors (DN ) method is based on training each base classifier with a random transformation of the dataset.
+In this method, the transformation adds new attributes. These attributes are obtained from a small sample of randomly selected training examples. These examples are called the Disturbing Neighbors.
+The additional attributes are based on which one of the Disturbing Neighbors is the nearest. The first added attribute is nominal, the possible values are the class labels. For a binary class data set, the attribute will be binary. For a given example, the value of this attribute is the class label of the nearest Disturbing Neighbor.
+For each Disturbing Neighbor an additional boolean attribute is included. The value of the attribute is true for a given example if the corresponding Disturbing Neighbor is the nearest one.
+As an additional source of diversity (a necessary ingredient of successful ensembles) for each base classifier the distances are calculated in a random subspace. This random subspace is only used for determining the nearest Disturbing Neighbor, the transformed dataset contains all the original attributes.
+It is possible to obtain ensembles using only the DN method, but usually is possible to obtain better results combining DN with other ensemble methods. The combination generally is better than the other ensemble method and the DN ensemble [17].
+In Figure 1 the tree at the right was obtained with the same method and from the same dataset (glass4) as the other trees but with the additional attributes from the Disturbing Neighbors. One of this attributes, Nearest 8, was selected as the root of the tree. This attribute indicates if the nearest DN is the eighth.
+From the considered sources of diversity, in [17] it was determined that for non particularly imbalanced data sets the most important source was the use of the boolean features, the impact of the nominal feature and the calculation of the distances in a random subspace were less important.
+
+III. EXPERIMENTS
+A. Datasets
+Two collections of datasets were used. The HDDT collection1 contains the binary imbalanced datasets used in [3]. The KEEL collection2 contains the binary imbalanced datasets from the repository of KEEL [22].
+1Available at http://www.nd.edu/∼dial/hddt/. 2Available at http://sci2s.ugr.es/keel/imbalanced.php.
+Table I shows the characteristics of the 20 datasets in the HDDT collection and the 66 datasets in the KEEL collection. Many datasets in these two collections are available or are modifications of datasets in the UCI Repository [23].
+
+B. Settings
+Weka [24] was used for the experiments. Unless explicitly specified, the parameters for the different methods take the default values given by Weka.
+Three tree methods were used. For conventional trees J48 was used. It is Weka’s re-implementation of C4.5 [18]. As recommended for imbalanced data [3], it was used without pruning and collapsing but with Laplace smoothing at the leaves. C4.5 with this options is called C4.4 [25]. The decision tree in Figure 1 was obtained because these options were used, otherwise the tree would have been simplified.
+The second tree method is specifically designed for imbalance data: Hellinger distance decision trees (HDDT) [3].
+The third tree method are model trees, the M5P method [19], [20] from Weka was used. This method is for regression problems, but it has been used for classification problems [21], including imbalanced data [7]. In this work they were used without pruning, as for the two other considered tree methods.
+The three tree methods were used for constructing single classifiers, but also as base methods for the ensemble methods. Ensemble size was 100. The first considered ensemble method is Bagging [8]. It was the best method for imbalanced data in [3] and [7].
+The second ensemble method is Disturbing Neighbors [17], denoted as DN -Ensemble in the result tables. Finally, the combination of Bagging and Disturbing Neighbors, denoted as DN -Bagging, was also considered. The number of used neighbors for these methods was 10.
+The results were obtained with 5×2-fold cross validation [26]. The dataset is halved in two folds. One is used for training and the other for testing. Then, the roles of the folds are reversed. This process is repeated five times. The results are the averages of these ten experiments. Cross validation was stratified: the classes proportion is approximately preserved for each fold.
+Average ranks [27] were used for comparing several methods across several datasets. For a given dataset, the considered methods are sorted from best to worst. The best method has rank 1, the second rank 2 and so on. If several methods have the same result, they are assigned average ranks. For instance, if there are two methods with the best result, the rank for each one is 1.5. Average ranks are then obtained averaging the ranks of a given method across all the considered datasets. The Iman and Davenport Test is used to determine the presence of differences among all the compared methods. As a post-hoc procedure, using the best method as the control, the Hochberg procedure is used [27].
+
+C. Results
+Table II shows the average ranks, according to the AUC, for the two collections. The Iman and Davenport Test rejects the null hypothesis in both cases. The Table also shows the adjusted p-values for the Hochberg tests. For the HDDT collection, the methods are nearly grouped according to the ensemble method, from top to bottom: DN -Bagging, Bagging, DN -Ensemble and single. The only exception of this grouping is the order of DN -Ensemble J48 and Bagging J48. These four ensemble methods had the same relative order in [17], where Disturbing Neighbors ensembles were used with non imbalanced data sets. The Disturbing Neighbors approach is not enough by itself to obtain competitive ensembles, but it improves the results of other ensemble methods, in this case Bagging. For the KEEL collection the methods are not grouped according to he ensemble method, but only due to the method DN -Ensemble J48.
+For the HDDT collection, the results are consistent with [3]: a single HDDT has better rank than J48 and Bagging HDDT has better rank than Bagging J48. Moreover for Bagging the results are also consistent for the KEEL collection. The results are also consistent with [7]: Single M5P is better than single J48, Bagging M5P is better than Bagging J48.
+For the two collections, the method with the top rank is DN -Bagging J48. Moreover, in both collections J48 also has the best rank among the DN -Ensembles but the worst rank among the Bagging ensembles. This indicates that Disturbing Neighbors improves more the results of J48 than the results of HDDT and M5P.
+Figure 2 compares the results of Bagging and DN - Bagging for both collections. For each decision tree method (i.e., J48, HDDT and M5P) there is a graph. The x coordinate is the AUC of Bagging and the y coordinate is for DN -Bagging. For each dataset there is a dot in the graph. The dot is above the diagonal if DN -Bagging is better than Bagging for that dataset.
+For the HDDT collection, it can be observed that for three datasets, the AUC of Bagging M5P is 0.5. This means that the classifier always predicts the majority class. Nevertheless, according to Table II a single M5P has better average ranks than HDDT and J48. Hence, the bad results on these three datasets are compensated with the results of the remaining datasets. This suggest that the use of M5P for imbalanced data could be improved, if it were possible to improve the results in those cases without affecting the results for the other cases.
+For the KEEL collection, it is more clear the advantage of DN -Bagging over Bagging. It can be observed that the improvements are better for J48 than for the other methods. One possible cause could be the presence of nominal attributes, in all the KEEL data sets there are only two nominal attributes. DN can work worse with nominal attributes because the distances will be discrete
+values, and many examples will have the same distance. Another possible explanation could be a replication effect. Many of the data sets in the KEEL collection are variants of a few multi class data set (i.e., ecoli, glass, yeast). It is expected that the data sets with the same origin have a similar behavior, the differences among methods would be increased.
+
+D. Diversity
+The ability of DN for improving other ensemble methods can be explained by the additional diversity or accuracy of the base classifiers that it provides. As an example, Figure 3
+shows an artificial data set3 [28] and the decision surfaces obtained without and with DN . These decision surfaces are from decision trees (i.e., Hellinger Trees) that are members
+3Available at http://sci2s.ugr.es/keel/imbalanced.php.
+of an ensemble obtained with Bagging. When DN is not used the decision surfaces are formed by decisions that are parallel to the axis. Trees with DN do not have that restriction and it is possible to have more diverse classifiers without sacrificing the accuracy.
+
+IV. CONCLUSIONS
+Disturbing Neighbors ensembles have been evaluated for imbalanced classification problems, using three tree methods: conventional (C4.5), specific for imbalance (HDDT) and model trees (M5P). Using two collection of datasets (with 20 and 66 datasets), DN ensembles have been compared and combined with Bagging. The combination of DN and Bagging gives the best results.
+Previous works and the obtained results for Bagging in this work indicated that Model Trees and Hellinger trees are better than standard decision trees for imbalanced data. Nevertheless, when using Disturbing Neighbors ensembles the best results are for standard decision trees.
+The DN method has a parameter, the number of neighbors. In this work it has been fixed at 10. With this fixed value the method shows its validity, the advantage could be improved adjusting the parameter for every data set, at the cost of increased training time.
+The combination of preprocessing methods (e.g., SMOTE, undersampling) for imbalanced data with classical ensemble methods (e.g., Bagging, Boosting) has given good results [4], [6], [29]. Hence, as future work, the combination of DN and other methods for imbalanced data will be studied.
+
+ACKNOWLEDGMENT
+This work was supported by the Projects TIN2011-24046 and IPT-2011-1265-020000 of the Spanish Ministry of Economy and Competitiveness.
+We wish to thank the developers of Weka [24], Hellinger Distance Decision Trees [3] and the used statistical tests [22]. We also express our gratitude to the donors of the different datasets.
+
+References
+[1]P. Flach,J. Hernandez-Orallo,C. FerriA coherent interpretation of AUC as a measure of aggregated classification performance28th International Conference on Machine Learning (ICML-11). ACM, June 2011, pp. 657–664.2011
+[2]H. He,E.A. GarciaLearning from Imbalanced DataIEEE Transactions on Knowledge and Data Engineering, vol. 21, no. 9, pp. 1263–1284, September 2009.2009
+[3]D. Cieslak,T. Hoens,N. Chawla,W. KegelmeyerHellinger distance decision trees are robust and skewinsensitiveData Mining and Knowledge Discovery, vol. 24, no. 1, pp. 136–158, 2012.2012
+[4]N.V. Chawla,A. Lazarevic,L.O. Hall,K.W. BowyerSMOTEBoost: Improving prediction of the minority class in boostingKnowledge Discovery in Databases: PKDD 2003, 2003, pp. 107–119.2003
+[5]T. Hoens,N. ChawlaGenerating Diverse Ensembles to Counter the Problem of Class ImbalanceAdvances in Knowledge Discovery and Data Mining, ser. LNCS. Springer Berlin / Heidelberg, 2010, vol. 6119, ch. 46, pp. 488–499.2010
+[6]C. Seiffert,T.M. Khoshgoftaar,J. Van Hulse,A. NapolitanoRUSBoost: A hybrid approach to alleviating class imbalanceIEEE Transactions on Systems, Man, and Cybernetics - Part A: Systems and Humans, vol. 40, no. 1, pp. 185–197, January 2010.2010
+[7]J.J. Rodrı́guez,J.F. Dı́ez-Pastor,C. Garcı́a-Osorio,P. SantosUsing model trees and their ensembles for imbalanced dataAdvances in Artificial Intelligence: 14th Conference of the Spanish Association for Artificial Intelligence. Springer, 2011, pp. 94–103.2011
+[8]L. BreimanBagging predictorsMachine Learning, vol. 24, no. 2, pp. 123–140, 1996.1996
+[9]R.E. Schapire,Y. SingerImproved boosting algorithms using confidence-rated predictionsMachine Learning, vol. 37, no. 3, pp. 397–336, 1999.1999
+[10]S. Hido,H. Kashima,Y. TakahashiRoughly balanced bagging for imbalanced dataStatistical Analysis and Data Mining, vol. 2, no. 5-6, pp. 412–426, 2009.2009
+[11]N.V. Chawla,K.W. Bowyer,L.O. Hall,W.P. KegelmeyerSMOTE: Synthetic minority over-sampling techniqueJournal of Artificial Intelligence Research, vol. 16, pp. 321–357, 2002.2002
+[12]N. Chawla,D. Cieslak,L. Hall,A. JoshiAutomatically countering imbalance and its empirical relationship to costData Mining and Knowledge Discovery, vol. 17, no. 2, pp. 225–252, Oct. 2008.2008
+[13]T.K. HoThe random subspace method for constructing decision forestsIEEE Transactions on Pattern Analysis and Machine Intelligence, vol. 20, no. 8, pp. 832–844, 1998.1998
+[14]Y. Freund,R.E. SchapireA decision-theoretic generalization of on-line learning and an application to boostingJournal of Computer and System Sciences, vol. 55, no. 1, pp. 119–139, 1997.1997
+[15]G.I. WebbMultiboosting: A technique for combining boosting and waggingMachine Learning, vol. 40, no. 2, pp. 159–196, 2000.2000
+[16]J. Friedman,T. Hastie,R. TibshiraniAdditive logistic regression: a statistical view of boostingAnnals of Statistics, vol. 95, no. 2, pp. 337–407, 2000.2000
+[17]J. Maudes,J.J. Rodrı́guez,C. Garcı́a-OsorioDisturbing neighbors diversity for decision forestsApplications of Supervised and Unsupervised Ensemble Methods, ser. Studies in Computational Intelligence, O. Okun and G. Valentini, Eds. Springer, 2009, vol. 245, pp. 113–133.2009
+[18]J.R. QuinlanPrograms for Machine Learning, ser. Machine Learning1993
+[19]R.J. QuinlanLearning with continuous classes5th Australian Joint Conference on Artificial Intelligence. Singapore: World Scientific, 1992, pp. 343–348.1992
+[20]Y. Wang,I.H. WittenInduction of model trees for predicting continuous classesPoster papers of the 9th European Conference on Machine Learning. Springer, 1997.1997
+[21]E. Frank,Y. Wang,S. Inglis,G. Holmes,I.H. WittenUsing model trees for classificationMachine Learning, vol. 32, pp. 63–76, 1998.1998
+[22]J. Alcalá-Fdez,A. Fernández,J. Luengo,J. Derrac,S. Garcı́aKEEL data-mining software tool: Data set repository, integration of algorithms and experimental analysis frameworkMultiple-Valued Logic and Soft Computing, vol. 17, no. 2-3, pp. 255–287, 2011.2011
+[23]A. Frank,A. AsuncionUCI machine learning repository2010. [Online]. Available: http://archive.ics.uci. edu/ml2010
+[24]M. Hall,E. Frank,G. Holmes,B. Pfahringer,P. Reutemann,I.H. WittenThe WEKA data mining software: An updateSIGKDD Explorations, vol. 11, no. 1, 2009.2009
+[25]F. Provost,P. DomingosTree induction for Probability- Based rankingMachine Learning, vol. 52, no. 3, pp. 199– 215, Sep. 2003.2003
+[26]T.G. DietterichApproximate statistical test for comparing supervised classification learning algorithmsNeural Computation, vol. 10, no. 7, pp. 1895–1923, 1998.1895
+[27]S. Garcı́a,A. Fernández,J. Luengo,F. HerreraAdvanced nonparametric tests for multiple comparisons in the design of experiments in computational intelligence and data mining: Experimental analysis of powerInformation Sciences, vol. 180, no. 10, pp. 2044–2064, May 2010.2010
+[28]K. Napierała,J. Stefanowski,S. WilkLearning from imbalanced data in presence of noisy and borderline examples rough sets and current trends in computingser. Lecture Notes in Computer Science. Berlin, Heidelberg: Springer Berlin / Heidelberg, 2010, vol. 6086, ch. 18, pp. 158–167.2010
+[29]M. Galar,A. Fernandez,E. Barrenechea,H. Bustince,F. HerreraA review on ensembles for the class imbalance problem: Bagging-, boosting-, and hybrid-based approachesSystems, Man, and Cybernetics, Part C: Applications and Reviews, IEEE Transactions on, vol. 42, no. 4, pp. 463 –484, july 2012. Figure 3. Artificial data set (top) and decision surfaces of trees without (left) and with (right) DN . 882012
