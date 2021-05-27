@@ -532,6 +532,7 @@ def introGen(fileID, df_selected, category_label, category_description):  # Intr
 
     ## ==== Problem_def begin ====
     topic = Survey_Topic_dict[fileID]
+    import nltk
     from nltk.tokenize import WordPunctTokenizer
     sen_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
     whole_text = ' '.join([i for i in df_selected.abstract] + [i for i in df_selected.intro])
