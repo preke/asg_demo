@@ -581,7 +581,7 @@ def introGen(fileID, df_selected, category_label, category_description):  # Intr
     # conjunction = " In the next section, we will introduce existing works in each types with details."
     # introduction += conjunction
 
-    introduction = background + '<br/><br/>....' + topic_intro
+    introduction = background.capitalize() + '<br/><br/>' + topic_intro.capitalize()
 
     return introduction
 
