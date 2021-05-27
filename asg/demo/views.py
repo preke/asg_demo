@@ -244,8 +244,8 @@ def get_survey_text(refs=Global_ref_list):
 
     try:
         ## abs generation
-        abs = absGen(Global_survey_id, Global_df_selected, Global_category_label)
-        survey['Abstract'] = abs
+        abs, last_sent = absGen(Global_survey_id, Global_df_selected, Global_category_label)
+        survey['Abstract'] = [abs, last_sent]
 
         ## Intro generation
         intro = introGen(Global_survey_id, Global_df_selected, Global_category_label, Global_category_description)

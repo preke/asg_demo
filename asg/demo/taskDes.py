@@ -319,8 +319,8 @@ def absGen(fileID, df_selected, category_label):  # Abstract Section generation
 
 
     template += cate_des + "."
-    abstract = clean_sum + " " + template
-    return abstract
+    # abstract = clean_sum + " " + template
+    return clean_sum, template
 
 
 '''------------------------------------introduction generation---------------------------------------------'''
