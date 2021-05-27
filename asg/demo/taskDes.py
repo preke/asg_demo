@@ -505,19 +505,19 @@ def introGen(fileID, df_selected, category_label, category_description):  # Intr
     topic = Survey_Topic_dict[fileID]
     refs = readReference(df_selected)
     newRefs, aiRefs, abslist, introlist = sentIntroText(refs)
-    newabs, newintro = extractTopicRef(topic, abslist, introlist)
-
-    if len(newintro) == 0:
-        newintro = introlist
-
-    newintro = extractTopicIntro(newintro)
-    if len(newintro) == 0:
-        newintro = introlist
+    # newabs, newintro = extractTopicRef(topic, abslist, introlist)
+    #
+    # if len(newintro) == 0:
+    #     newintro = introlist
+    #
+    # newintro = extractTopicIntro(newintro)
+    # if len(newintro) == 0:
+    #     newintro = introlist
 
     ## ==== Background begin ====
 
-    abs_list = '\n'.join([' '.join(i.split(' ')[:50]) for i in newabs])
-    intro_list = ' '.join([i.split('\n')[0] for i in newintro])
+    abs_list = '\n'.join([' '.join(i[:50]) for i in abslist])
+    intro_list = ' '.join([i.split('\n')[0] for i in introlist])
     text = abs_list + ' ' + intro_list
     summ = summarize(text, words=150)
     ## ==== Background end ====
