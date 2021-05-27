@@ -558,6 +558,8 @@ def introGen(fileID, df_selected, category_label, category_description):  # Intr
     # challenges = ' '.join(extractTopicIntro(challenges))
     challenges = summarize(challenges, words=100)
     challenges = clean_wzy(challenges)
+    begin = 'There are several challenges of ' + Survey_dict[fileID] + '.'
+    challenges = begin + challenges
     ## ==== Challenges end ====
 
 
