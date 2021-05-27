@@ -385,8 +385,8 @@ FONTS & ICONS
 						document.getElementById("survey_content").innerHTML+= "<p align=\"justify\"><span>" + result[p][0] + " <b>" + result[p][1] + "</b></span></p>";
 					} else if (p == "Introduction") {
 						document.getElementById("survey_content").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
-						for (var i in result[p]) {
-							document.getElementById("survey_content").innerHTML+= "<p align=\"justify\">" + i + "</p>";
+						for (var i in result[p].length) {
+							document.getElementById("survey_content").innerHTML+= "<p align=\"justify\">" + result[p][i] + "</p>";
 						}
 					} else if (p == "Conclusion") {
 						document.getElementById("survey_content").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
