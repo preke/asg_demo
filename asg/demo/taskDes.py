@@ -504,7 +504,7 @@ def clean_wzy(text):
     text = text.replace("< NO >", "")
     text = text.replace("< NO>", "")
     text = text.replace("<NO >", "")
-    text = extractTopicIntro(text)
+    text = ' '.join(extractTopicIntro(text))
     # text = cleanComma(text)
     return text
 
