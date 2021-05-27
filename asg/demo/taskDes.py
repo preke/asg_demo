@@ -539,6 +539,8 @@ def introGen(fileID, df_selected, category_label, category_description):  # Intr
     whole_text = ' '.join([i for i in df_selected.abstract] + [i for i in df_selected.intro])
     whole_text = sen_tokenizer.tokenize(' '.join(whole_text))
     whole_text = [i.lower() for i in whole_text]
+    print(whole_text)
+
     topic_sents = []
     for t in topic:
         for sent in whole_text:
@@ -546,6 +548,8 @@ def introGen(fileID, df_selected, category_label, category_description):  # Intr
                 topic_sents.append(sent)
     topic_sents = set(topic_sents)
     topic_introduction = ' '.join([i for i in topic_sents])
+
+
     topic_intro = summarize(topic_introduction, words=150)
     topic_intro = clean_wzy(topic_intro)
     ## ==== Problem_def end ====
