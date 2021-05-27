@@ -382,8 +382,7 @@ FONTS & ICONS
 						document.getElementById("survey_content").innerHTML+= "<h1>" + result[p] + "</h1>";
 					} else if (p == "Abstract") {
 						document.getElementById("survey_content").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
-						document.getElementById("survey_content").innerHTML+= "<p>" + result[p][0];
-						document.getElementById("survey_content").innerHTML+= "<b> " + result[p][1] + "</b></p>";
+						document.getElementById("survey_content").innerHTML+= "<p><span>" + result[p][0] + " <b>" + result[p][1] + "</b></span></p>";
 					} else if (p == "Introduction") {
 						document.getElementById("survey_content").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
 						document.getElementById("survey_content").innerHTML+= "<p>" + result[p] + "</p>";
