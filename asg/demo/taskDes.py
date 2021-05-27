@@ -555,6 +555,8 @@ def introGen(fileID, df_selected, category_label, category_description):  # Intr
     challenges = ' '.join([i for i in whole_text if (key_words[0] in i.split() or key_words[1] in i.split() or
                                                              key_words[2] in i.split() or key_words[3] in i.split() or
                                                              key_words[4] in i.split())])
+    challenges = selectIntroSentences(challenges)
+    challenges = summarize(challenges, words=100)
     challenges = clean_wzy(challenges)
     ## ==== Challenges end ====
 
