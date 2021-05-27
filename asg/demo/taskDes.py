@@ -499,10 +499,18 @@ def introGen(fileID, df_selected, category_label, category_description):  # Intr
     return introduction
 '''
 
+def clean_wzy(text):
+    text = text.replace("\n", "")
+    text = text.replace("< NO >", "")
+    text = text.replace("< NO>", "")
+    text = text.replace("<NO >", "")
+    text = cleanComma(text)
+    return text
+
 
 def introGen(fileID, df_selected, category_label, category_description):  # Introduction Section generation
 
-    # topic = Survey_Topic_dict[fileID]
+
     # refs = readReference(df_selected)
     # newRefs, aiRefs, abslist, introlist = sentIntroText(refs)
     # newabs, newintro = extractTopicRef(topic, abslist, introlist)
@@ -515,12 +523,30 @@ def introGen(fileID, df_selected, category_label, category_description):  # Intr
     #     newintro = introlist
 
     ## ==== Background begin ====
-
     abs_list = '\n'.join([' '.join(i.split(' ')[:50]) for i in df_selected.abstract])
     intro_list = ' '.join([i.split('\n')[0] for i in df_selected.intro])
     text = abs_list + ' ' + intro_list
-    summ = summarize(text, words=150)
+    background = summarize(text, words=150)
+    background = clean_wzy(background)
     ## ==== Background end ====
+
+    ## ==== Problem_def begin ====
+    topic = Survey_Topic_dict[fileID]
+    from nltk.tokenize import WordPunctTokenizer
+    sen_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
+    whole_text = ' '.join([i for i in df_selected.abstract] + [i for i in df_selected.intro])
+    whole_text = sen_tokenizer.tokenize(' '.join(whole_text))
+    whole_text = [i.lower() for i in whole_text]
+    topic_sents = []
+    for t in topic:
+        for sent in whole_text:
+            if t in sent.split():
+                topic_sents.append(sent)
+    topic_sents = set(topic_sents)
+    topic_introduction = ' '.join([i for i in topic_sents])
+    topic_intro = summarize(topic_introduction, words=150)
+    topic_intro = clean_wzy(topic_intro)
+    ## ==== Problem_def end ====
 
     # ## ==== Taxonomy begin ====
 
@@ -549,15 +575,7 @@ def introGen(fileID, df_selected, category_label, category_description):  # Intr
     # conjunction = " In the next section, we will introduce existing works in each types with details."
     # introduction += conjunction
 
-    introduction = summ
-
-    sent = sent_tokenize(introduction)
-    introduction = " ".join([s.strip() for s in sent])
-    introduction = introduction.replace("\n", "")
-    introduction = introduction.replace("< NO >", "")
-    introduction = introduction.replace("< NO>", "")
-    introduction = introduction.replace("<NO >", "")
-    introduction = cleanComma(introduction)
+    introduction = [background, topic_intro]
 
     return introduction
 
