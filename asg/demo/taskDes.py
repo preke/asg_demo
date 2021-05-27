@@ -415,7 +415,7 @@ def selectIntroSentences(intros):
     sentences = [sentences[i] for i in sent_id]
     return sentences
 
-
+'''
 def introGen(fileID, df_selected, category_label, category_description):  # Introduction Section generation
 
     topic = Survey_Topic_dict[fileID]
@@ -497,6 +497,70 @@ def introGen(fileID, df_selected, category_label, category_description):  # Intr
     introduction += conjunction
     # introduction = introduction.replace("< NO >", "")
     return introduction
+'''
+
+
+def introGen(fileID, df_selected, category_label, category_description):  # Introduction Section generation
+
+    topic = Survey_Topic_dict[fileID]
+    refs = readReference(df_selected)
+    newRefs, aiRefs, abslist, introlist = sentIntroText(refs)
+    newabs, newintro = extractTopicRef(topic, abslist, introlist)
+
+    if len(newintro) == 0:
+        newintro = introlist
+
+    newintro = extractTopicIntro(newintro)
+    if len(newintro) == 0:
+        newintro = introlist
+
+    ## ==== Background begin ====
+
+    abs_list = '\n'.join([' '.join(i.split(' ')[:50]) for i in newabs])
+    intro_list = ' '.join([i.split('\n')[0] for i in newintro])
+    text = abs_list + ' ' + intro_list
+    summ = summarize(text, words=150)
+    ## ==== Background end ====
+
+    # ## ==== Taxonomy begin ====
+
+    # categories = category_label
+    # des = category_description
+
+    # template = "In this paper, we reviewed existing works and classify them into " + no2word[
+    #     len(categories)] + " types namely: "
+
+    # keywords_des = ""
+    # for i in range(len(categories)):
+    #     if i != len(categories) - 1:
+    #         keywords_des += categories[i]
+    #         keywords_des += ', '
+    #     else:
+    #         keywords_des += ' and '
+    #         keywords_des += categories[i]
+
+    # keywords_des += "."
+    # template += keywords_des
+    # types_des = " ".join(des)
+    # template += " " + types_des
+    # introduction = summ + "\n" + template
+    # ## ==== Taxonomy end ====
+
+    # conjunction = " In the next section, we will introduce existing works in each types with details."
+    # introduction += conjunction
+
+    introduction = summ
+
+    sent = sent_tokenize(introduction)
+    introduction = " ".join([s.strip() for s in sent])
+    introduction = introduction.replace("\n", "")
+    introduction = introduction.replace("< NO >", "")
+    introduction = introduction.replace("< NO>", "")
+    introduction = introduction.replace("<NO >", "")
+    introduction = cleanComma(introduction)
+
+    return introduction
+
 
 
 def conclusionGen(fileID, category_label):  # Conclusion section generation
