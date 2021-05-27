@@ -563,34 +563,34 @@ def introGen(fileID, df_selected, category_label, category_description):  # Intr
     ## ==== Challenges end ====
 
 
-    # ## ==== Taxonomy begin ====
+    ## ==== Taxonomy begin ====
+    categories = category_label
+    des = category_description
 
-    # categories = category_label
-    # des = category_description
+    template = "In this paper, we reviewed existing works and classify them into " + no2word[
+        len(categories)] + " types namely: "
 
-    # template = "In this paper, we reviewed existing works and classify them into " + no2word[
-    #     len(categories)] + " types namely: "
+    keywords_des = ""
+    for i in range(len(categories)):
+        if i != len(categories) - 1:
+            keywords_des += categories[i]
+            keywords_des += ', '
+        else:
+            keywords_des += ' and '
+            keywords_des += categories[i]
 
-    # keywords_des = ""
-    # for i in range(len(categories)):
-    #     if i != len(categories) - 1:
-    #         keywords_des += categories[i]
-    #         keywords_des += ', '
-    #     else:
-    #         keywords_des += ' and '
-    #         keywords_des += categories[i]
-
-    # keywords_des += "."
-    # template += keywords_des
-    # types_des = " ".join(des)
-    # template += " " + types_des
-    # introduction = summ + "\n" + template
+    keywords_des += "."
+    template += keywords_des
+    types_des = " ".join(des)
+    template += " " + types_des
+    taxonomy = template
     # ## ==== Taxonomy end ====
 
-    # conjunction = " In the next section, we will introduce existing works in each types with details."
-    # introduction += conjunction
+    conjunction = " In the following section, we will introduce existing works in each category in detail."
 
-    introduction = background.capitalize() + '<br/><br/>' + topic_intro.capitalize() + '<br/><br/>' + challenges.capitalize()
+
+    introduction = background.capitalize() + '<br/><br/>' + topic_intro.capitalize() + '<br/><br/>' + challenges.capitalize() \
+                   + '<br/><br/>' + taxonomy.capitalize() + '<br/><br/>' + conjunction.capitalize()
 
     return introduction
 
