@@ -586,7 +586,7 @@ def introGen(fileID, df_selected, category_label, category_description):  # Intr
     taxonomy = template
     # ## ==== Taxonomy end ====
 
-    conjunction = " In the following section, we will introduce existing works in each category in detail."
+    conjunction = "In the following section, we will introduce existing works in each category in detail."
 
 
     introduction = background.capitalize() + '<br/><br/>' + topic_intro.capitalize() + '<br/><br/>' + challenges.capitalize() \
