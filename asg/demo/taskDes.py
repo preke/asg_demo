@@ -531,13 +531,15 @@ def introGen(fileID, df_selected, category_label, category_description):  # Intr
     background = clean_wzy(background)
     ## ==== Background end ====
 
+    whole_text = [i for i in df_selected.abstract] + [i for i in df_selected.intro]
+    whole_text = sen_tokenizer.tokenize(' '.join(whole_text))
+
     ## ==== Problem_def begin ====
     topic = Survey_Topic_dict[fileID]
     import nltk
     from nltk.tokenize import WordPunctTokenizer
     sen_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
-    whole_text = [i for i in df_selected.abstract] + [i for i in df_selected.intro]
-    whole_text = sen_tokenizer.tokenize(' '.join(whole_text))
+
     # whole_text = [i.lower() for i in whole_text]
     # print(whole_text)
 
@@ -548,11 +550,18 @@ def introGen(fileID, df_selected, category_label, category_description):  # Intr
                 topic_sents.append(sent)
     topic_sents = set(topic_sents)
     topic_introduction = ' '.join([i for i in topic_sents])
-
-
-    topic_intro = summarize(topic_introduction, words=150)
+    topic_intro = summarize(topic_introduction, words=100)
     topic_intro = clean_wzy(topic_intro)
     ## ==== Problem_def end ====
+
+    ## ==== Challenges begin ====
+    key_words = ['challenge', 'challenges', 'challenging', 'difficult', 'difficulties']
+    challenges = ' '.join([i for i in whole_text if (key_words[0] in i.split() or key_words[1] in i.split() or
+                                                             key_words[2] in i.split() or key_words[3] in i.split() or
+                                                             key_words[4] in i.split())])
+    challenges = clean_wzy(challenges)
+    ## ==== Challenges end ====
+
 
     # ## ==== Taxonomy begin ====
 
@@ -581,7 +590,7 @@ def introGen(fileID, df_selected, category_label, category_description):  # Intr
     # conjunction = " In the next section, we will introduce existing works in each types with details."
     # introduction += conjunction
 
-    introduction = background.capitalize() + '<br/><br/>' + topic_intro.capitalize()
+    introduction = background.capitalize() + '<br/><br/>' + topic_intro.capitalize() + '<br/><br/>' + challenges.capitalize()
 
     return introduction
 
