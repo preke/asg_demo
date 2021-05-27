@@ -590,7 +590,7 @@ def introGen(fileID, df_selected, category_label, category_description):  # Intr
 
 
     introduction = background.capitalize() + '<br/><br/>' + topic_intro.capitalize() + '<br/><br/>' + challenges.capitalize() \
-                   + '<br/><br/>' + taxonomy.capitalize() + '<br/><br/>' + conjunction.capitalize()
+                   + '<br/><br/>' + taxonomy.capitalize() + '<br/><br/>' + conjunction
 
     return introduction
 
