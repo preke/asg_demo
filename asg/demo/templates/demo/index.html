@@ -214,6 +214,12 @@ FONTS & ICONS
 			</div>
 		</form>
 		<p align="right"> *(Select the references for instant survey generation)</p>
+		<form action="" method="post", id="tax_std">
+			{% csrf_token %}
+			<input placeholder="Please input your taxonomy standard" class="form-control", id="taxonomy_standard">
+			<p></p>
+		</form>
+
 		<div style="text-align: center">
 			<input class="btn btn-info" onclick="display_taxonomy()" value="Automatic Taxonomy">
 		</div>
@@ -223,13 +229,14 @@ FONTS & ICONS
      Taxonomy Result
     ============================ -->
 	<div class="col-md-12" style="display: none" id="taxonomy">
-		<h2 align="left"> <span class="fas fa-chart-pie"></span> The Categorization Result of Selected References based on Semantic Clustering : </h2>
+		<h2 align="left"> <span class="fas fa-chart-pie"></span> The Categorization Result of Selected References based on the chosen taxonomy standard: </h2>
 
 		<div class="row">
 			<div class="col-md-7" style="height:400px;">
 				<img src="#" style="width:400px;height:400px;", id="tsne_img">
 			</div>
 			<div class="col-md-5" style="height:400px;">
+					<p>  </p>
 					<ul id="legend" style="position: relative;top: 30%;transform: translateY(-30%);">
 					</ul>
 			</div>
@@ -238,7 +245,65 @@ FONTS & ICONS
 		<br>
 		<hr class="firsthr">
 		<div style="text-align: center">
-			<input class="btn btn-info" onclick="display_survey()" value="Generate Survey Content" style="width: 200px">
+			<input class="btn btn-info" onclick="select_section()" value="Generate Survey Content" style="width: 200px">
+		</div>
+	</div>
+
+
+	<!-- ===========================
+     Select Sections
+    ============================ -->
+	<div class="col-md-12" style="display: none" id="sections">
+		<p>
+		<p>
+		<form action="" method="post", id="sections">
+			{% csrf_token %}
+			<div class="form-check">
+			  <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
+			  <label class="form-check-label" for="flexCheckChecked">
+				Title
+			  </label>
+			<div class="form-check">
+			  <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
+			  <label class="form-check-label" for="flexCheckChecked">
+				Abstract
+			  </label>
+			</div>
+			<div class="form-check">
+			  <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+			  <label class="form-check-label" for="flexCheckChecked">
+				Introduction
+			  </label>
+			</div>
+			<div class="form-check">
+			  <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+			  <label class="form-check-label" for="flexCheckChecked">
+				Methodology
+			  </label>
+			</div>
+			<div class="form-check">
+			  <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+			  <label class="form-check-label" for="flexCheckChecked">
+				Conclusion
+			  </label>
+			</div>
+			<div style="text-align: center">
+				<input class="btn btn-info" onclick="content_modification()" value="Confirm">
+			</div>
+		</form>
+
+	</div>
+
+	<!-- ===========================
+     Content Modification
+    ============================ -->
+	<div class="col-md-12" style="display: none" id="modification">
+		<form action="" method="post", id="content_modify">
+			{% csrf_token %}
+		</form>
+
+		<div style="text-align: center">
+			<input class="btn btn-info" onclick="display_survey()" value="Confirm">
 		</div>
 	</div>
 
@@ -351,6 +416,7 @@ FONTS & ICONS
 			data: $('#ref_form').serialize(),
 			success: function(result) {
 				// alert("Success!");
+				document.getElementById("legend").innerHTML += "<h2>" + $("#taxonomy_standard").val() + "</h2>";
 				for (let i = 0, len = result['colors'].length; i < len; i++) {
 					document.getElementById("legend").innerHTML += "<li class=\"list-group-item\"; style=\"color: "+ result['colors'][i]+" \">" + result['category_label'][i]+" </li>"
 				}
@@ -367,7 +433,59 @@ FONTS & ICONS
 		});
 	}
 
+	function select_section() {
+		$("#sections").attr("style","display:inline;");
+	}
 
+	function content_modification() {
+		$.ajax({
+			type: "GET",
+			dataType: "json",
+			url: "/get_survey",
+			success: function(result) {
+				// alert("Success!");
+				// alert(result);
+				for(var p in result) {
+					if (p == "Title") {
+						document.getElementById("content_modify").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
+						document.getElementById("content_modify").innerHTML+= "<textarea class=\"form-control\">"  + result[p] + "</textarea>";
+					} else if (p == "Abstract") {
+						document.getElementById("content_modify").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
+						document.getElementById("content_modify").innerHTML+= "<textarea class=\"form-control\">" + result[p][0] + " " + result[p][1] + "</textarea>";
+
+					} else if (p == "Introduction") {
+						document.getElementById("content_modify").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
+						document.getElementById("content_modify").innerHTML+= "<textarea class=\"form-control\">" + result[p] + "</textarea>";
+					} else if (p == "Conclusion") {
+						document.getElementById("content_modify").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
+						document.getElementById("content_modify").innerHTML+= "<textarea class=\"form-control\">" + result[p] + "</textarea>";
+					} else if (p == "References") {
+
+					} else {
+						document.getElementById("content_modify").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
+						document.getElementById("content_modify").innerHTML+= "<textarea class=\"form-control\">" + result[p][0] + "</textarea><p>";
+						for(var inner_json in result[p][1]) {
+							document.getElementById("content_modify").innerHTML+= "<h3 style=\"padding: 0px; color: black\"> Sub-section </h3>";
+							document.getElementById("content_modify").innerHTML+= "<input class=\"form-control\" value=" + result[p][1][inner_json]["subtitle"] + "</input><p>";
+							document.getElementById("content_modify").innerHTML+= "<textarea class=\"form-control\">" + result[p][1][inner_json]["content"] + "</textarea><p>";
+						}
+					}
+				}
+				$("#modification").attr("style","display:inline;");
+			},
+			error: function(jqXHR, textStatus, errorThrown){
+				alert(jqXHR.responseText);
+				/*
+				alert(jqXHR.status);
+				alert(jqXHR.readyState);
+				alert(jqXHR.statusText);
+				alert(textStatus);
+				alert(errorThrown);
+				*/
+			}
+		});
+
+	}
 
 	function display_survey(){
 		$.ajax({
