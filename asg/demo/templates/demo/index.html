@@ -148,6 +148,7 @@ FONTS & ICONS
 								<input type="radio" name="topics" id="option5" value="3274658"> Analysis of Handwritten Signature
 							</label>
 							<label class="btn btn-info" style="height:80px" onclick="sub_topic()">
+							<!--<label class="btn btn-info" style="height:80px" onclick="select_sections()">-->
 								Reference Selection
 							</label>
 
@@ -245,7 +246,7 @@ FONTS & ICONS
 		<br>
 		<hr class="firsthr">
 		<div style="text-align: center">
-			<input class="btn btn-info" onclick="select_section()" value="Generate Survey Content" style="width: 200px">
+			<input class="btn btn-info" onclick="display_select_sections()" value="Generate Survey Content" style="width: 200px">
 		</div>
 	</div>
 
@@ -254,41 +255,71 @@ FONTS & ICONS
      Select Sections
     ============================ -->
 	<div class="col-md-12" style="display: none" id="sections">
-		<p>
-		<p>
+		<br>
+		<h3 align="left"> Please Choose the sections (subsections) you want to generate: </h3>
 		<form action="" method="post", id="sections">
 			{% csrf_token %}
 			<div class="form-check">
-			  <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
-			  <label class="form-check-label" for="flexCheckChecked">
+			  <input class="form-check-input" type="checkbox" name="Title" value="Title" id="cbx_title" >
+			  <label class="form-check-label" for="cbx_title">
 				Title
 			  </label>
 			<div class="form-check">
-			  <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
-			  <label class="form-check-label" for="flexCheckChecked">
+			  <input class="form-check-input" type="checkbox" name="Abstract" value="Abstract" id="cbx_abstract" >
+			  <label class="form-check-label" for="cbx_abstract">
 				Abstract
 			  </label>
 			</div>
 			<div class="form-check">
-			  <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
-			  <label class="form-check-label" for="flexCheckChecked">
+			  <input class="form-check-input" type="checkbox" name="Introduction" value="Introduction" id="cbx_introduction" >
+			  <label class="form-check-label" for="cbx_introduction">
 				Introduction
 			  </label>
+				<div class="row">
+					<div class="col-sm-1 form-check" style="width: 10px"></div>
+					<div class="col-sm-10 form-check">
+						<input class="form-check-input" type="checkbox" name="Background" value="Background" id="cbx_background" >
+						<label class="form-check-label" for="cbx_background">
+							Background
+						</label>
+					</div>
+					<div class="col-sm-1 form-check"></div>
+				</div>
+				<div class="row">
+					<div class="col-sm-1 form-check" style="width: 10px"></div>
+					<div class="col-sm-10 form-check">
+						<input class="form-check-input" type="checkbox" name="Method" value="Method" id="cbx_method" >
+						<label class="form-check-label" for="cbx_method">
+							Method
+						</label>
+					</div>
+					<div class="col-sm-1 form-check"></div>
+				</div>
+				<div class="row">
+					<div class="col-sm-1 form-check" style="width: 10px"></div>
+					<div class="col-sm-10 form-check">
+						<input class="form-check-input" type="checkbox" name="Reminder" value="Reminder" id="cbx_reminder" >
+						<label class="form-check-label" for="cbx_reminder">
+							Reminder
+						</label>
+					</div>
+					<div class="col-sm-1 form-check"></div>
+				</div>
 			</div>
 			<div class="form-check">
-			  <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
-			  <label class="form-check-label" for="flexCheckChecked">
+			  <input class="form-check-input" type="checkbox" name="Methodology" value="Methodology" id="cbx_methodology" >
+			  <label class="form-check-label" for="cbx_methodology">
 				Methodology
 			  </label>
 			</div>
 			<div class="form-check">
-			  <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
-			  <label class="form-check-label" for="flexCheckChecked">
+			  <input class="form-check-input" type="checkbox" name="Conclusion" value="Conclusion" id="cbx_conclusion" >
+			  <label class="form-check-label" for="cbx_conclusion">
 				Conclusion
 			  </label>
 			</div>
 			<div style="text-align: center">
-				<input class="btn btn-info" onclick="content_modification()" value="Confirm">
+				<input class="btn btn-info" onclick="select_sections()" value="Confirm">
 			</div>
 		</form>
 
@@ -327,6 +358,8 @@ FONTS & ICONS
 		<div class="container pre-scrollable col-md-12" style="max-height: 700px" id="survey_content">
 		</div>
 	</div>
+
+	<div class="col-md-12" style="display: none" id="references"></div>
 
 
 </div><!--container end-->
@@ -433,123 +466,134 @@ FONTS & ICONS
 		});
 	}
 
-	function select_section() {
+	function display_select_sections() {
 		$("#sections").attr("style","display:inline;");
 	}
 
-	function content_modification() {
+	function select_sections() {
+		var section_list = {};
+
+			if($('#cbx_title').is(":checked")) {section_list['title'] = 1}
+			if($('#cbx_introduction').is(":checked")) {section_list['introduction'] = 1}
+			if($('#cbx_abstract').is(":checked")) {section_list['abstract'] = 1}
+			if($('#cbx_background').is(":checked")) {section_list['background'] = 1}
+			if($('#cbx_method').is(":checked")) {section_list['method'] = 1}
+			if($('#cbx_reminder').is(":checked")) {section_list['reminder'] = 1}
+			if($('#cbx_methodology').is(":checked")) {section_list['methodology'] = 1}
+			if($('#cbx_conclusion').is(":checked")) {section_list['conclusion'] = 1}
+
+
 		$.ajax({
-			type: "GET",
-			dataType: "json",
-			url: "/get_survey",
-			success: function(result) {
-				// alert("Success!");
-				// alert(result);
+            type: "POST",
+            dataType: "json",
+            url: "/select_sections",
+            data: section_list,
+            success: function(result) {
+                for(var p in result) {
+                    if (p == "title") {
+                        document.getElementById("content_modify").innerHTML+= "<h2 style=\"padding: 0px; color: black\"> Title </h2>";
+                        document.getElementById("content_modify").innerHTML+= "<textarea id=section_" + p + " class=\"form-control\">"  + result[p] + "</textarea>";
+                    }
+                }
+
+                for(var p in result) {
+                    if (p == "abstract") {
+                        document.getElementById("content_modify").innerHTML+= "<h2 style=\"padding: 0px; color: black\"> Abstract </h2>";
+                        document.getElementById("content_modify").innerHTML+= "<textarea id=section_" + p + " class=\"form-control\" rows = \" 15 \">" + result[p][0] + " " + result[p][1] + "</textarea>";
+
+                    }
+                }
+
+                for(var p in result) {
+                    if (p == "introduction") {
+                        document.getElementById("content_modify").innerHTML+= "<h2 style=\"padding: 0px; color: black\"> Introduction </h2>";
+                        document.getElementById("content_modify").innerHTML+= "<textarea id=section_" + p + " class=\"form-control\" rows = \" 20 \">" + result[p] + "</textarea>";
+                    }
+                }
+
+                for(var p in result) {
+                    if (p == "methodology") {
+                        document.getElementById("content_modify").innerHTML+= "<h2 style=\"padding: 0px; color: black\"> Methodology </h2>";
+                        document.getElementById("content_modify").innerHTML+= "<textarea id=section_" + p + " class=\"form-control\" rows = \" 10 \">" + result[p][0] + "</textarea><p>";
+                        for(var inner_json in result[p][1]) {
+                            document.getElementById("content_modify").innerHTML+= "<h3 style=\"padding: 0px; color: black\"> Sub-section </h3>";
+                            document.getElementById("content_modify").innerHTML+= "<textarea name=\"method_sub_title\" class=\"form-control\" rows = \" 1 \">" + result[p][1][inner_json]["subtitle"] + "</textarea><p>";
+                            document.getElementById("content_modify").innerHTML+= "<textarea name=\"method_sub_content\" class=\"form-control\" rows = \" 30 \">" + result[p][1][inner_json]["content"] + "</textarea><p>";
+                        }
+                    }
+                }
+                for(var p in result) {
+                    if (p == "conclusion") {
+                        document.getElementById("content_modify").innerHTML+= "<h2 style=\"padding: 0px; color: black\">Conclusion</h2>";
+                        document.getElementById("content_modify").innerHTML+= "<textarea id=section_" + p + " class=\"form-control\" rows = \" 5 \" >" + result[p] + "</textarea>";
+                    }
+                }
 				for(var p in result) {
-					if (p == "Title") {
-						document.getElementById("content_modify").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
-						document.getElementById("content_modify").innerHTML+= "<textarea class=\"form-control\">"  + result[p] + "</textarea>";
-					} else if (p == "Abstract") {
-						document.getElementById("content_modify").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
-						document.getElementById("content_modify").innerHTML+= "<textarea class=\"form-control\">" + result[p][0] + " " + result[p][1] + "</textarea>";
+                    if (p == "references") {
+                        var cnt = 1;
+                        for (var entry in result[p]) {
+                            document.getElementById("references").innerHTML+= "<p style=\"color:black;\">[" + cnt + "]" + "   " + result[p][entry] + "</p>";
+                            cnt = cnt + 1;
+                        }
+                    }
+                }
 
-					} else if (p == "Introduction") {
-						document.getElementById("content_modify").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
-						document.getElementById("content_modify").innerHTML+= "<textarea class=\"form-control\">" + result[p] + "</textarea>";
-					} else if (p == "Conclusion") {
-						document.getElementById("content_modify").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
-						document.getElementById("content_modify").innerHTML+= "<textarea class=\"form-control\">" + result[p] + "</textarea>";
-					} else if (p == "References") {
-
-					} else {
-						document.getElementById("content_modify").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
-						document.getElementById("content_modify").innerHTML+= "<textarea class=\"form-control\">" + result[p][0] + "</textarea><p>";
-						for(var inner_json in result[p][1]) {
-							document.getElementById("content_modify").innerHTML+= "<h3 style=\"padding: 0px; color: black\"> Sub-section </h3>";
-							document.getElementById("content_modify").innerHTML+= "<input class=\"form-control\" value=" + result[p][1][inner_json]["subtitle"] + "</input><p>";
-							document.getElementById("content_modify").innerHTML+= "<textarea class=\"form-control\">" + result[p][1][inner_json]["content"] + "</textarea><p>";
-						}
-					}
-				}
-				$("#modification").attr("style","display:inline;");
-			},
-			error: function(jqXHR, textStatus, errorThrown){
-				alert(jqXHR.responseText);
-				/*
-				alert(jqXHR.status);
-				alert(jqXHR.readyState);
-				alert(jqXHR.statusText);
-				alert(textStatus);
-				alert(errorThrown);
-				*/
-			}
-		});
+                $("#modification").attr("style","display:inline;");
+            },
+            error: function(jqXHR, textStatus, errorThrown){
+                alert(jqXHR.responseText);
+            }
+        });
 
 	}
 
+
+
 	function display_survey(){
-		$.ajax({
-			type: "GET",
-			dataType: "json",
-			url: "/get_survey",
-			success: function(result) {
-				// alert("Success!");
-				// alert(result);
-				for(var p in result) {
-					if (p == "Title") {
-						document.getElementById("survey_content").innerHTML+= "<h1>" + result[p] + "</h1>";
-					} else if (p == "Abstract") {
-						document.getElementById("survey_content").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
-						document.getElementById("survey_content").innerHTML+= "<p align=\"justify\"><span>" + result[p][0] + " <b>" + result[p][1] + "</b></span></p>";
-					} else if (p == "Introduction") {
-						document.getElementById("survey_content").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
-						document.getElementById("survey_content").innerHTML+= "<p align=\"justify\">" + result[p] + "</p>";
-					} else if (p == "Conclusion") {
-						document.getElementById("survey_content").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
-						document.getElementById("survey_content").innerHTML+= "<p>" + result[p] + "</p>";
-					} else if (p == "References" ) {
-						document.getElementById("survey_content").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
-						var cnt = 1;
-						for (var entry in result[p]) {
-							document.getElementById("survey_content").innerHTML+= "<p style=\"color:black;\">[" + cnt + "]" + "   " + result[p][entry] + "</p>";
-							cnt = cnt + 1;
-						}
+
+		if (document.getElementById("section_title")) {
+			document.getElementById("survey_content").innerHTML+= "<h1>" + document.getElementById("section_title").value + "</h1>";
+		}
+		if (document.getElementById("section_abstract")) {
+			document.getElementById("survey_content").innerHTML+= "<h2 style=\"padding: 0px; color: black\">Abstract</h2>";
+			document.getElementById("survey_content").innerHTML+= "<p align=\"justify\">" + document.getElementById("section_abstract").value + "</p>";
+		}
+		if (document.getElementById("section_introduction")) {
+			document.getElementById("survey_content").innerHTML+= "<h2 style=\"padding: 0px; color: black\">Introduction</h2>";
+			document.getElementById("survey_content").innerHTML+= "<p align=\"justify\">" + document.getElementById("section_introduction").value + "</p>";
+		}
+
+		if (document.getElementById("section_methodology")) {
+			document.getElementById("survey_content").innerHTML+= "<h2 style=\"padding: 0px; color: black\">Methodology</h2>";
+			document.getElementById("survey_content").innerHTML+= "<p align=\"justify\">" + document.getElementById("section_methodology").value + "</p>";
+			var len = document.getElementsByName("method_sub_title").length;
+			for(var i=0; i<len; i++) {
+				document.getElementById("survey_content").innerHTML+= "<h3>" + document.getElementsByName("method_sub_title")[i].value + "</h3>";
+				document.getElementById("survey_content").innerHTML+= "<p>" + document.getElementsByName("method_sub_content")[i].value + "</p>";
+			}
+
+		}
+
+		if (document.getElementById("section_conclusion")) {
+			document.getElementById("survey_content").innerHTML+= "<h2 style=\"padding: 0px; color: black\">Conclusion</h2>";
+			document.getElementById("survey_content").innerHTML+= "<p align=\"justify\">" + document.getElementById("section_conclusion").value + "</p>";
+		}
+
+		document.getElementById("survey_content").innerHTML+= "<h2 style=\"padding: 0px; color: black\"> References </h2>";
+		document.getElementById("survey_content").innerHTML+= document.getElementById("references").innerHTML;
 
 
-					} else {
-						document.getElementById("survey_content").innerHTML+= "<h2 style=\"padding: 0px; color: black\">" + p + "</h2>";
-						document.getElementById("survey_content").innerHTML+= "<p>" + result[p][0] + "</p>";
-						for(var inner_json in result[p][1]) {
-							document.getElementById("survey_content").innerHTML+= "<h3>" + result[p][1][inner_json]["subtitle"] + "</h3>";
-							document.getElementById("survey_content").innerHTML+= "<p>" + result[p][1][inner_json]["content"] + "</p>";
-						}
-					}
-				}
-				$("#survey").attr("style","display:inline;");
-				$("#template").popover({
-					html : true,
-					/* delay:{show:500, hide:1000},
-					container: 'body', */
-					content: function() {
-					 return content();
-					}
-				});
-			},
-			error: function(jqXHR, textStatus, errorThrown){
-				alert(jqXHR.responseText);
-				/*
-				alert(jqXHR.status);
-				alert(jqXHR.readyState);
-				alert(jqXHR.statusText);
-				alert(textStatus);
-				alert(errorThrown);
-				*/
+		$("#survey").attr("style","display:inline;");
+		/*
+		$("#template").popover({
+			html : true,
+			// delay:{show:500, hide:1000},
+			// container: 'body',
+			content: function() {
+				return content();
 			}
 		});
-
-		function content() {
-			return "<img src=\'static/img/template.png\' >";
-		}
+		*/
 	}
 
 </script>
@@ -563,8 +607,13 @@ FONTS & ICONS
 <script src="{% static 'scripts/jquery.nicescroll.min.js' %}"></script>
 <script src="{% static 'scripts/evenfly.js' %}"></script>
 {% endblock %}
+
 </body>
+
 <footer>
-	<h5 align="center" > IMCL NLP Group</h5>
+	<p>
+	<p>
+	<p>
+	<!--<h5 align="center" > IMCL NLP Group</h5>-->
 </footer>
 </html>

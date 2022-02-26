@@ -509,88 +509,132 @@ def clean_wzy(text):
     return text
 
 
-def introGen(fileID, df_selected, category_label, category_description):  # Introduction Section generation
+# def introGen(fileID, df_selected, category_label, category_description):
+#
+#
+#     # refs = readReference(df_selected)
+#     # newRefs, aiRefs, abslist, introlist = sentIntroText(refs)
+#     # newabs, newintro = extractTopicRef(topic, abslist, introlist)
+#     #
+#     # if len(newintro) == 0:
+#     #     newintro = introlist
+#     #
+#     # newintro = extractTopicIntro(newintro)
+#     # if len(newintro) == 0:
+#     #     newintro = introlist
+#
+#     ## ==== Background begin ====
+#     abs_list = '\n'.join([' '.join(i.split(' ')[:50]) for i in df_selected.abstract])
+#     intro_list = ' '.join([i.split('\n')[0] for i in df_selected.intro])
+#     text = abs_list + ' ' + intro_list
+#     background = summarize(text, words=150)
+#     background = clean_wzy(background)
+#     ## ==== Background end ====
+#
+#     import nltk
+#     from nltk.tokenize import WordPunctTokenizer
+#     sen_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
+#     whole_text = [i for i in df_selected.abstract] + [i for i in df_selected.intro]
+#     whole_text = sen_tokenizer.tokenize(' '.join(whole_text))
+#
+#     ## ==== Problem_def begin ====
+#     topic = Survey_Topic_dict[fileID]
+#     topic_sents = []
+#     for t in topic:
+#         for sent in whole_text:
+#             if t in sent.split():
+#                 topic_sents.append(sent)
+#     topic_sents = set(topic_sents)
+#     topic_introduction = ' '.join([i for i in topic_sents])
+#     topic_intro = summarize(topic_introduction, words=100)
+#     topic_intro = clean_wzy(topic_intro)
+#     ## ==== Problem_def end ====
+#
+#     ## ==== Challenges begin ====
+#     key_words = ['challenge', 'challenges', 'challenging', 'difficult', 'difficulties']
+#     challenges = ' '.join([i for i in whole_text if (key_words[0] in i.split() or key_words[1] in i.split() or
+#                                                              key_words[2] in i.split() or key_words[3] in i.split() or
+#                                                              key_words[4] in i.split())])
+#     # challenges = ' '.join(extractTopicIntro(challenges))
+#     challenges = summarize(challenges, words=100)
+#     challenges = clean_wzy(challenges)
+#     begin = 'There are several challenges of ' + Survey_dict[fileID] + '.'
+#     challenges = begin + challenges
+#     ## ==== Challenges end ====
+#
+#
+#     ## ==== Taxonomy begin ====
+#     categories = category_label
+#     des = category_description
+#
+#     template = "In this paper, we reviewed existing works and classify them into " + no2word[
+#         len(categories)] + " types namely: "
+#
+#     keywords_des = ""
+#     for i in range(len(categories)):
+#         if i != len(categories) - 1:
+#             keywords_des += categories[i]
+#             keywords_des += ', '
+#         else:
+#             keywords_des += ' and '
+#             keywords_des += categories[i]
+#
+#     keywords_des += "."
+#     template += keywords_des
+#     types_des = " ".join(des)
+#     template += " " + types_des
+#     taxonomy = template
+#     # ## ==== Taxonomy end ====
+#
+#     conjunction = "In the following section, we will introduce existing works in each category in detail."
+#
+#
+#     introduction = background.capitalize() + '<br/><br/>' + topic_intro.capitalize() + '<br/><br/>' + challenges.capitalize() \
+#                    + '<br/><br/>' + taxonomy.capitalize() + '<br/><br/>' + conjunction
+#
+#     return introduction
 
 
-    # refs = readReference(df_selected)
-    # newRefs, aiRefs, abslist, introlist = sentIntroText(refs)
-    # newabs, newintro = extractTopicRef(topic, abslist, introlist)
-    #
-    # if len(newintro) == 0:
-    #     newintro = introlist
-    #
-    # newintro = extractTopicIntro(newintro)
-    # if len(newintro) == 0:
-    #     newintro = introlist
+def introGen(fileID, df_selected, category_label, category_description, survey_sections):
 
-    ## ==== Background begin ====
-    abs_list = '\n'.join([' '.join(i.split(' ')[:50]) for i in df_selected.abstract])
-    intro_list = ' '.join([i.split('\n')[0] for i in df_selected.intro])
-    text = abs_list + ' ' + intro_list
-    background = summarize(text, words=150)
-    background = clean_wzy(background)
-    ## ==== Background end ====
+    introduction = ""
+    if "background" in survey_sections.keys():
 
-    import nltk
-    from nltk.tokenize import WordPunctTokenizer
-    sen_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
-    whole_text = [i for i in df_selected.abstract] + [i for i in df_selected.intro]
-    whole_text = sen_tokenizer.tokenize(' '.join(whole_text))
+        ## ==== Background begin ====
+        abs_list = '\n'.join([' '.join(i.split(' ')[:50]) for i in df_selected.abstract])
+        intro_list = ' '.join([i.split('\n')[0] for i in df_selected.intro])
+        text = abs_list + ' ' + intro_list
+        background = summarize(text, words=150)
+        background = clean_wzy(background)
+        ## ==== Background end ====
 
-    ## ==== Problem_def begin ====
-    topic = Survey_Topic_dict[fileID]
-    topic_sents = []
-    for t in topic:
-        for sent in whole_text:
-            if t in sent.split():
-                topic_sents.append(sent)
-    topic_sents = set(topic_sents)
-    topic_introduction = ' '.join([i for i in topic_sents])
-    topic_intro = summarize(topic_introduction, words=100)
-    topic_intro = clean_wzy(topic_intro)
-    ## ==== Problem_def end ====
+        introduction += background.capitalize() + '\n \n'
 
-    ## ==== Challenges begin ====
-    key_words = ['challenge', 'challenges', 'challenging', 'difficult', 'difficulties']
-    challenges = ' '.join([i for i in whole_text if (key_words[0] in i.split() or key_words[1] in i.split() or
-                                                             key_words[2] in i.split() or key_words[3] in i.split() or
-                                                             key_words[4] in i.split())])
-    # challenges = ' '.join(extractTopicIntro(challenges))
-    challenges = summarize(challenges, words=100)
-    challenges = clean_wzy(challenges)
-    begin = 'There are several challenges of ' + Survey_dict[fileID] + '.'
-    challenges = begin + challenges
-    ## ==== Challenges end ====
+    if "method" in survey_sections.keys():
+        import nltk
+        from nltk.tokenize import WordPunctTokenizer
+        sen_tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
+        whole_text = [i for i in df_selected.abstract] + [i for i in df_selected.intro]
+        whole_text = sen_tokenizer.tokenize(' '.join(whole_text))
 
+        ## ==== Problem_def begin ====
+        topic = Survey_Topic_dict[fileID]
+        topic_sents = []
+        for t in topic:
+            for sent in whole_text:
+                if t in sent.split():
+                    topic_sents.append(sent)
+        topic_sents = set(topic_sents)
+        topic_introduction = ' '.join([i for i in topic_sents])
+        topic_intro = summarize(topic_introduction, words=100)
+        topic_intro = clean_wzy(topic_intro)
+        ## ==== Problem_def end ====
 
-    ## ==== Taxonomy begin ====
-    categories = category_label
-    des = category_description
+        introduction += topic_intro.capitalize() + '\n \n'
 
-    template = "In this paper, we reviewed existing works and classify them into " + no2word[
-        len(categories)] + " types namely: "
-
-    keywords_des = ""
-    for i in range(len(categories)):
-        if i != len(categories) - 1:
-            keywords_des += categories[i]
-            keywords_des += ', '
-        else:
-            keywords_des += ' and '
-            keywords_des += categories[i]
-
-    keywords_des += "."
-    template += keywords_des
-    types_des = " ".join(des)
-    template += " " + types_des
-    taxonomy = template
-    # ## ==== Taxonomy end ====
-
-    conjunction = "In the following section, we will introduce existing works in each category in detail."
-
-
-    introduction = background.capitalize() + '<br/><br/>' + topic_intro.capitalize() + '<br/><br/>' + challenges.capitalize() \
-                   + '<br/><br/>' + taxonomy.capitalize() + '<br/><br/>' + conjunction
+    if "reminder" in survey_sections.keys():
+        conjunction = "In the following section, we will introduce existing works in each category in detail."
+        introduction += conjunction
 
     return introduction
 

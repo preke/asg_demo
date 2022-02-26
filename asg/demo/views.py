@@ -183,6 +183,50 @@ def automatic_taxonomy(request):
 
 
 @csrf_exempt
+def select_sections(request):
+
+    sections = request.POST
+    # print(sections)
+
+    survey = {}
+
+    for k,v in sections.items():
+        if k == "title":
+            survey['title'] = "A Survey of " + Survey_dict[Global_survey_id]
+        if k == "abstract":
+            abs, last_sent = absGen(Global_survey_id, Global_df_selected, Global_category_label)
+            survey['abstract'] = [abs, last_sent]
+        if k == "introduction":
+            intro = introGen(Global_survey_id, Global_df_selected, Global_category_label, Global_category_description, sections)
+            survey['introduction'] = intro
+        if k == "methodology":
+            proceeding, detailed_des = methodologyGen(Global_survey_id, Global_df_selected, Global_category_label,
+                                                      Global_category_description)
+            survey['methodology'] = [proceeding, detailed_des]
+            print('======')
+            print(survey['methodology'])
+            print('======')
+
+        if k == "conclusion":
+            conclusion = conclusionGen(Global_survey_id, Global_category_label)
+            survey['conclusion'] = conclusion
+
+
+        ## reference
+        ## here is the algorithm part
+        # df = pd.read_csv(data_path, sep='\t')
+        survey['references'] = []
+        for ref in Global_df_selected['ref_entry']:
+            entry = str(ref)
+            survey['references'].append(entry)
+
+
+    survey_dict = json.dumps(survey)
+
+    return HttpResponse(survey_dict)
+
+
+@csrf_exempt
 def get_survey(request):
     survey_dict = get_survey_text()
     survey_dict = json.dumps(survey_dict)
@@ -294,3 +338,5 @@ def Clustering_refs(n_clusters):
                 category_description[i] = j['category_desp']
                 category_label[i] = j['topic_word'].replace('-', ' ').title()
     return colors, category_label, category_description
+
+
