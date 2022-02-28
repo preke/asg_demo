@@ -628,9 +628,9 @@ def introGen_supervised(fileID, df_selected, category_label, category_descriptio
 
     ## ==== Background begin ====
     output_background_text = ""
+    summarizer_dict = MODEL_PATH_DICT
+    
     if "background" in survey_sections.keys():
-        #input_text = abs_str
-        summarizer_dict = MODEL_PATH_DICT
         section_name = 'background'
         summarizer_name = "asg_pegasus"
         #Summarizer = Text_Summarizer(summarizer_dict).load_model(section_name,summarizer_name)
