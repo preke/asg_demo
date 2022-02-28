@@ -13,13 +13,24 @@ from . import views
 import pandas as pd
 import numpy as np
 
+from .text_summarizer import Text_Summarizer
+from .text_classifier import Text_Classifier
+import torch
+import pdb
+
 # line 66, 88 change the title for the category descroption
 no2word = {2: "two", 3: "three", 4: "four", 5: "five", 6: "six"}
 
 Survey_dict = views.Survey_dict
 Survey_Topic_dict = views.Survey_Topic_dict
 
+MODEL_PATH_DICT={}
+MODEL_PATH_DICT['asg_pegasus']={}
+MODEL_PATH_DICT['asg_pegasus']['background']="/home/disk1/data/shuaiqi/survey_gen/models/pegasus/survey_mds_background_3000_300/checkpoint-10170"
+MODEL_PATH_DICT['asg_pegasus']['method']="/home/disk1/data/shuaiqi/survey_gen/models/pegasus/survey_mds_method_3000_300/checkpoint-9980"
 
+MODEL_PATH_DICT['bert_base_3sent_classify']={}
+MODEL_PATH_DICT['bert_base_3sent_classify']['CSAbstruct']="/home/disk1/data/shuaiqi/survey_gen/models/classify/bert_base_3sent/CSAbstruct/checkpoint-1418"
 
 
 def readReference(df):
@@ -594,6 +605,61 @@ def clean_wzy(text):
 #
 #     return introduction
 
+
+def introGen_supervised(fileID, df_selected, category_label, category_description, survey_sections):
+    
+    output_intro_text = ""
+    
+    abs_str_list = [' '.join(abs_i.split(' ')[:300]) for abs_i in df_selected.abstract]
+    #abs_str = '\n'.join([' '.join(abs_i.split(' ')[:300]) for abs_i in df_selected.abstract])
+    #intro_str = ' '.join([intro_i.split('\n')[0] for intro_i in df_selected.intro])
+    #text = abs_str + ' ' + intro_str
+
+    ## ==== classify begin ====
+    classifier_dict = MODEL_PATH_DICT
+    train_set_name = "CSAbstruct"
+    summarizer_name = "bert_base_3sent_classify"
+    
+    Classifier = Text_Classifier(classifier_dict,train_set_name,summarizer_name)
+    background_sent_list,method_sent_list = Classifier.classify_sent(abs_str_list, batch_size=16, input_max_length = 1024)
+
+    background_sent_str=' '.join(background_sent_list)
+    method_sent_str=' '.join(method_sent_list)
+
+    ## ==== Background begin ====
+    output_background_text = ""
+    if "background" in survey_sections.keys():
+        #input_text = abs_str
+        summarizer_dict = MODEL_PATH_DICT
+        section_name = 'background'
+        summarizer_name = "asg_pegasus"
+        #Summarizer = Text_Summarizer(summarizer_dict).load_model(section_name,summarizer_name)
+        Summarizer = Text_Summarizer(summarizer_dict,section_name,summarizer_name)
+        output_background_text = Summarizer.summarize(background_sent_str, output_len=300, input_max_length = 1024)
+        output_background_text = output_background_text + '\n \n' 
+    output_intro_text = output_intro_text + output_background_text
+
+    ## ==== Method begin ====
+    output_method_text = ""
+    if "method" in survey_sections.keys():
+        section_name = 'method'
+        summarizer_name = "asg_pegasus"
+        Summarizer = Text_Summarizer(summarizer_dict,section_name,summarizer_name)
+        output_method_text = Summarizer.summarize(method_sent_str, output_len=300, input_max_length = 1024)
+        output_method_text = output_method_text + '\n \n' 
+    output_intro_text = output_intro_text + output_method_text
+
+    ## conjunction
+    if "reminder" in survey_sections.keys():
+        conjunction = "In the following section, we will introduce existing works in each category in detail."
+    output_intro_text = output_intro_text + conjunction
+
+    #pdb.set_trace()
+    #output_intro_text = output_background_text + '<br/><br/>' + output_method_text + '<br/><br/>' + conjunction
+    #introduction = background.capitalize() + '<br/><br/>' + topic_intro.capitalize() + '<br/><br/>' + challenges.capitalize() \
+    #               + '<br/><br/>' + taxonomy.capitalize() + '<br/><br/>' + conjunction
+
+    return output_intro_text
 
 def introGen(fileID, df_selected, category_label, category_description, survey_sections):
 

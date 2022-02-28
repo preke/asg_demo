@@ -54,7 +54,7 @@ Global_category_label = []
 Global_df_selected = ""
 
 
-from demo.taskDes import absGen, introGen, methodologyGen, conclusionGen
+from demo.taskDes import absGen, introGen,introGen_supervised, methodologyGen, conclusionGen
 from demo.category_and_tsne import clustering, get_cluster_description
 
 
@@ -197,7 +197,8 @@ def select_sections(request):
             abs, last_sent = absGen(Global_survey_id, Global_df_selected, Global_category_label)
             survey['abstract'] = [abs, last_sent]
         if k == "introduction":
-            intro = introGen(Global_survey_id, Global_df_selected, Global_category_label, Global_category_description, sections)
+            intro = introGen_supervised(Global_survey_id, Global_df_selected, Global_category_label, Global_category_description, sections)
+            #intro = introGen(Global_survey_id, Global_df_selected, Global_category_label, Global_category_description, sections)
             survey['introduction'] = intro
         if k == "methodology":
             proceeding, detailed_des = methodologyGen(Global_survey_id, Global_df_selected, Global_category_label,
@@ -292,7 +293,8 @@ def get_survey_text(refs=Global_ref_list):
         survey['Abstract'] = [abs, last_sent]
 
         ## Intro generation
-        intro = introGen(Global_survey_id, Global_df_selected, Global_category_label, Global_category_description)
+        intro = introGen_supervised(Global_survey_id, Global_df_selected, Global_category_label, Global_category_description)
+        #intro = introGen(Global_survey_id, Global_df_selected, Global_category_label, Global_category_description)
         survey['Introduction'] = intro
 
         ## Methodology generation
