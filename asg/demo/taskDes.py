@@ -650,6 +650,7 @@ def introGen_supervised(fileID, df_selected, category_label, category_descriptio
     output_intro_text = output_intro_text + output_method_text
 
     ## conjunction
+    conjunction = ""
     if "reminder" in survey_sections.keys():
         conjunction = "In the following section, we will introduce existing works in each category in detail."
     output_intro_text = output_intro_text + conjunction
