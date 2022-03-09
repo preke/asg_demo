@@ -122,8 +122,10 @@ FONTS & ICONS
 	CHOOSE TOPICS
 	============================ -->
 	<div class="col-md-12">
-			<h2 align="left"> <span class="fas fa-tags"></span>  Choose a topic from: </h2>
+
 			<div class="row">
+				<div id="select_refs">
+				<h2 align="left"> <span class="fas fa-tags"></span>  Choose a topic from: </h2>
 				<!--<div class="col-md-1"></div>-->
 				<div class="col-md-12">
 					<form action="" method="post", id="topic_form">
@@ -156,6 +158,7 @@ FONTS & ICONS
 						<br>
 					</form>
 				</div>
+				</div>
 
 						<!--<div class="input-group mb-3">-->
 						  <!--<div class="input-group-prepend">-->
@@ -175,7 +178,8 @@ FONTS & ICONS
 				<!--<div class="col-md-1"></div>-->
 			</div>
 			<br>
-
+			<div id="input_ref">
+			<h2 align="left" id="input_ref_head"> <span class="fas fa-tags"></span>  Or you can also input topic by yourself: </h2>
 			<form action="" method="post", id="topic_input" enctype=”multipart/form-data”>
 				{% csrf_token %}
 				<div class="row">
@@ -200,15 +204,15 @@ FONTS & ICONS
 						</button>
 					</div>
 				</div>
-
 			</form>
+			</div>
 	</div>
 
 	<!-- ===========================
      References
     ============================ -->
 	<div class="col-md-12" style="display: none" id="refs">
-		<h2 align="left"> <span class="fas fa-copy"></span> Here are the Most Related References from Our Dataset: </h2>
+		<h2 align="left" id="refs_head"> <span class="fas fa-copy"></span> Here are the most related references from our dataset: </h2>
 		<form action="" method="post", id="ref_form">
 			{% csrf_token %}
 			<div class="list-group pre-scrollable" id="ref_list">
@@ -396,6 +400,9 @@ FONTS & ICONS
 					document.getElementById("ref_list").innerHTML += "<div class=\"input-group\"><span class=\"input-group-addon\"><input name=\"refs\" type=\"checkbox\" value="+result['ref_ids'][i] + " checked></span><a href=" + encodeURI(result['ref_links'][i])+ " target=\"_blank\" class=\"list-group-item\">" + result['references'][i] + "</a></div>";
 				}
 				$("#refs").attr("style","display:inline;");
+				$("#select_refs").attr("style","display:none;");
+				$("#input_ref_head").html("<span class=\"fas fa-tags\"></span> You can input topic by yourself:");
+				$("#refs_head").html("<span class=\"fas fa-copy\"></span> Here are the uploaded references:");
 			},
 			error: function(jqXHR, textStatus, errorThrown){
 				alert(jqXHR.responseText);
@@ -426,6 +433,7 @@ FONTS & ICONS
 					document.getElementById("ref_list").innerHTML += "<div class=\"input-group\"><span class=\"input-group-addon\"><input name=\"refs\" type=\"checkbox\" value="+result['ref_ids'][i] + " checked></span><a href=" + result['ref_links'][i]+ " target=\"_blank\" class=\"list-group-item\">" + result['references'][i] + "</a></div>";
 				}
 				$("#refs").attr("style","display:inline;");
+				$("#input_ref").attr("style","display:none;");
 			},
 			error: function(jqXHR, textStatus, errorThrown){
 				alert(jqXHR.responseText);
