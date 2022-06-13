@@ -217,11 +217,10 @@ FONTS & ICONS
 			{% csrf_token %}
 			<div class="list-group pre-scrollable" id="ref_list">
 			</div>
-		</form>
+
 		<p align="right"> *(Select the references for instant survey generation)</p>
-		<form action="" method="post", id="tax_std">
-			{% csrf_token %}
-			<input placeholder="Please input your taxonomy standard" class="form-control", id="taxonomy_standard">
+		<input placeholder="Please input your taxonomy standard" class="form-control", id="taxonomy_standard", name="taxonomy_standard">
+			<p></p>
 			<p></p>
 		</form>
 
@@ -448,7 +447,12 @@ FONTS & ICONS
 		});
 	}
 
-
+	function formToJson (data) {
+    	data=data.replace(/&/g,"\",\"");
+    	data=data.replace(/=/g,"\":\"");
+    	data="{\""+data+"\"}";
+    	return data;
+	}
 	function display_taxonomy(){
 		$.ajax({
 			type: "POST",

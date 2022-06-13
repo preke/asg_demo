@@ -164,10 +164,13 @@ def automatic_taxonomy(request):
     ref_dict = dict(request.POST)
     print(ref_dict)
     ref_list = ref_dict['refs']
+    query = ref_dict['taxonomy_standard']
     global Global_ref_list
     Global_ref_list = ref_list
 
-    colors, category_label, category_description =  Clustering_refs(n_clusters=Survey_n_clusters[Global_survey_id])
+    # colors, category_label, category_description =  Clustering_refs(n_clusters=Survey_n_clusters[Global_survey_id])
+    colors, category_label, category_description = Clustering_refs(n_clusters=Survey_n_clusters[Global_survey_id], query=query)
+
     global Global_category_description
     Global_category_description = category_description
     global Global_category_label
