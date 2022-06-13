@@ -31,12 +31,20 @@ import nltk
 from fuzzywuzzy import fuzz
 
 from summa.summarizer import summarize
+from transformers import AutoTokenizer, AutoModel
+import pandas as pd
+import spacy
+from rank_bm25 import BM25Okapi
+import torch
+from sklearn.cluster import AgglomerativeClustering
+
 
 IMG_PATH = 'static/img/'
 
 plt.switch_backend('agg')
 
-
+tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased", model_max_length = 128)
+model = AutoModel.from_pretrained("bert-base-uncased")
 class ref_category_desp(object):
 
     def __init__(
@@ -464,6 +472,269 @@ def clustering(df, n_cluster, survey_id):
     plt.close()
     return df, colors
 
+def selectSentences(query, absIntro):
+    '''
+    tokenized_corpus = [para.split(" ") for para in absIntro]
+    bm25 = BM25Okapi(tokenized_corpus)
+    tokenized_query = query.split(" ")
+    para_scores = bm25.get_scores(tokenized_query)
+    print(para_scores)
+    '''
+
+    sent_no = []
+    sentences = []
+    nlp = spacy.load("en_core_sci_sm")
+    doc = nlp(absIntro)
+    sents = list(doc.sents)
+    sent_no.append(len(sents))
+    sentences = [str(sent) for sent in sents]
+    print("The number of total sentences:", len(sentences))
+    print(sentences)
+    tokenized_sentences = [doc.split() for doc in sentences]
+    bm25Sent = BM25Okapi(tokenized_sentences)
+    sent_scores = bm25Sent.get_scores(query.split())
+    max_score = max(sent_scores)
+    min_score = min(sent_scores)
+    sent_scores = [(score - min_score) / (max_score - min_score + 0.00001) for score in sent_scores]
+
+    #print(sent_scores)
+    #print(len(sent_scores))
+    total_sentences = [query] + sentences
+    inputs = tokenizer(total_sentences, return_tensors = "pt", padding=True, truncation = True)
+    outputs = model(**inputs)
+    #print(len(outputs))
+    pooled_outputs = outputs[1]
+    #print(pooled_outputs.size())
+    print(pooled_outputs[0].size())
+    ptm_sent_scores = torch.mm(pooled_outputs[0].unsqueeze(0), pooled_outputs[1:].t()).squeeze().tolist()
+    max_score = max(ptm_sent_scores)
+    min_score = min(ptm_sent_scores)
+    ptm_sent_scores = [(score - min_score) / (max_score - min_score + 0.00001) for score in ptm_sent_scores]
+    #print(ptm_sent_scores)
+    total_scores = [sent_score + ptm_score for sent_score, ptm_score in zip(sent_scores, ptm_sent_scores)]
+    #print(total_scores)
+    sentences_scores = sorted([(score, sentence) for score, sentence in zip(total_scores, sentences)], reverse = True)
+    selected_sentences = [sentence for score, sentence in sentences_scores[: 10]]
+    return " ".join(selected_sentences)
+
+def clustering_with_criteria(df, n_cluster, survey_id, query):
+    text = df['abstract']
+    for doc in text:
+        selected_sentences = selectSentences(query, doc)
+        sentences.append(selected_sentences)
+
+    inputs = tokenizer(sentences, return_tensors = "pt", padding=True, truncation = True)
+    outputs = model(**inputs)
+    pooled_outputs = outputs[1].detach().numpy()
+    kmeans = AgglomerativeClustering(n_clusters = 3, affinity = "cosine", linkage = "complete").fit(pooled_outputs)
+    labels = kmeans.labels_
+    '''
+
+    wordstest_model = text
+    test_model = [
+        [wordnet_lemmatizer.lemmatize(word.lower()) for word in remove_stopwords(strip_punctuation(words)).split()] for
+        words in wordstest_model]
+    dictionary = corpora.Dictionary(test_model, prune_at=2000000)
+    corpus_model = [dictionary.doc2bow(test) for test in test_model]
+    tfidf_model = models.TfidfModel(corpus_model)
+    corpus_tfidf = tfidf_model[corpus_model]
+
+    top_words = []
+    for testword in text:
+        test_bow = dictionary.doc2bow([wordnet_lemmatizer.lemmatize(word.lower()) for word in
+                                       remove_stopwords(strip_punctuation(testword)).split()])
+        test_tfidf = tfidf_model[test_bow]
+        top_n_words = sorted(test_tfidf, key=lambda x: x[1], reverse=True)[:5]  # [:len(test_tfidf)]
+        top_words.append([(dictionary[i[0]]) for i in top_n_words])
+
+    x_train = []
+    cnt = 0
+    for i, text in enumerate(text):
+        word_list = top_words[cnt]
+        document = TaggededDocument(word_list, tags=[i])
+        x_train.append(document)
+        cnt += 1
+
+    min_cnt = 2 if len(df)>20 else 1
+
+    model_dm = Doc2Vec(x_train, min_count=min_cnt, size=100, sample=1e-3, workers=4)
+    model_dm.train(x_train, total_examples=model_dm.corpus_count, epochs=500)
+    model_dm.save('model_dm')
+    infered_vectors_list = []
+    # print("load doc2vec model...")
+    model_dm = Doc2Vec.load("model_dm")
+    # print("load train vectors...")
+    i = 0
+    for text, label in x_train:
+        vector = model_dm.infer_vector(text)
+        infered_vectors_list.append(vector)
+        i += 1
+
+    sim_matrix = cosine_similarity(infered_vectors_list)
+    labels = SpectralClustering(n_clusters=n_cluster, gamma=0.1).fit_predict(sim_matrix)
+    '''
+    df['label'] = labels
+
+    tfidf_top_words = []
+    for i in range(len(x_train)):
+        string = ""
+        text = x_train[i][0]
+        for word in text:
+            string = string + word + ' '
+        tfidf_top_words.append(string)
+    df['top_n_words'] = tfidf_top_words
+
+    ## ------ get unigram ------
+    n = df['label'].nunique()
+    top_dicts = []
+    for i in range(n):
+        tmp_dict = {}
+        for j, r in df.iterrows():
+            if r['label'] == i:
+                testword = r['top_n_words']
+                for word in [wordnet_lemmatizer.lemmatize(word.lower()) for word in
+                             remove_stopwords(strip_punctuation(testword)).split()]:
+                    try:
+                        tmp_dict[word] += 1
+                    except:
+                        tmp_dict[word] = 1
+        top_dicts.append(tmp_dict)
+
+    top_list = []
+    for d in top_dicts:
+        tmp = sorted(d.items(), key=itemgetter(1), reverse=True)
+        tmp_list = []
+        for i in [0, 1, 2]:
+            if tmp[i][1] >= 2:
+                tmp_list.append(tmp[i][0])
+        top_list.append(tmp_list)
+
+    topic_words = []
+    for j, r in df.iterrows():
+        topic_words.append(top_list[r['label']])
+
+    df['topic_word'] = topic_words
+
+    ## ------ get bigram ------
+    n = df['label'].nunique()
+    docs = []
+    for i in range(n):
+        tmp = []
+        docs.append(tmp)
+
+    source_docs = []
+    for i in range(n):
+        tmp = []
+        source_docs.append(tmp)
+
+    for i in range(n):
+        for j, r in df.iterrows():
+            if r['label'] == i:
+                testword = r['abstract']
+                for word in [word.lower() for word in remove_stopwords(strip_punctuation(testword)).split()]:
+                    docs[i].append(lancaster_stemmer.stem(wordnet_lemmatizer.lemmatize(word)))
+                    source_docs[i].append(word)
+
+    bigram_docs = []
+    for i in range(n):
+        tmp = []
+        for j in range(len(docs[i]) - 1):
+            tmp.append(docs[i][j] + "_" + docs[i][j + 1])
+
+        bigram_docs.append(tmp)
+
+    test_model = bigram_docs
+    dictionary = corpora.Dictionary(test_model, prune_at=2000000)
+    corpus_model = [dictionary.doc2bow(test) for test in test_model]
+    tfidf_model = models.TfidfModel(corpus_model)
+    corpus_tfidf = tfidf_model[corpus_model]
+
+    def get_source(bigram):
+        for i in range(n):
+            for j in range(len(docs[i]) - 1):
+                if bigram == docs[i][j] + "_" + docs[i][j + 1]:
+                    return (source_docs[i][j] + "_" + source_docs[i][j + 1])
+
+    top_list = []
+    for testword in test_model:
+        test_bow = dictionary.doc2bow(testword)
+        test_tfidf = tfidf_model[test_bow]
+        top_n_words = sorted(test_tfidf, key=lambda x: x[1], reverse=True)[:5]
+        # print([(get_source(dictionary[i[0]]), i[1]) for i in top_n_words])
+        top_list.append([(get_source(dictionary[i[0]])) for i in top_n_words])
+        # print()
+
+    topic_words = []
+    for j, r in df.iterrows():
+        topic_words.append(top_list[r['label']])
+
+    df['topic_bigram'] = topic_words
+
+    ## ------ get trigram ------
+    n = df['label'].nunique()
+    docs = []
+    for i in range(n):
+        tmp = []
+        docs.append(tmp)
+
+    source_docs = []
+    for i in range(n):
+        tmp = []
+        source_docs.append(tmp)
+
+    for i in range(n):
+        for j, r in df.iterrows():
+            if r['label'] == i:
+                testword = r['abstract']
+                for word in [word.lower() for word in remove_stopwords(strip_punctuation(testword)).split()]:
+                    docs[i].append(lancaster_stemmer.stem(wordnet_lemmatizer.lemmatize(word)))
+                    source_docs[i].append(word)
+
+    trigram_docs = []
+    for i in range(n):
+        tmp = []
+        for j in range(len(docs[i]) - 2):
+            tmp.append(docs[i][j] + "_" + docs[i][j + 1] + "_" + docs[i][j + 2])
+
+        trigram_docs.append(tmp)
+
+    test_model = trigram_docs
+    dictionary = corpora.Dictionary(test_model, prune_at=2000000)
+    corpus_model = [dictionary.doc2bow(test) for test in test_model]
+    tfidf_model = models.TfidfModel(corpus_model)
+    corpus_tfidf = tfidf_model[corpus_model]
+
+    def get_source(trigram):
+        for i in range(n):
+            for j in range(len(docs[i]) - 2):
+                if trigram == docs[i][j] + "_" + docs[i][j + 1] + "_" + docs[i][j + 2]:
+                    return (source_docs[i][j] + "_" + source_docs[i][j + 1] + "_" + source_docs[i][j + 2])
+
+    top_list = []
+    for testword in test_model:
+        test_bow = dictionary.doc2bow(testword)
+        test_tfidf = tfidf_model[test_bow]
+        top_n_words = sorted(test_tfidf, key=lambda x: x[1], reverse=True)[:5]
+        top_list.append([(get_source(dictionary[i[0]])) for i in top_n_words])
+        # print([(get_source(dictionary[i[0]]), i[1]) for i in top_n_words])
+
+    topic_words = []
+    for j, r in df.iterrows():
+        topic_words.append(top_list[r['label']])
+
+    df['topic_trigram'] = topic_words
+
+
+    ## get tsne fig
+
+    tsne = TSNE(n_components=2, init='pca', perplexity=10)
+    X_tsne = tsne.fit_transform(np.array(infered_vectors_list))
+    colors = scatter(X_tsne, df['label'])
+
+    plt.savefig(IMG_PATH + 'tsne_' + survey_id + '.png', dpi=800, transparent=True)
+
+    plt.close()
+    return df, colors
 
 def scatter(x, colors):
     sns.set_style('whitegrid')
