@@ -488,8 +488,8 @@ def selectSentences(query, absIntro):
     sents = list(doc.sents)
     sent_no.append(len(sents))
     sentences = [str(sent) for sent in sents]
-    print("The number of total sentences:", len(sentences))
-    print(sentences)
+    #print("The number of total sentences:", len(sentences))
+    #print(sentences)
     tokenized_sentences = [doc.split() for doc in sentences]
     bm25Sent = BM25Okapi(tokenized_sentences)
     sent_scores = bm25Sent.get_scores(query.split())
@@ -505,7 +505,7 @@ def selectSentences(query, absIntro):
     #print(len(outputs))
     pooled_outputs = outputs[1]
     #print(pooled_outputs.size())
-    print(pooled_outputs[0].size())
+    #print(pooled_outputs[0].size())
     ptm_sent_scores = torch.mm(pooled_outputs[0].unsqueeze(0), pooled_outputs[1:].t()).squeeze().tolist()
     max_score = max(ptm_sent_scores)
     min_score = min(ptm_sent_scores)
@@ -529,7 +529,7 @@ def clustering_with_criteria(df, n_cluster, survey_id, query):
     pooled_outputs = outputs[1].detach().numpy()
     kmeans = AgglomerativeClustering(n_clusters = 3, affinity = "cosine", linkage = "complete").fit(pooled_outputs)
     labels = kmeans.labels_
-    '''
+    
 
     wordstest_model = text
     test_model = [
@@ -572,8 +572,8 @@ def clustering_with_criteria(df, n_cluster, survey_id, query):
         i += 1
 
     sim_matrix = cosine_similarity(infered_vectors_list)
-    labels = SpectralClustering(n_clusters=n_cluster, gamma=0.1).fit_predict(sim_matrix)
-    '''
+    #labels = SpectralClustering(n_clusters=n_cluster, gamma=0.1).fit_predict(sim_matrix)
+    
     df['label'] = labels
 
     tfidf_top_words = []
