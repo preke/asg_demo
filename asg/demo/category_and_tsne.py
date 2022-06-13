@@ -519,6 +519,7 @@ def selectSentences(query, absIntro):
 
 def clustering_with_criteria(df, n_cluster, survey_id, query):
     text = df['abstract']
+    '''
     sentences = []
     for doc in text:
         selected_sentences = selectSentences(query, doc)
@@ -529,7 +530,7 @@ def clustering_with_criteria(df, n_cluster, survey_id, query):
     pooled_outputs = outputs[1].cpu().detach().numpy()
     kmeans = AgglomerativeClustering(n_clusters = 3, affinity = "cosine", linkage = "complete").fit(pooled_outputs)
     labels = kmeans.labels_
-    
+    '''
 
     wordstest_model = text
     test_model = [
@@ -572,7 +573,7 @@ def clustering_with_criteria(df, n_cluster, survey_id, query):
         i += 1
 
     sim_matrix = cosine_similarity(infered_vectors_list)
-    #labels = SpectralClustering(n_clusters=n_cluster, gamma=0.1).fit_predict(sim_matrix)
+    labels = SpectralClustering(n_clusters=n_cluster, gamma=0.1).fit_predict(sim_matrix)
     
     df['label'] = labels
 
