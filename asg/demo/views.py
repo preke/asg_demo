@@ -55,7 +55,7 @@ Global_df_selected = ""
 
 
 from demo.taskDes import absGen, introGen,introGen_supervised, methodologyGen, conclusionGen
-from demo.category_and_tsne import clustering, get_cluster_description
+from demo.category_and_tsne import clustering, get_cluster_description, clustering_with_criteria
 
 
 class reference_collection(object):
