@@ -503,7 +503,7 @@ def selectSentences(query, absIntro):
     inputs = tokenizer(total_sentences, return_tensors = "pt", padding=True, truncation = True).to(device)
     outputs = model(**inputs)
     #print(len(outputs))
-    pooled_outputs = outputs[1].detach()
+    pooled_outputs = outputs[1].cpu().detach()
     #print(pooled_outputs.size())
     #print(pooled_outputs[0].size())
     ptm_sent_scores = torch.mm(pooled_outputs[0].unsqueeze(0), pooled_outputs[1:].t()).squeeze().tolist()
@@ -526,7 +526,7 @@ def clustering_with_criteria(df, n_cluster, survey_id, query):
 
     inputs = tokenizer(sentences, return_tensors = "pt", padding=True, truncation = True).to(device)
     outputs = model(**inputs)
-    pooled_outputs = outputs[1].detach().numpy()
+    pooled_outputs = outputs[1].cpu().detach().numpy()
     kmeans = AgglomerativeClustering(n_clusters = 3, affinity = "cosine", linkage = "complete").fit(pooled_outputs)
     labels = kmeans.labels_
     
