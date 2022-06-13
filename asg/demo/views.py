@@ -169,7 +169,7 @@ def automatic_taxonomy(request):
     Global_ref_list = ref_list
 
     # colors, category_label, category_description =  Clustering_refs(n_clusters=Survey_n_clusters[Global_survey_id])
-    colors, category_label, category_description = Clustering_refs(n_clusters=Survey_n_clusters[Global_survey_id], query=query)
+    colors, category_label, category_description = Clustering_refs_with_criteria(n_clusters=Survey_n_clusters[Global_survey_id], query=query)
 
     global Global_category_description
     Global_category_description = category_description
