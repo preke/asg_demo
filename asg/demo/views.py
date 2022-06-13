@@ -164,7 +164,7 @@ def automatic_taxonomy(request):
     ref_dict = dict(request.POST)
     print(ref_dict)
     ref_list = ref_dict['refs']
-    query = ref_dict['taxonomy_standard']
+    query = ref_dict['taxonomy_standard'][0]
     global Global_ref_list
     Global_ref_list = ref_list
 
