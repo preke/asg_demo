@@ -341,4 +341,29 @@ def Clustering_refs(n_clusters):
                 category_label[i] = j['topic_word'].replace('-', ' ').title()
     return colors, category_label, category_description
 
+def Clustering_refs_with_criteria(n_clusters):
+    df = pd.read_csv(DATA_PATH + Global_survey_id + '.tsv', sep='\t', index_col=0)
+    df_selected = df.iloc[Global_ref_list]
+
+    print(df_selected.shape)
+    ## update cluster labels and keywords
+    df_selected, colors = clustering_with_criteria(df_selected, n_clusters, Global_survey_id)
+    # print(colors)
+    print(df_selected.shape)
+    ## get description and topic word for each cluster
+    description_list = get_cluster_description(df_selected, Global_survey_id)
+    # print(description_list)
+
+    global Global_df_selected
+    Global_df_selected = df_selected
+    category_description = [0]*len(colors)
+    category_label = [0]*len(colors)
+    for i in range(len(colors)):
+        for j in description_list:
+            if j['category'] == i:
+                category_description[i] = j['category_desp']
+                category_label[i] = j['topic_word'].replace('-', ' ').title()
+    return colors, category_label, category_description
+
+
 
