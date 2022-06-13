@@ -729,7 +729,7 @@ def clustering_with_criteria(df, n_cluster, survey_id, query):
     ## get tsne fig
 
     tsne = TSNE(n_components=2, init='pca', perplexity=10)
-    X_tsne = tsne.fit_transform(np.array(infered_vectors_list))
+    X_tsne = tsne.fit_transform(pooled_outputs)   #np.array(infered_vectors_list)
     colors = scatter(X_tsne, df['label'])
 
     plt.savefig(IMG_PATH + 'tsne_' + survey_id + '.png', dpi=800, transparent=True)
