@@ -519,6 +519,7 @@ def selectSentences(query, absIntro):
 
 def clustering_with_criteria(df, n_cluster, survey_id, query):
     text = df['abstract']
+    sentences = []
     for doc in text:
         selected_sentences = selectSentences(query, doc)
         sentences.append(selected_sentences)
