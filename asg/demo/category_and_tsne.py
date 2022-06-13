@@ -500,10 +500,10 @@ def selectSentences(query, absIntro):
     #print(sent_scores)
     #print(len(sent_scores))
     total_sentences = [query] + sentences
-    inputs = tokenizer(total_sentences, return_tensors = "pt", padding=True, truncation = True)
+    inputs = tokenizer(total_sentences, return_tensors = "pt", padding=True, truncation = True).to(device)
     outputs = model(**inputs)
     #print(len(outputs))
-    pooled_outputs = outputs[1]
+    pooled_outputs = outputs[1].detach()
     #print(pooled_outputs.size())
     #print(pooled_outputs[0].size())
     ptm_sent_scores = torch.mm(pooled_outputs[0].unsqueeze(0), pooled_outputs[1:].t()).squeeze().tolist()
