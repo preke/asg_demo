@@ -42,9 +42,9 @@ from sklearn.cluster import AgglomerativeClustering
 IMG_PATH = 'static/img/'
 
 plt.switch_backend('agg')
-
+device = 0
 tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased", model_max_length = 128)
-model = AutoModel.from_pretrained("bert-base-uncased")
+model = AutoModel.from_pretrained("bert-base-uncased").to(device)
 class ref_category_desp(object):
 
     def __init__(
@@ -524,7 +524,7 @@ def clustering_with_criteria(df, n_cluster, survey_id, query):
         selected_sentences = selectSentences(query, doc)
         sentences.append(selected_sentences)
 
-    inputs = tokenizer(sentences, return_tensors = "pt", padding=True, truncation = True)
+    inputs = tokenizer(sentences, return_tensors = "pt", padding=True, truncation = True).to(device)
     outputs = model(**inputs)
     pooled_outputs = outputs[1].detach().numpy()
     kmeans = AgglomerativeClustering(n_clusters = 3, affinity = "cosine", linkage = "complete").fit(pooled_outputs)
