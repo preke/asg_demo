@@ -399,9 +399,7 @@ def clustering(df, n_cluster, survey_id):
     for testword in test_model:
         test_bow = dictionary.doc2bow(testword)
         test_tfidf = tfidf_model[test_bow]
-        print(test_tfidf)
-        import time
-        time.sleep(100)
+       
 
         top_n_words = sorted(test_tfidf, key=lambda x: x[1], reverse=True)[:5]
         # print([(get_source(dictionary[i[0]]), i[1]) for i in top_n_words])
@@ -690,6 +688,9 @@ def clustering_with_criteria(df, n_cluster, survey_id, query):
     for testword in test_model:
         test_bow = dictionary.doc2bow(testword)
         test_tfidf = tfidf_model[test_bow]
+        print(test_tfidf)
+        import time
+        time.sleep(100)
         top_n_words = sorted(test_tfidf, key=lambda x: x[1], reverse=True)[:5]
         # print([(get_source(dictionary[i[0]]), i[1]) for i in top_n_words])
         top_list.append([(get_source(dictionary[i[0]])) for i in top_n_words])
