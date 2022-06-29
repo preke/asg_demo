@@ -15,6 +15,10 @@ from sklearn.cluster import SpectralClustering
 from operator import itemgetter
 import traceback
 
+import nltk
+from nltk.tokenize import word_tokenize,sent_tokenize
+
+
 
 import numpy as np
 import matplotlib.pyplot as plt
