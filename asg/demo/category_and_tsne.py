@@ -767,6 +767,21 @@ def scatter(x, colors):
     return color_hex[:colors.nunique()]
 
 
+def ngram_is_topicword(input_ngram_str):
+    is_topicword = False
+    input_words = word_tokenize(input_ngram_str)
+    if len(input_words)>1:
+        pos_tags =nltk.pos_tag(input_words)
+        #print(pos_tags)
+        if pos_tags[0][1]=="JJ" or pos_tags[0][1][:2]=="NN":
+            for tag_index, pos_tag in enumerate(pos_tags[1:]):
+                #print(pos_tag[1][:2])
+                if pos_tag[1][:2]!="NN":
+                    break
+                if tag_index==len(input_words)-2:
+                    is_topicword = True
+    return is_topicword
+
 def get_cluster_description(df, survey_id):
     match_ratio = 70  # threshold for fuzzy matching
     summary_len = 30  # length of generated summary
@@ -782,7 +797,9 @@ def get_cluster_description(df, survey_id):
     for i in range(len(description_list)):
         if description_list[i]['topic_word'] == "":
             print(list(input_DF['topic_bigram'])[i])
-            description_list[i]['topic_word'] = ' '.join(list(input_DF['topic_bigram'])[i][i%2].split('_'))
+            
+            available_list = [i for i in list(input_DF['topic_bigram']) if ngram_is_topicword(i)]
+            description_list[i]['topic_word'] = ' '.join(available_list[i][i%2].split('_'))
             print(description_list)
 
 
