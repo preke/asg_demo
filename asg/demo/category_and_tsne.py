@@ -496,6 +496,7 @@ def selectSentences(query, absIntro):
     max_score = max(sent_scores)
     min_score = min(sent_scores)
     sent_scores = [(score - min_score) / (max_score - min_score + 0.00001) for score in sent_scores]
+    '''
 
     #print(sent_scores)
     #print(len(sent_scores))
@@ -513,13 +514,16 @@ def selectSentences(query, absIntro):
     #print(ptm_sent_scores)
     total_scores = [sent_score + ptm_score for sent_score, ptm_score in zip(sent_scores, ptm_sent_scores)]
     #print(total_scores)
+    
     sentences_scores = sorted([(score, sentence) for score, sentence in zip(total_scores, sentences)], reverse = True)
+    '''
+    sentences_scores = sorted([(score, sentence) for score, sentence in zip(sent_scores, sentences)], reverse = True)
     selected_sentences = [sentence for score, sentence in sentences_scores[: 10]]
     return " ".join(selected_sentences)
 
 def clustering_with_criteria(df, n_cluster, survey_id, query):
     text = df['abstract']
-    '''
+    
     sentences = []
     for doc in text:
         selected_sentences = selectSentences(query, doc)
@@ -530,7 +534,7 @@ def clustering_with_criteria(df, n_cluster, survey_id, query):
     pooled_outputs = outputs[1].cpu().detach().numpy()
     kmeans = AgglomerativeClustering(n_clusters = 3, affinity = "cosine", linkage = "complete").fit(pooled_outputs)
     labels = kmeans.labels_
-    '''
+    
 
     wordstest_model = text
     test_model = [
@@ -573,7 +577,7 @@ def clustering_with_criteria(df, n_cluster, survey_id, query):
         i += 1
 
     sim_matrix = cosine_similarity(infered_vectors_list)
-    labels = SpectralClustering(n_clusters=n_cluster, gamma=0.1).fit_predict(sim_matrix)
+    #labels = SpectralClustering(n_clusters=n_cluster, gamma=0.1).fit_predict(sim_matrix)
     
     df['label'] = labels
 
@@ -730,7 +734,8 @@ def clustering_with_criteria(df, n_cluster, survey_id, query):
     ## get tsne fig
 
     tsne = TSNE(n_components=2, init='pca', perplexity=10)
-    X_tsne = tsne.fit_transform(np.array(infered_vectors_list))   #np.array(infered_vectors_list)
+    #X_tsne = tsne.fit_transform(np.array(infered_vectors_list))   #np.array(pooled_outputs)
+    X_tsne = tsne.fit_transform(np.array(pooled_outputs))
     colors = scatter(X_tsne, df['label'])
 
     plt.savefig(IMG_PATH + 'tsne_' + survey_id + '.png', dpi=800, transparent=True)
