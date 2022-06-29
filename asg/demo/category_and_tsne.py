@@ -696,9 +696,9 @@ def clustering_with_criteria(df, n_cluster, survey_id, query):
         # tmp_list = [i for i in tmp_list if ngram_is_topicword(' '.join(i.split('_')))][:5]  
         top_list.append(tmp_list)
         
-        import time
-        time.sleep(2)
-        print(top_list)
+        # import time
+        # time.sleep(2)
+        # print(top_list)
 
     topic_words = []
     for j, r in df.iterrows():
@@ -806,13 +806,12 @@ def get_cluster_description(df, survey_id):
     input_DF = df
     category_desp = ref_category_desp(input_DF, survey_id)
     description_list = category_desp.desp_generator(match_ratio=match_ratio, summary_len=summary_len, topic_selection=topic_selection)
-
-    print(input_DF['topic_bigram'])
+    print('='*100)
+    print(description_list)
+    print('*'*100)
     for i in range(len(description_list)):
         if description_list[i]['topic_word'] == "":
-            print(list(input_DF['topic_bigram'])[i])
             description_list[i]['topic_word'] = ' '.join(list(input_DF['topic_bigram'])[i][i%2].split('_'))
-            print(description_list)
 
 
     return description_list
