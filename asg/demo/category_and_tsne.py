@@ -37,7 +37,7 @@ import spacy
 from rank_bm25 import BM25Okapi
 import torch
 from sklearn.cluster import AgglomerativeClustering
-
+nlp = spacy.load("en_core_sci_sm")
 
 IMG_PATH = 'static/img/'
 
@@ -472,6 +472,9 @@ def clustering(df, n_cluster, survey_id):
     plt.close()
     return df, colors
 
+
+
+
 def selectSentences(query, absIntro):
     '''
     tokenized_corpus = [para.split(" ") for para in absIntro]
@@ -483,7 +486,6 @@ def selectSentences(query, absIntro):
 
     sent_no = []
     sentences = []
-    nlp = spacy.load("en_core_sci_sm")
     doc = nlp(absIntro)
     sents = list(doc.sents)
     sent_no.append(len(sents))
@@ -523,12 +525,11 @@ def selectSentences(query, absIntro):
 
 def clustering_with_criteria(df, n_cluster, survey_id, query):
     text = df['abstract']
-    
     sentences = []
     for doc in text:
         selected_sentences = selectSentences(query, doc)
         sentences.append(selected_sentences)
-
+    
     inputs = tokenizer(sentences, return_tensors = "pt", padding=True, truncation = True).to(device)
     outputs = model(**inputs)
     pooled_outputs = outputs[1].cpu().detach().numpy()
