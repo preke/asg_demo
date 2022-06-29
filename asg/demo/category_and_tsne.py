@@ -15,9 +15,9 @@ from sklearn.cluster import SpectralClustering
 from operator import itemgetter
 import traceback
 
+
 import nltk
 from nltk.tokenize import word_tokenize,sent_tokenize
-
 
 
 import numpy as np
@@ -399,6 +399,10 @@ def clustering(df, n_cluster, survey_id):
     for testword in test_model:
         test_bow = dictionary.doc2bow(testword)
         test_tfidf = tfidf_model[test_bow]
+        print(test_tfidf)
+        import time
+        time.sleep(100)
+
         top_n_words = sorted(test_tfidf, key=lambda x: x[1], reverse=True)[:5]
         # print([(get_source(dictionary[i[0]]), i[1]) for i in top_n_words])
         top_list.append([(get_source(dictionary[i[0]])) for i in top_n_words])
@@ -454,6 +458,7 @@ def clustering(df, n_cluster, survey_id):
     for testword in test_model:
         test_bow = dictionary.doc2bow(testword)
         test_tfidf = tfidf_model[test_bow]
+
         top_n_words = sorted(test_tfidf, key=lambda x: x[1], reverse=True)[:5]
         top_list.append([(get_source(dictionary[i[0]])) for i in top_n_words])
         # print([(get_source(dictionary[i[0]]), i[1]) for i in top_n_words])
@@ -475,6 +480,21 @@ def clustering(df, n_cluster, survey_id):
 
     plt.close()
     return df, colors
+
+def ngram_is_topicword(input_ngram_str):
+    is_topicword = False
+    input_words = word_tokenize(input_ngram_str)
+    if len(input_words)>1:
+        pos_tags =nltk.pos_tag(input_words)
+        #print(pos_tags)
+        if pos_tags[0][1]=="JJ" or pos_tags[0][1][:2]=="NN":
+            for tag_index, pos_tag in enumerate(pos_tags[1:]):
+                #print(pos_tag[1][:2])
+                if pos_tag[1][:2]!="NN":
+                    break
+                if tag_index==len(input_words)-2:
+                    is_topicword = True
+    return is_topicword
 
 
 
@@ -771,21 +791,6 @@ def scatter(x, colors):
     return color_hex[:colors.nunique()]
 
 
-def ngram_is_topicword(input_ngram_str):
-    is_topicword = False
-    input_words = word_tokenize(input_ngram_str)
-    if len(input_words)>1:
-        pos_tags =nltk.pos_tag(input_words)
-        #print(pos_tags)
-        if pos_tags[0][1]=="JJ" or pos_tags[0][1][:2]=="NN":
-            for tag_index, pos_tag in enumerate(pos_tags[1:]):
-                #print(pos_tag[1][:2])
-                if pos_tag[1][:2]!="NN":
-                    break
-                if tag_index==len(input_words)-2:
-                    is_topicword = True
-    return is_topicword
-
 def get_cluster_description(df, survey_id):
     match_ratio = 70  # threshold for fuzzy matching
     summary_len = 30  # length of generated summary
@@ -797,20 +802,12 @@ def get_cluster_description(df, survey_id):
     category_desp = ref_category_desp(input_DF, survey_id)
     description_list = category_desp.desp_generator(match_ratio=match_ratio, summary_len=summary_len, topic_selection=topic_selection)
 
-    for i in range(0, len(input_DF)):
-        print(input_DF['topic_bigram'][i])
-        print(ngram_is_topicword(' '.join(input_DF['topic_bigram'][i][0].split('_'))))
-
-
-    available_list = [i[0] for i in list(input_DF['topic_bigram'])]# if ngram_is_topicword(' '.join(i[0].split('_')))]
-    print('='*50)
-    print(available_list)
+    print(input_DF['topic_bigram'])
     for i in range(len(description_list)):
         if description_list[i]['topic_word'] == "":
-            
-            print(available_list[i])
-            description_list[i]['topic_word'] = ' '.join(available_list[i].split('_'))
+            print(list(input_DF['topic_bigram'])[i])
+            description_list[i]['topic_word'] = ' '.join(list(input_DF['topic_bigram'])[i][i%2].split('_'))
+            print(description_list)
 
-    print('*'*50)
-    print(description_list)
+
     return description_list
