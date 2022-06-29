@@ -693,7 +693,7 @@ def clustering_with_criteria(df, n_cluster, survey_id, query):
         top_n_words = sorted(test_tfidf, key=lambda x: x[1], reverse=True)[:10]
         # print([(get_source(dictionary[i[0]]), i[1]) for i in top_n_words])
         tmp_list = [(get_source(dictionary[i[0]])) for i in top_n_words]
-        tmp_list = [i for i in tmp_list if ngram_is_topicword(' '.join(i.split('_')))][:5]  
+        # tmp_list = [i for i in tmp_list if ngram_is_topicword(' '.join(i.split('_')))][:5]  
         top_list.append(tmp_list)
         
         import time
