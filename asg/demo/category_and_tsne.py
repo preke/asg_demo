@@ -797,9 +797,12 @@ def get_cluster_description(df, survey_id):
     category_desp = ref_category_desp(input_DF, survey_id)
     description_list = category_desp.desp_generator(match_ratio=match_ratio, summary_len=summary_len, topic_selection=topic_selection)
 
-    print(input_DF['topic_bigram'][0])
-    print()
-    available_list = [i[0] for i in list(input_DF['topic_bigram']) if ngram_is_topicword(' '.join(i[0].split('_')))]
+    for i in range(0, len(input_DF)):
+        print(input_DF['topic_bigram'][i])
+        print(ngram_is_topicword(' '.join(input_DF['topic_bigram'][i][0].split('_'))))
+
+        
+    available_list = [i[0] for i in list(input_DF['topic_bigram'])]# if ngram_is_topicword(' '.join(i[0].split('_')))]
     print('='*50)
     print(available_list)
     for i in range(len(description_list)):
