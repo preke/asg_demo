@@ -690,13 +690,15 @@ def clustering_with_criteria(df, n_cluster, survey_id, query):
         test_tfidf = tfidf_model[test_bow]
         
         
-        top_n_words = sorted(test_tfidf, key=lambda x: x[1], reverse=True)[:5]
+        top_n_words = sorted(test_tfidf, key=lambda x: x[1], reverse=True)[:10]
         # print([(get_source(dictionary[i[0]]), i[1]) for i in top_n_words])
-        top_list.append([(get_source(dictionary[i[0]])) for i in top_n_words])
-        print(top_list) 
+        tmp_list = [(get_source(dictionary[i[0]])) for i in top_n_words]
+        tmp_list = [i for i in tmp_list if is_topicword(' '.join(i.strip('_')))][:5]  
+        top_list.append(tmp_list)
+        
         import time
-        time.sleep(10)
-        # print()
+        time.sleep(2)
+        print(top_list)
 
     topic_words = []
     for j, r in df.iterrows():
