@@ -498,7 +498,7 @@ def selectSentences(query, absIntro):
     max_score = max(sent_scores)
     min_score = min(sent_scores)
     sent_scores = [(score - min_score) / (max_score - min_score + 0.00001) for score in sent_scores]
-    '''
+    
 
     #print(sent_scores)
     #print(len(sent_scores))
@@ -518,8 +518,8 @@ def selectSentences(query, absIntro):
     #print(total_scores)
     
     sentences_scores = sorted([(score, sentence) for score, sentence in zip(total_scores, sentences)], reverse = True)
-    '''
-    sentences_scores = sorted([(score, sentence) for score, sentence in zip(sent_scores, sentences)], reverse = True)
+    
+    #sentences_scores = sorted([(score, sentence) for score, sentence in zip(sent_scores, sentences)], reverse = True)
     selected_sentences = [sentence for score, sentence in sentences_scores[: 10]]
     return " ".join(selected_sentences)
 
