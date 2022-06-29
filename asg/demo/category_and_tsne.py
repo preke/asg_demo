@@ -801,15 +801,16 @@ def get_cluster_description(df, survey_id):
         print(input_DF['topic_bigram'][i])
         print(ngram_is_topicword(' '.join(input_DF['topic_bigram'][i][0].split('_'))))
 
-        
+
     available_list = [i[0] for i in list(input_DF['topic_bigram'])]# if ngram_is_topicword(' '.join(i[0].split('_')))]
     print('='*50)
     print(available_list)
     for i in range(len(description_list)):
         if description_list[i]['topic_word'] == "":
-            # print(available_list[i])
+            
+            print(available_list[i])
             description_list[i]['topic_word'] = ' '.join(available_list[i].split('_'))
-            # print(description_list)
 
-
+    print('*'*50)
+    print(description_list)
     return description_list
