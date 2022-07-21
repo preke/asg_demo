@@ -6,6 +6,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
+
 import os
 import json
 import requests
@@ -14,6 +15,15 @@ import pandas as pd
 import numpy as np
 
 import traceback
+
+from demo.category_and_tsne import ref_category_desp
+from demo.ref_paper_desp import ref_desp
+import hashlib
+import pdb
+import re
+import pke
+import networkx as nx
+from collections import defaultdict
 
 DATA_PATH = 'static/data/'
 TXT_PATH = 'static/reftxtpapers/overall/'
@@ -47,6 +57,7 @@ Survey_n_clusters = {
     '3274658' : 2
 }
 
+
 Global_survey_id = ""
 Global_ref_list = []
 Global_category_description = []
@@ -56,6 +67,7 @@ Global_df_selected = ""
 
 from demo.taskDes import absGen, introGen,introGen_supervised, methodologyGen, conclusionGen
 from demo.category_and_tsne import clustering, get_cluster_description, clustering_with_criteria
+
 
 
 class reference_collection(object):
@@ -84,65 +96,283 @@ class reference_collection(object):
             matched_entries, matched_num = self.full_match_with_entries_in_pd(query_paper_titles)
         return matched_entries, matched_num
 
+
+def generate_uid():
+    uid_str=""
+    hash = hashlib.sha1()
+    hash.update(str(time.time()).encode('utf-8'))
+    uid_str= hash.hexdigest()[:10]
+    
+    return uid_str
+
 def index(request):
     return render(request, 'demo/index.html')
 
 
+class PosRank(pke.unsupervised.PositionRank):
+    def __init__(self):
+        """Redefining initializer for PositionRank."""
+        super(PosRank, self).__init__()
+        self.positions = defaultdict(float)
+        """Container the sums of word's inverse positions."""
+    def candidate_selection(self,grammar=None,maximum_word_number=3,minimum_word_number=2):
+        if grammar is None:
+            grammar = "NP:{<ADJ>*<NOUN|PROPN>+}"
+
+        # select sequence of adjectives and nouns
+        self.grammar_selection(grammar=grammar)
+
+        # filter candidates greater than 3 words
+        for k in list(self.candidates):
+            v = self.candidates[k]
+            #pdb.set_trace()
+            #if len(k) < 3:
+            #    del self.candidates[k]
+            if len(v.lexical_form) > maximum_word_number or len(v.lexical_form) < minimum_word_number:
+                #if len(v.lexical_form) < minimum_word_number:
+                #    pdb.set_trace()
+                del self.candidates[k]
+    
+def clean_str(input_str):
+    input_str = str(input_str).strip().lower()
+    if input_str == "none" or input_str == "nan" or len(input_str) == 0:
+        return ""
+    input_str = input_str.replace('\\n',' ').replace('\n',' ').replace('\r',' ').replace('——',' ').replace('——',' ').replace('__',' ').replace('__',' ').replace('........','.').replace('....','.').replace('....','.').replace('..','.').replace('..','.').replace('..','.').replace('. . . . . . . . ','. ').replace('. . . . ','. ').replace('. . . . ','. ').replace('. . ','. ').replace('. . ','. ')
+    input_str = re.sub(r'\\u[0-9a-z]{4}', ' ', input_str).replace('  ',' ').replace('  ',' ')
+    return input_str
+
+def PosRank_get_top5_ngrams(input_pd):
+
+    pos = {'NOUN', 'PROPN', 'ADJ'}
+    #extractor = pke.unsupervised.TextRank()
+    #extractor = pke.unsupervised.PositionRank()
+    extractor = PosRank()
+
+    #input_str=input_pd["abstract"][0].replace('-','')#.value()
+
+    #pdb.set_trace()
+    
+    #for (keyphrase, score) in extractor.get_n_best(n=5, stemming=True):#stemming=False
+    #    print(keyphrase, score)
+    abs_top5_unigram_list_list = []
+    abs_top5_bigram_list_list = []
+    abs_top5_trigram_list_list = []
+    intro_top5_unigram_list_list = []
+    intro_top5_bigram_list_list = []
+    intro_top5_trigram_list_list = []
+
+    for line_index,pd_row in input_pd.iterrows():
+        
+        input_str=pd_row["abstract"].replace('-','')
+        extractor.load_document(input=input_str,language='en',normalization=None)
+        #extractor.load_document(input=input_str,language="en",normalization='stemming')
+
+        #unigram
+        unigram_extractor=extractor
+        #unigram_extractor.candidate_weighting(window=1,pos=pos,top_percent=0.33)
+        unigram_extractor.candidate_selection(maximum_word_number=1,minimum_word_number=1)
+        unigram_extractor.candidate_weighting(window=6,pos=pos,normalized=False)
+        abs_top5_unigram_list = []
+        for (keyphrase, score) in unigram_extractor.get_n_best(n=5, stemming=True):
+            keyphrase = keyphrase.replace('-','')
+            if len(keyphrase)>2:
+                abs_top5_unigram_list.append(keyphrase)
+        #pdb.set_trace()
+        #bigram
+        bigram_extractor=extractor
+        #bigram_extractor.candidate_weighting(window=2,pos=pos,top_percent=0.33)
+        #abs_top5_bigram = extractor.get_n_best(n=5, stemming=True)#stemming=False
+        bigram_extractor.candidate_selection(maximum_word_number=2,minimum_word_number=2)
+        bigram_extractor.candidate_weighting(window=6,pos=pos,normalized=False)
+        abs_top5_bigram_list = []
+        for (keyphrase, score) in bigram_extractor.get_n_best(n=5, stemming=True):
+            keyphrase = keyphrase.replace('-','')
+            if len(keyphrase)>2:
+                abs_top5_bigram_list.append(keyphrase)
+        
+        #trigram
+        trigram_extractor=extractor
+        #trigram_extractor.candidate_weighting(window=3,pos=pos,top_percent=0.33)
+        trigram_extractor.candidate_selection(maximum_word_number=3,minimum_word_number=3)
+        trigram_extractor.candidate_weighting(window=6,pos=pos,normalized=False)
+        abs_top5_trigram_list = []
+        for (keyphrase, score) in trigram_extractor.get_n_best(n=5, stemming=True):
+            keyphrase = keyphrase.replace('-','')
+            if len(keyphrase)>2:
+                abs_top5_trigram_list.append(keyphrase)
+
+        '''
+        input_str=pd_row["intro"].replace('-','')
+        extractor.load_document(input=input_str,language='en',normalization=None)
+
+        #unigram
+        extractor.candidate_weighting(window=1,pos=pos,top_percent=0.33)
+        intro_top5_unigram_list = []
+        for (keyphrase, score) in extractor.get_n_best(n=5, stemming=True):
+            intro_top5_unigram_list.append(keyphrase)
+
+        #bigram
+        extractor.candidate_weighting(window=2,pos=pos,top_percent=0.33)
+        #intro_top5_bigram = extractor.get_n_best(n=5, stemming=True)#stemming=False
+        intro_top5_bigram_list = []
+        for (keyphrase, score) in extractor.get_n_best(n=5, stemming=True):
+            intro_top5_bigram_list.append(keyphrase)
+        
+        #trigram
+        extractor.candidate_weighting(window=3,pos=pos,top_percent=0.33)
+        intro_top5_trigram_list = []
+        for (keyphrase, score) in extractor.get_n_best(n=5, stemming=True):
+            intro_top5_trigram_list.append(keyphrase)
+        '''
+
+        abs_top5_unigram_list_list.append(abs_top5_unigram_list) 
+        abs_top5_bigram_list_list.append(abs_top5_bigram_list) 
+        abs_top5_trigram_list_list.append(abs_top5_trigram_list)
+        ''' 
+        intro_top5_unigram_list_list.append(intro_top5_unigram_list) 
+        intro_top5_bigram_list_list.append(intro_top5_bigram_list)
+        intro_top5_trigram_list_list.append(intro_top5_trigram_list)
+        '''
+    return abs_top5_unigram_list_list,abs_top5_bigram_list_list,abs_top5_trigram_list_list
+    
+
 @csrf_exempt
 def upload_refs(request):
-    import time
-    time.sleep(1)
-    topic = request.POST.get('topic')
-    files = request.POST.getlist('files[]')
-    global Global_survey_id
-    Global_survey_id = '001'
-    Survey_dict[Global_survey_id] = topic
-    Survey_Topic_dict[Global_survey_id] = [topic.lower()]
+    is_valid_submission = True
+    has_label_id = False
+    has_ref_link = False
 
-    Survey_n_clusters[Global_survey_id] = 2
+    file_dict = request.FILES
+    if len(list(file_dict.keys()))>0:
+        file_name = list(file_dict.keys())[0]
+        file_obj = file_dict[file_name]
+    else:
+        is_valid_submission = False
+    
+    if is_valid_submission == True:
+        ## get uid
+        global Global_survey_id
+        uid_str = generate_uid()
+        Global_survey_id = uid_str
 
-    input_folder_dir = DATA_PATH + 'merge.tsv'
-    input_tsv = pd.read_csv(input_folder_dir, sep='\t', header=0)
-    query_paper_titles = [i.split('.')[0] for i in files]
+
+        new_file_name = "upload_file_" + Global_survey_id
+        csvfile_name = new_file_name + '.'+ file_name.split('.')[-1]
+        with open(DATA_PATH + csvfile_name, 'wb+') as f:
+            for chunk in file_obj.chunks():
+                f.write(chunk)
+
+        input_pd = pd.read_csv(DATA_PATH + csvfile_name, sep = '\t')
+        #print(input_pd.keys())
+        #pdb.set_trace()
+
+        '''
+        input_required_col_names = ['reference paper title',
+           'reference paper citation information (can be collected from Google scholar/DBLP)',
+           'reference paper abstract (Please copy the text AND paste here)',
+           'reference paper introduction (Please copy the text AND paste here)',
+           ]
+        input_optional_col_names = ['reference paper doi link (optional)','reference paper category id (optional)']
+
+        output_optional_col_names = ["ref_title","ref_context","ref_entry","abstract","intro","ref_link","label","topic_word","topic_bigram","topic_trigram","description"]
+        '''
+        if input_pd.shape[0]>0:
+
+            ## change col name
+            try:
+                # required columns
+                input_pd["ref_title"] = input_pd["reference paper title"].apply(lambda x: clean_str(x) if len(str(x))>0 else '')
+                input_pd["ref_context"] = [""]*input_pd.shape[0]
+                input_pd["ref_entry"] = input_pd["reference paper citation information (can be collected from Google scholar/DBLP)"]
+                input_pd["abstract"] = input_pd["reference paper abstract (Please copy the text AND paste here)"].apply(lambda x: clean_str(x) if len(str(x))>0 else '')
+                input_pd["intro"] = input_pd["reference paper introduction (Please copy the text AND paste here)"].apply(lambda x: clean_str(x) if len(str(x))>0 else '')
+
+                # optional columns
+                input_pd["ref_link"] = input_pd["reference paper doi link (optional)"].apply(lambda x: x if len(str(x))>0 else '')
+                input_pd["label"] = input_pd["reference paper category id (optional)"].apply(lambda x: x if len(str(x))>0 else '')
+            except:
+                print("Cannot convert the column name")
+                is_valid_submission = False
+
+            ## get cluster_num, check has_label_id
+            stat_input_pd_labels = input_pd["label"].value_counts()
+            #pdb.set_trace()
+            if len(stat_input_pd_labels.keys())>1:
+                cluster_num = len(stat_input_pd_labels.keys())
+                has_label_id = True
+            else:
+                #pdb.set_trace()
+                cluster_num = 3 # as default
+
+            Survey_n_clusters[uid_str] = cluster_num
+
+            ## check has_ref_link
+            if len(input_pd["ref_link"].value_counts().keys())>1:
+                has_ref_link = True
+            
+            
+            ## get keywords
+            try:
+                #pdb.set_trace()
+                input_pd["topic_word"],input_pd["topic_bigram"],input_pd["topic_trigram"] = PosRank_get_top5_ngrams(input_pd)
+                #input_pd["topic_word"],input_pd["topic_bigram"],input_pd["topic_trigram"] = abs_top5_unigram_list_list, abs_top5_bigram_list_list, abs_top5_trigram_list_list
+
+                #Survey_Topic_dict[uid_str] = input_pd["topic_word"]
+            except:
+                print("Cannot select keywords")
+                is_valid_submission = False
+                #Survey_Topic_dict[uid_str] = []
+
+            ## generate reference description
+            try:
+                ref_desp_gen = ref_desp(input_pd)
+                description_list = ref_desp_gen.ref_desp_generator()
+                ref_desp_list=[]
+                for ref_desp_set in description_list:
+                    ref_desp_list.append(ref_desp_set[1])
+                #pdb.set_trace()
+                input_pd["description"]=ref_desp_list
+            except:
+                print("Cannot generate reference paper's description")
+                is_valid_submission = False
 
 
+            ## output tsv
+            try:
+                output_tsv_filename = DATA_PATH + new_file_name + '.tsv'
+                
+                output_df = input_pd[["ref_title","ref_context","ref_entry","abstract","intro","topic_word","topic_bigram","topic_trigram","description"]]
+                if has_label_id == True:
+                    output_df["label"]=input_pd["label"]
+                else:
+                    output_df["label"]=[""]*input_pd.shape[0]
+                if has_ref_link == True:
+                    output_df["ref_link"]=input_pd["ref_link"]
+                else:
+                    output_df["ref_link"]=[""]*input_pd.shape[0]
+            
+                #pdb.set_trace()
+                output_df.to_csv(output_tsv_filename, sep='\t')
+            except:
+                print("Cannot output tsv")
+                is_valid_submission = False
+            #Survey_dict[Global_survey_id] = topic
+            #Survey_Topic_dict[Global_survey_id] = [topic.lower()]
 
-    ref_set = reference_collection(input_tsv)
-    matched_entries_pd, matched_entries_num = ref_set.match_ref_paper(query_paper_titles, match_mode='full')
+        else:
+            # no record in submitted file
+            is_valid_submission = False
+    
 
-    # print(matched_entries_pd)
-    matched_entries_pd.to_csv(DATA_PATH + '001.tsv', sep='\t')
-
-    references, ref_links, ref_ids = get_refs(Global_survey_id)
-
-    ref_links = [TXT_PATH+i for i in files]
-
-    for i in ref_links:
-        print(i)
-
-    ref_list = {
-        'references': references,
-        'ref_links': ref_links,
-        'ref_ids': ref_ids
-    }
-
+    if is_valid_submission == True:
+        ref_list = {'references':output_df['ref_title'].tolist(),'ref_links':output_df['ref_link'].tolist(),'ref_ids':[i for i in range(output_df['ref_title'].shape[0])],'is_valid_submission':is_valid_submission,"uid":uid_str,"tsv_filename":output_tsv_filename}
+        #ref_list = {'references':output_df['ref_title'].tolist(),'ref_links':output_df['ref_link'].tolist(),'ref_ids':[i for i in range(output_df['ref_title'].shape[0])]}
+    else:
+        ref_list = {'references':[],'ref_links':[],'ref_ids':[],'is_valid_submission':is_valid_submission,"uid":uid_str,"tsv_filename":output_tsv_filename}
+        #ref_list = {'references':[],'ref_links':[],'ref_ids':[]}
     ref_list = json.dumps(ref_list)
+    #pdb.set_trace()
     return HttpResponse(ref_list)
-
-    # print(files)
-    # print(request.POST['files[]'])
-
-
-    # references, ref_links, ref_ids = get_refs(topic)
-    # global Global_survey_id
-    # Global_survey_id = topic
-    # ref_list = {
-    #     'references' : references,
-    #     'ref_links'  : ref_links,
-    #     'ref_ids'    : ref_ids
-    # }
-    # ref_list = json.dumps(ref_list)
-    # return HttpResponse(ref_list)
 
 
 @csrf_exempt
@@ -151,6 +381,7 @@ def get_topic(request):
     references, ref_links, ref_ids = get_refs(topic)
     global Global_survey_id
     Global_survey_id = topic
+    #pdb.set_trace()
     ref_list = {
         'references' : references,
         'ref_links'  : ref_links,
@@ -167,6 +398,8 @@ def automatic_taxonomy(request):
     query = ref_dict['taxonomy_standard'][0]
     global Global_ref_list
     Global_ref_list = ref_list
+
+    #pdb.set_trace()
 
     # colors, category_label, category_description =  Clustering_refs(n_clusters=Survey_n_clusters[Global_survey_id])
     colors, category_label, category_description = Clustering_refs_with_criteria(n_clusters=Survey_n_clusters[Global_survey_id], query=query)
@@ -200,8 +433,8 @@ def select_sections(request):
             abs, last_sent = absGen(Global_survey_id, Global_df_selected, Global_category_label)
             survey['abstract'] = [abs, last_sent]
         if k == "introduction":
-            intro = introGen_supervised(Global_survey_id, Global_df_selected, Global_category_label, Global_category_description, sections)
-            #intro = introGen(Global_survey_id, Global_df_selected, Global_category_label, Global_category_description, sections)
+            #intro = introGen_supervised(Global_survey_id, Global_df_selected, Global_category_label, Global_category_description, sections)
+            intro = introGen(Global_survey_id, Global_df_selected, Global_category_label, Global_category_description, sections)
             survey['introduction'] = intro
         if k == "methodology":
             proceeding, detailed_des = methodologyGen(Global_survey_id, Global_df_selected, Global_category_label,
@@ -296,8 +529,8 @@ def get_survey_text(refs=Global_ref_list):
         survey['Abstract'] = [abs, last_sent]
 
         ## Intro generation
-        intro = introGen_supervised(Global_survey_id, Global_df_selected, Global_category_label, Global_category_description)
-        #intro = introGen(Global_survey_id, Global_df_selected, Global_category_label, Global_category_description)
+        #intro = introGen_supervised(Global_survey_id, Global_df_selected, Global_category_label, Global_category_description)
+        intro = introGen(Global_survey_id, Global_df_selected, Global_category_label, Global_category_description)
         survey['Introduction'] = intro
 
         ## Methodology generation
@@ -367,6 +600,3 @@ def Clustering_refs_with_criteria(n_clusters, query):
                 category_description[i] = j['category_desp']
                 category_label[i] = j['topic_word'].replace('-', ' ').title()
     return colors, category_label, category_description
-
-
-
