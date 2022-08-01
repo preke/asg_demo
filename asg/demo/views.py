@@ -275,7 +275,7 @@ def upload_refs(request):
            'reference paper abstract (Please copy the text AND paste here)',
            'reference paper introduction (Please copy the text AND paste here)',
            ]
-        input_optional_col_names = ['reference paper doi link (optional)','reference paper category id (optional)']
+        input_optional_col_names = ['reference paper doi link (optional)','reference paper category label (optional)'] #'reference paper category id (optional)'
 
         output_optional_col_names = ["ref_title","ref_context","ref_entry","abstract","intro","ref_link","label","topic_word","topic_bigram","topic_trigram","description"]
         or
@@ -296,7 +296,8 @@ def upload_refs(request):
 
                 # optional columns
                 input_pd["ref_link"] = input_pd["reference paper doi link (optional)"].apply(lambda x: x if len(str(x))>0 else '')
-                input_pd["label"] = input_pd["reference paper category id (optional)"].apply(lambda x: str(x) if len(str(x))>0 else '')
+                input_pd["label"] = input_pd["reference paper category label (optional)"].apply(lambda x: str(x) if len(str(x))>0 else '')
+                #input_pd["label"] = input_pd["reference paper category id (optional)"].apply(lambda x: str(x) if len(str(x))>0 else '')
             except:
                 print("Cannot convert the column name")
                 is_valid_submission = False
