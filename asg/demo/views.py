@@ -255,7 +255,10 @@ def upload_refs(request):
         uid_str = generate_uid()
         Global_survey_id = uid_str
 
-
+        global Survey_dict
+        survey_title = file_name.split('.')[-1].title()
+        Survey_dict[uid_str] = survey_title
+        
         new_file_name = "upload_file_" + Global_survey_id
         csvfile_name = new_file_name + '.'+ file_name.split('.')[-1]
         with open(DATA_PATH + csvfile_name, 'wb+') as f:
@@ -276,6 +279,8 @@ def upload_refs(request):
 
         output_optional_col_names = ["ref_title","ref_context","ref_entry","abstract","intro","ref_link","label","topic_word","topic_bigram","topic_trigram","description"]
         '''
+        clusters_topic_words = []
+        
         if input_pd.shape[0]>0:
 
             ## change col name
@@ -289,7 +294,7 @@ def upload_refs(request):
 
                 # optional columns
                 input_pd["ref_link"] = input_pd["reference paper doi link (optional)"].apply(lambda x: x if len(str(x))>0 else '')
-                input_pd["label"] = input_pd["reference paper category id (optional)"].apply(lambda x: x if len(str(x))>0 else '')
+                input_pd["label"] = input_pd["reference paper category id (optional)"].apply(lambda x: str(x) if len(str(x))>0 else '')
             except:
                 print("Cannot convert the column name")
                 is_valid_submission = False
@@ -299,12 +304,15 @@ def upload_refs(request):
             #pdb.set_trace()
             if len(stat_input_pd_labels.keys())>1:
                 cluster_num = len(stat_input_pd_labels.keys())
+                clusters_topic_words = stat_input_pd_labels.keys()
                 has_label_id = True
             else:
                 #pdb.set_trace()
                 cluster_num = 3 # as default
-
+            global Survey_n_clusters
             Survey_n_clusters[uid_str] = cluster_num
+            global Survey_Topic_dict
+            Survey_Topic_dict[uid_str] = clusters_topic_words
 
             ## check has_ref_link
             if len(input_pd["ref_link"].value_counts().keys())>1:
@@ -365,10 +373,10 @@ def upload_refs(request):
     
 
     if is_valid_submission == True:
-        ref_list = {'references':output_df['ref_title'].tolist(),'ref_links':output_df['ref_link'].tolist(),'ref_ids':[i for i in range(output_df['ref_title'].shape[0])],'is_valid_submission':is_valid_submission,"uid":uid_str,"tsv_filename":output_tsv_filename}
+        ref_list = {'references':output_df['ref_title'].tolist(),'ref_links':output_df['ref_link'].tolist(),'ref_ids':[i for i in range(output_df['ref_title'].shape[0])],'is_valid_submission':is_valid_submission,"uid":uid_str,"tsv_filename":output_tsv_filename,'topic_words': clusters_topic_words}
         #ref_list = {'references':output_df['ref_title'].tolist(),'ref_links':output_df['ref_link'].tolist(),'ref_ids':[i for i in range(output_df['ref_title'].shape[0])]}
     else:
-        ref_list = {'references':[],'ref_links':[],'ref_ids':[],'is_valid_submission':is_valid_submission,"uid":uid_str,"tsv_filename":output_tsv_filename}
+        ref_list = {'references':[],'ref_links':[],'ref_ids':[],'is_valid_submission':is_valid_submission,"uid":uid_str,"tsv_filename":output_tsv_filename,'topic_words': []}
         #ref_list = {'references':[],'ref_links':[],'ref_ids':[]}
     ref_list = json.dumps(ref_list)
     #pdb.set_trace()
