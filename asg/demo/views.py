@@ -278,6 +278,8 @@ def upload_refs(request):
         input_optional_col_names = ['reference paper doi link (optional)','reference paper category id (optional)']
 
         output_optional_col_names = ["ref_title","ref_context","ref_entry","abstract","intro","ref_link","label","topic_word","topic_bigram","topic_trigram","description"]
+        or
+        output_optional_col_names = ["ref_title","ref_context","ref_entry","abstract","intro","ref_link","label","description"]
         '''
         clusters_topic_words = []
         
@@ -349,7 +351,9 @@ def upload_refs(request):
             try:
                 output_tsv_filename = DATA_PATH + new_file_name + '.tsv'
                 
+                #output_df = input_pd[["ref_title","ref_context","ref_entry","abstract","intro","description"]]
                 output_df = input_pd[["ref_title","ref_context","ref_entry","abstract","intro","topic_word","topic_bigram","topic_trigram","description"]]
+                
                 if has_label_id == True:
                     output_df["label"]=input_pd["label"]
                 else:
