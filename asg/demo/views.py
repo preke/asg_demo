@@ -265,7 +265,7 @@ def upload_refs(request):
             for chunk in file_obj.chunks():
                 f.write(chunk)
 
-        input_pd = pd.read_csv(DATA_PATH + csvfile_name, sep = '\t')
+        input_pd = pd.read_csv(DATA_PATH + csvfile_name, sep = ',') #sep = '\t'
         #print(input_pd.keys())
         #pdb.set_trace()
 
